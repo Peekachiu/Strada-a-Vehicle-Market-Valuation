@@ -1,0 +1,66 @@
+:root{
+  --bg:#f7fafc;
+  --surface:#ffffff;
+  --muted:#6b7280;
+  --accent:#0ea5a4;
+  --accent-2:#0369a1;
+  --radius:12px;
+  --container:1100px;
+  --shadow: 0 6px 18px rgba(16,24,40,0.08);
+  --ff-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:var(--ff-sans);
+  background:var(--bg);
+  color:#111827;
+}
+.container{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:0 1rem;
+}
+
+.site-header{
+  padding:1rem 0;
+  background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+  border-bottom:1px solid rgba(15,23,42,0.04);
+}
+.header-inner{ display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.brand{ font-weight:700; color:var(--accent-2); text-decoration:none; font-size:1.05rem; }
+
+/* Hero */
+.hero { padding:3rem 0; }
+.hero-inner{ display:flex; gap:2rem; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.hero-copy{ flex:1 1 320px; }
+.hero-copy h1{ font-size:2rem; margin:0 0 .5rem; }
+.lead{ color:var(--muted); margin-bottom:1rem; }
+.cta-row{ display:flex; gap:0.75rem; margin-top:1rem; }
+.btn{ border:0; padding:0.6rem 0.9rem; border-radius:10px; cursor:pointer; font-weight:600; }
+.btn-primary{ background:var(--accent); color:white; box-shadow: var(--shadow);}
+.btn-ghost{ background:transparent; color:var(--accent-2); border:1px solid rgba(3,105,161,0.08)}
+
+/* device placeholder */
+.device-mockup{ width:360px; height:220px; background:linear-gradient(180deg,#fff,#f1f5f9);
+  border-radius:12px; border:1px dashed rgba(15,23,42,0.06); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); }
+
+/* Form / Valuation */
+.form-card{ background:var(--surface); padding:1rem; border-radius:12px; box-shadow:var(--shadow); }
+.form-row{ display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1rem; }
+label{ display:block; font-size:0.9rem; color:var(--muted); }
+input,select,textarea{ width:100%; padding:0.6rem; border-radius:8px; border:1px solid rgba(15,23,42,0.06); margin-top:0.35rem; font-size:0.95rem; }
+
+/* Result */
+.result { margin-top:1rem; padding:1rem; border-radius:10px; background:#f8fffd; border:1px solid rgba(14,165,132,0.12); }
+
+/* Utilities */
+.mt-4{ margin-top:1rem; }
+.hidden{ display:none !important; }
+
+/* Responsive */
+@media (max-width:720px){
+  .hero-inner{ flex-direction:column-reverse; }
+  .device-mockup{ width:100%; height:200px; }
+}
