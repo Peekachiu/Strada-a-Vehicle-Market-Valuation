@@ -54,31 +54,31 @@ const router = {
 
 document.addEventListener('DOMContentLoaded', () => {
   // HEADER NAVBAR
+// ----- header injection (paste inside your DOMContentLoaded handler) -----
   const header = document.getElementById('site-header');
-  header.innerHTML = `
-    <div class="container navbar">
-      <div class="nav-left">
-        <a class="brand" href="#home">
-          <img src="/assets/icons/logo-car.svg" alt="Strada Logo" class="brand-icon" />
-          <span>Strada</span>
-        </a>
-      </div>
+  if (header) {
+    header.innerHTML = `
+      <div class="container navbar">
+        <div class="nav-left">
+          <a class="brand" href="#home">
+            <img src="/assets/icons/strada_logo.jpg" alt="Strada logo" class="brand-icon" />
+            <div class="brand-icon">🚗</div>
+            <span>Strada</span>
+          </a>
+        </div>
 
-      <nav class="nav-links">
-        <a href="#home" class="nav-item active">
-          <span class="icon">🏠</span> Home
-        </a>
-        <a href="#about" class="nav-item">
-          <span class="icon">ℹ️</span> About Us
-        </a>
-        <a href="#valuation" class="nav-item">
-          <span class="icon">💲</span> Get Car Price
-        </a>
-        <a href="#login" class="nav-item">Login</a>
-        <a href="#signup" class="btn btn-dark">Sign Up</a>
-      </nav>
-    </div>
-  `;
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#home" class="nav-item active"><span class="nav-icon">🏠</span> Home</a>
+          <a href="#about" class="nav-item"><span class="nav-icon">ℹ️</span> About Us</a>
+          <a href="#valuation" class="nav-item"><span class="nav-icon">💲</span> Get Car Price</a>
+          <a href="#login" class="nav-item">Login</a>
+          <a href="#signup" class="btn btn-dark">Sign Up</a>
+        </nav>
+      </div>
+    `;
+  } else {
+    console.warn('site-header element not found.');
+  }
 
   // Handle navigation clicks
   document.querySelectorAll('.nav-item, .brand').forEach(link => {
