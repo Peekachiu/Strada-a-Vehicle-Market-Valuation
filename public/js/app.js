@@ -54,15 +54,14 @@ const router = {
 
 document.addEventListener('DOMContentLoaded', () => {
   // HEADER NAVBAR
-// ----- header injection (paste inside your DOMContentLoaded handler) -----
   const header = document.getElementById('site-header');
   if (header) {
     header.innerHTML = `
       <div class="container navbar">
         <div class="nav-left">
           <a class="brand" href="#home">
-            <img src="/assets/icons/strada_logo.jpg" alt="Strada logo" class="brand-icon" />
-            <div class="brand-icon">🚗</div>
+            <img src="/assets/images/strada_logo.jpg" onerror="this.style.display='none'" alt="Strada logo" class="brand-icon" />
+            <div class="brand-icon-fallback" aria-hidden="true">🚗</div>
             <span>Strada</span>
           </a>
         </div>
