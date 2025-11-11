@@ -37,8 +37,8 @@ const router = {
       });
       valuationController.init();
       
-      // Set active nav
-      const homeNav = document.querySelector('[href="#home"]');
+      // Set active nav (updated to "Get Car Price")
+      const homeNav = document.querySelector('[href="#valuation"]');
       if (homeNav) homeNav.classList.add('active');
       
     } else if (this.currentPage === 'about') {
@@ -53,26 +53,27 @@ const router = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  // HEADER NAVBAR
+  // HEADER NAVBAR (Re-designed)
   const header = document.getElementById('site-header');
   if (header) {
     header.innerHTML = `
       <div class="container navbar">
         <div class="nav-left">
           <a class="brand" href="#home">
-            <img src="/assets/images/strada_logo.jpg" onerror="this.style.display='none'" alt="Strada logo" class="brand-icon" />
-            <div class="brand-icon-fallback" aria-hidden="true">🚗</div>
             <span>Strada</span>
           </a>
         </div>
 
         <nav class="nav-links" aria-label="Main navigation">
-          <a href="#home" class="nav-item active"><span class="nav-icon">🏠</span> Home</a>
-          <a href="#about" class="nav-item"><span class="nav-icon">ℹ️</span> About Us</a>
-          <a href="#valuation" class="nav-item"><span class="nav-icon">💲</span> Get Car Price</a>
+          <a href="#about" class="nav-item">About Us</a>
+          <a href="#valuation" class="nav-item">Get Car Price</a>
+          <a href="#features" class="nav-item">Features</a>
+        </nav>
+
+        <div class="nav-auth">
           <a href="#login" class="nav-item">Login</a>
           <a href="#signup" class="btn btn-dark">Sign Up</a>
-        </nav>
+        </div>
       </div>
     `;
   } else {
@@ -97,6 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const valuationEl = document.getElementById('valuation-root');
           if (valuationEl) {
             valuationEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+      } else if (href === '#features') { // Added handler for Features
+        e.preventDefault();
+        router.navigate('home');
+        setTimeout(() => {
+          const featuresEl = document.getElementById('why'); // Scrolls to 'Why Choose Strada?'
+          if (featuresEl) {
+            featuresEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }, 100);
       }
