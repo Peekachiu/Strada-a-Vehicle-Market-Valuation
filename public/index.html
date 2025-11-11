@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Strada — Valuation (MVC)</title>
+  <title>Strada</title>
   <link rel="icon" type="image/jpeg" href="/assets/images/strada_logo.jpg" />
   <link rel="stylesheet" href="/css/styles.css" />
+  <script src="/js/firebase-config.js"></script>
 
   <!-- Add Firebase SDKs -->
   <script type="module">
     // Load Firebase app and auth, grabbing config from the environment
     try {
-      const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+      const firebaseConfig = window.__firebase_config || {};
       if (firebaseConfig.apiKey) {
         await import("https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js");
         await import("https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js");
@@ -37,7 +38,7 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <!-- The 'id="year"' is critical for app.js -->
-      <p>&copy; <span id="year"></span> Strada — Built with MVC</p>
+      <p>&copy; <span id="year"></span> Strada — Your trusted Vehicle Valuation Tool</p>
     </div>
   </footer>
 
