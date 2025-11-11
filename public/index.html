@@ -3,21 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Strada</title>
-  <link rel="icon" type="image/jpeg" href="/assets/images/strada_logo.jpg">
+  <title>Strada — Valuation (MVC)</title>
+  <link rel="icon" type="image/jpeg" href="/assets/images/strada_logo.jpg" />
   <link rel="stylesheet" href="/css/styles.css" />
+
+  <!-- Add Firebase SDKs -->
+  <script type="module">
+    // Load Firebase app and auth, grabbing config from the environment
+    try {
+      const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+      if (firebaseConfig.apiKey) {
+        await import("https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js");
+        await import("https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js");
+        await import("https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js");
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase initialized");
+      } else {
+        console.warn("Firebase config not found. Auth will not work.");
+      }
+    } catch (e) {
+      console.error("Error initializing Firebase:", e);
+    }
+  </script>
 </head>
 <body>
+  <!-- This is where the navbar is injected by app.js -->
   <header id="site-header"></header>
 
+  <!-- This is where the page content is injected -->
   <main id="main-content"></main>
 
+  <!-- This is your footer -->
   <footer class="site-footer">
     <div class="container footer-inner">
+      <!-- The 'id="year"' is critical for app.js -->
       <p>&copy; <span id="year"></span> Strada — Built with MVC</p>
     </div>
   </footer>
 
+  <!-- This script fills the <main> tag -->
   <script type="module" src="/js/app.js"></script>
 </body>
 </html>
