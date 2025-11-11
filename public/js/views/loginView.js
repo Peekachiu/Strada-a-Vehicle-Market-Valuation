@@ -1,5 +1,3 @@
-// public/js/views/loginView.js
-
 export function renderLogin(container) {
   container.innerHTML = `
     <div class="auth-container-grid">
@@ -34,6 +32,9 @@ export function renderLogin(container) {
         <div class="auth-card">
           <h2 class="auth-title">Login to Your Account</h2>
           <p class="auth-sub">Enter your credentials to access your account</p>
+
+          <!-- Add error container -->
+          <div id="auth-error" class="auth-error"></div>
 
           <form id="login-form" class="auth-form">
             <div class="form-group">
@@ -72,7 +73,7 @@ export function renderLogin(container) {
             <hr class="auth-separator" />
 
             <p class="auth-footer">
-              Don't have an account? <a href="#signup" class="nav-item-link">Sign up for free</a>
+              Don't have an account? <a href="#signup" class="nav-item-link" data-navigate="signup">Sign up for free</a>
             </p>
           </form>
         </div>

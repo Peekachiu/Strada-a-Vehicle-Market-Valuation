@@ -1,60 +1,109 @@
 import { ValuationModel } from '../models/valuationModel.js';
-import { renderValuation, showResult } from '../views/valuationView.js';
+import { 
+  renderValuationForm, 
+  renderValuationPlaceholder, 
+  renderValuationResults,
+  renderTabContent 
+} from '../views/valuationView.js';
 
 export class ValuationController {
   constructor(rootEl, opts = {}) {
-    this.root = rootEl;
+    // This controller now expects the root of the *page*, not the form
+    this.pageRoot = rootEl; 
     this.apiBase = opts.apiBase || '/api/estimate';
     this.model = new ValuationModel(this.apiBase);
+    
+    this.currentValuationData = null; // To store the latest valuation
+    this.activeTab = 'trends'; // Default active tab
   }
 
   init() {
-    renderValuation(this.root);
-    this.form = this.root.querySelector('#valuation-form');
-    this.resultContainer = this.root.querySelector('#valuation-result');
+    // Find the containers rendered by the view
+    this.formContainer = this.pageRoot.querySelector('#valuation-form-container');
+    this.resultsContainer = this.pageRoot.querySelector('#valuation-results-container');
+    this.tabsContentContainer = this.pageRoot.querySelector('#valuation-tabs-content');
+    
+    // Render initial content
+    renderValuationForm(this.formContainer);
+    renderValuationPlaceholder(this.resultsContainer);
+    renderTabContent(this.tabsContentContainer, this.activeTab, null);
+
+    // Find the form *after* it's rendered
+    this.form = this.formContainer.querySelector('#valuation-form');
     this.bindEvents();
   }
 
   bindEvents() {
-    if (!this.form) return;
+    if (this.form) {
+      this.form.addEventListener('submit', (e) => this.onSubmit(e));
+    }
+    
+    // Bind tab clicks
+    this.pageRoot.querySelectorAll('.valuation-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => this.onTabClick(e));
+    });
+  }
+  
+  onTabClick(e) {
+    const newTabName = e.currentTarget.dataset.tab;
+    if (newTabName === this.activeTab) return; // Do nothing if already active
 
-    const resetBtn = this.root.querySelector('#btn-reset');
-    if (resetBtn) resetBtn.addEventListener('click', () => this.resetForm());
-
-    this.form.addEventListener('submit', (e) => this.onSubmit(e));
+    this.activeTab = newTabName;
+    
+    // Update active class on tabs
+    this.pageRoot.querySelectorAll('.valuation-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.tab === newTabName);
+    });
+    
+    // Render new tab content
+    renderTabContent(this.tabsContentContainer, this.activeTab, this.currentValuationData);
   }
 
   async onSubmit(e) {
     e.preventDefault();
-    const form = this.form;
-    const model = form.querySelector('#input-model').value.trim();
-    const year = form.querySelector('#input-year').value;
-    const mileage = form.querySelector('#input-mileage').value;
-    const condition = form.querySelector('#input-condition').value;
+    
+    // Get all new form values
+    const data = {
+      make: this.form.querySelector('#val-make').value,
+      model: this.form.querySelector('#val-model').value.trim(),
+      year: this.form.querySelector('#val-year').value,
+      mileage: this.form.querySelector('#val-mileage').value,
+      condition: this.form.querySelector('#val-condition').value,
+      transmission: this.form.querySelector('#val-transmission').value,
+      fuelType: this.form.querySelector('#val-fuel').value,
+    };
 
-    if (!model || !year || !mileage) {
-      alert('Please complete all fields.');
+    if (!data.model || !data.year || !data.mileage) {
+      console.warn('Please complete all fields.');
+      // In a real app, show a user-friendly error
       return;
     }
 
-    // show loading/placeholder
-    showResult(this.root, { estimate: '…', currency: '', explain: { status: 'calculating' } });
+    // Show a temporary loading state in the results box
+    renderValuationResults(this.resultsContainer, { 
+      marketValue: "...", 
+      lowRange: "...", 
+      highRange: "...", 
+      basePrice: "...",
+      factors: { condition: "...", mileage: "...", age: "...", demand: "..." },
+      vehicle: data 
+    });
 
     try {
-      const payload = { model, year: Number(year), mileage: Number(mileage), condition };
-      const result = await this.model.estimate(payload);
-      showResult(this.root, result);
-      // broadcast for other parts of the app
+      const result = await this.model.estimate(data);
+      this.currentValuationData = result; // Store the result
+      
+      // Render the full results card
+      renderValuationResults(this.resultsContainer, result);
+      
+      // Also update the active tab with the new data
+      renderTabContent(this.tabsContentContainer, this.activeTab, result);
+      
       document.dispatchEvent(new CustomEvent('valuation:completed', { detail: result }));
     } catch (err) {
       console.error(err);
-      showResult(this.root, null);
-      alert('Failed to get estimate. Check console for details.');
+      // If error, reset to placeholder
+      renderValuationPlaceholder(this.resultsContainer);
     }
-  }
-
-  resetForm() {
-    this.form.reset();
-    showResult(this.root, null);
   }
 }
