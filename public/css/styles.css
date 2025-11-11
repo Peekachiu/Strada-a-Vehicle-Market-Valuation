@@ -20,7 +20,7 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
-  padding-top: 4rem;
+  padding-top: 6rem;
 }
 
 .container {
@@ -30,7 +30,7 @@ body {
 }
 
 /* ==== NAVBAR HEADER ==== */
-.site-header {
+#site-header {
   position: fixed;
   top: 0;
   left: 0;
@@ -116,6 +116,13 @@ body {
   background: transparent;
   color: var(--text-primary);
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  /* Hide the new center nav links, but show the auth links */
+  .nav-links {
+    display: none;
+  }
 }
 
 /* signup button */
@@ -977,18 +984,297 @@ input:focus, select:focus {
   }
 }
 
-/* ==== NAVBAR UPDATES ==== */
-/* New style for the "active" nav item (bold, not background) */
-.nav-item.active {
-  background: transparent;
-  color: var(--text-primary);
-  font-weight: 600;
+/* ========================================
+   AUTH PAGE STYLES (Login / Sign Up)
+   ======================================== */
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  min-height: 80vh;
 }
 
-/* Responsive adjustment for new layout */
-@media (max-width: 768px) {
-  /* Hide the new center nav links, but show the auth links */
-  .nav-links {
-    display: none;
+.auth-card {
+  background: var(--surface);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid #f3f4f6;
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.auth-sub {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.9375rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-top: 0; /* Override default input margin */
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--dark-navy);
+  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+}
+
+.forgot-link-container {
+  text-align: right;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.forgot-link {
+  font-size: 0.875rem;
+  color: var(--dark-navy);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.btn-full {
+  width: 100%;
+  justify-content: center;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+  font-size: 1rem;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+.auth-footer .nav-item-link {
+  color: var(--dark-navy);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-footer .nav-item-link:hover {
+  text-decoration: underline;
+}
+
+/* ========================================
+   NEW AUTH PAGE STYLES (2-Column)
+   ======================================== */
+
+/* This is the main full-page container */
+.auth-container-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  min-height: 90vh; /* Use min-height to account for footer */
+  background: linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+}
+
+/* This is the 2-column grid */
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Default to 1 column */
+  gap: 3rem;
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Set up 2 columns on large screens */
+@media (min-width: 1024px) {
+  .auth-grid {
+    grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Left-Side Branding Column */
+.auth-branding {
+  display: none; /* Hide branding on mobile */
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* Show branding on large screens */
+@media (min-width: 1024px) {
+  .auth-branding {
+    display: flex;
+  }
+}
+
+.auth-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-car-icon {
+  width: 48px;
+  height: 48px;
+  padding: 10px;
+  background: var(--primary-blue);
+  color: white;
+  border-radius: 12px;
+}
+
+.auth-brand-name {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.auth-branding-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.auth-branding-sub {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.auth-features-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.auth-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.auth-check-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #dbeafe; /* Light blue */
+  color: var(--primary-blue);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+
+/* Right-Side Form Column */
+.auth-card {
+  max-width: 500px; /* Limit card width */
+  margin: 0 auto;   /* Center it */
+}
+
+.auth-form {
+  gap: 1.5rem; /* Increase gap between form elements */
+}
+
+/* Inputs with Icons */
+.input-with-icon {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none; /* Make icon unclickable */
+}
+
+.form-input.with-icon {
+  padding-left: 2.75rem; /* Make space for the icon */
+}
+
+/* Checkbox Row */
+.form-row-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-label-checkbox {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.form-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 0;
+  accent-color: var(--primary-blue);
+  cursor: pointer;
+}
+
+/* Button with Icon */
+.btn .icon-arrow {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover .icon-arrow {
+  transform: translateX(2px);
+}
+
+/* Separator */
+.auth-separator {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 0.5rem 0;
 }
