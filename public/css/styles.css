@@ -113,8 +113,9 @@ body {
 }
 
 .nav-item.active {
-  background: var(--dark-navy);
-  color: white;
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* signup button */
@@ -977,29 +978,6 @@ input:focus, select:focus {
 }
 
 /* ==== NAVBAR UPDATES ==== */
-
-/* Make brand text-only and bolder */
-.brand {
-  font-weight: 700;
-  font-size: 1.25rem;
-}
-
-/* Hide the old image and fallback icon */
-.brand-icon,
-.brand-icon-fallback {
-  display: none !important;
-}
-
-/* Hide the emoji icons in nav links */
-.nav-item .nav-icon {
-  display: none;
-}
-
-/* Main nav links in the center */
-.nav-links {
-  gap: 1.5rem; /* Give them more space */
-}
-
 /* New style for the "active" nav item (bold, not background) */
 .nav-item.active {
   background: transparent;
@@ -1007,22 +985,10 @@ input:focus, select:focus {
   font-weight: 600;
 }
 
-/* New container for auth buttons on the right */
-.nav-auth {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 /* Responsive adjustment for new layout */
 @media (max-width: 768px) {
   /* Hide the new center nav links, but show the auth links */
   .nav-links {
     display: none;
-  }
-  
-  /* This rule was hiding all nav links, now we just hide the main ones */
-  .nav-auth {
-    display: flex; /* Make sure auth links are visible */
   }
 }

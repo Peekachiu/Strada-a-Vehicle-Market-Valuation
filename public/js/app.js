@@ -7,13 +7,7 @@ import { ValuationController } from './controllers/valuationController.js';
 const router = {
   currentPage: 'home',
   
-  navigate(page) {
-    this.currentPage = page;
-    this.render();
-    window.scrollTo(0, 0);
-  },
-  
-  render() {
+render() {
     const main = document.getElementById('main-content');
     main.innerHTML = '';
     
@@ -37,8 +31,8 @@ const router = {
       });
       valuationController.init();
       
-      // Set active nav (updated to "Get Car Price")
-      const homeNav = document.querySelector('[href="#valuation"]');
+      // Set active nav (updated to "Home")
+      const homeNav = document.querySelector('[href="#home"]');
       if (homeNav) homeNav.classList.add('active');
       
     } else if (this.currentPage === 'about') {
@@ -60,20 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="container navbar">
         <div class="nav-left">
           <a class="brand" href="#home">
+            <img src="/assets/images/strada_logo.jpg" onerror="this.style.display='none'" alt="Strada logo" class="brand-icon" />
+            <div class="brand-icon-fallback" aria-hidden="true">🚗</div>
             <span>Strada</span>
           </a>
         </div>
 
         <nav class="nav-links" aria-label="Main navigation">
+          <a href="#home" class="nav-item">Home</a>
           <a href="#about" class="nav-item">About Us</a>
           <a href="#valuation" class="nav-item">Get Car Price</a>
-          <a href="#features" class="nav-item">Features</a>
-        </nav>
-
-        <div class="nav-auth">
           <a href="#login" class="nav-item">Login</a>
           <a href="#signup" class="btn btn-dark">Sign Up</a>
-        </div>
+        </nav>
       </div>
     `;
   } else {
@@ -100,16 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
             valuationEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }, 100);
-      } else if (href === '#features') { // Added handler for Features
-        e.preventDefault();
-        router.navigate('home');
-        setTimeout(() => {
-          const featuresEl = document.getElementById('why'); // Scrolls to 'Why Choose Strada?'
-          if (featuresEl) {
-            featuresEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 100);
       }
+      // No handler for #login or #signup, they are just links
     });
   });
 
