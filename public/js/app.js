@@ -1,7 +1,8 @@
 // public/js/app.js
 import { renderHero } from './views/heroView.js';
 import { renderAbout } from './views/aboutView.js';
-import { renderLogin } from './views/loginView.js'; // <-- 1. IMPORT
+import { renderLogin } from './views/loginView.js';
+import { renderSignUp } from './views/signupView.js'; // <-- 1. IMPORT
 import { ValuationController } from './controllers/valuationController.js';
 
 // Simple router
@@ -23,7 +24,7 @@ const router = {
     main.innerHTML = '';
     
     // Update active nav item
-    document.querySelectorAll('.nav-item').forEach(item => {
+    document.querySelectorAll('.nav-item, .btn-dark').forEach(item => {
       item.classList.remove('active');
     });
     
@@ -50,12 +51,19 @@ const router = {
       const aboutNav = document.querySelector('[href="#about"]');
       if (aboutNav) aboutNav.classList.add('active');
 
-    } else if (this.currentPage === 'login') { // <-- 2. ADD LOGIN RENDER
+    } else if (this.currentPage === 'login') {
       // Render login page
       renderLogin(main);
 
       const loginNav = document.querySelector('[href="#login"]');
       if (loginNav) loginNav.classList.add('active');
+
+    } else if (this.currentPage === 'signup') { // <-- 2. ADD SIGNUP RENDER
+      // Render signup page
+      renderSignUp(main);
+
+      const signupNav = document.querySelector('[href="#signup"]');
+      if (signupNav) signupNav.classList.add('active');
     }
   }
 };
@@ -101,14 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (href === '#about') {
       e.preventDefault();
       router.navigate('about');
-    } else if (href === '#login') { // <-- 3. ADD LOGIN CLICK HANDLER
+    } else if (href === '#login') {
       e.preventDefault();
       router.navigate('login');
-    } else if (href === '#signup' && target.classList.contains('nav-item-link')) {
-      // Handle the "Sign up" link on the login page
+    } else if (href === '#signup') { // <-- 3. ADD SIGNUP CLICK HANDLER
       e.preventDefault();
-      // We'll navigate to signup once it exists, for now, do nothing or log
-      console.log('Navigate to signup page (not implemented yet)');
+      router.navigate('signup');
     } else if (href === '#valuation') {
       e.preventDefault();
       router.navigate('home');
@@ -125,8 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash.slice(1);
   if (hash === 'about') {
     router.navigate('about');
-  } else if (hash === 'login') { // <-- 4. ADD LOGIN HASH CHECK
+  } else if (hash === 'login') {
     router.navigate('login');
+  } else if (hash === 'signup') { // <-- 4. ADD SIGNUP HASH CHECK
+    router.navigate('signup');
   } else {
     router.navigate('home');
   }
@@ -134,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle browser back/forward
   window.addEventListener('hashchange', () => {
     const page = window.location.hash.slice(1) || 'home';
-    if (page === 'about' || page === 'home' || page === 'login') { // <-- 5. ADD LOGIN TO HASHCHANGE
+    if (page === 'about' || page === 'home' || page === 'login' || page === 'signup') { // <-- 5. ADD SIGNUP TO HASHCHANGE
       router.navigate(page);
     }
   });

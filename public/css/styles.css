@@ -1278,3 +1278,30 @@ input:focus, select:focus {
   border-top: 1px solid #e5e7eb;
   margin: 0.5rem 0;
 }
+
+/* ========================================
+   SIGN UP PAGE STYLES (Terms)
+   ======================================== */
+
+.form-label-terms {
+  line-height: 1.6; /* Allows text to wrap nicely */
+  font-size: 0.875rem;
+}
+
+/* Style for inline links like 'Terms of Service' */
+.auth-link-inline {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-link-inline:hover {
+  text-decoration: underline;
+}
+
+/* Make the 'Sign Up' button active when on the signup page */
+.btn-dark.active {
+  background: #334155; /* Darker navy */
+  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.2);
+}
