@@ -1415,3 +1415,24 @@ input:focus, select:focus {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* ========================================
+   12. AUTH PAGE: HIDE HEADER
+   ======================================== */
+
+/* When on login/signup, hide the main header */
+body.auth-page #site-header {
+  display: none;
+}
+
+/* When on login/signup, remove the top padding */
+body.auth-page {
+  padding-top: 0;
+}
+
+/* When on login/signup, make the auth container fill the screen */
+body.auth-page .auth-container-grid {
+  min-height: 100vh;
+  padding-top: 0;
+  padding-bottom: 0;
+}
