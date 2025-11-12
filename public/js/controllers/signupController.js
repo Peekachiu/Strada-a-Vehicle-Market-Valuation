@@ -38,7 +38,7 @@ export class SignUpController {
     const password = this.main.querySelector('#signup-password').value;
     const phone = this.main.querySelector('#signup-phone').value; 
 
-    console.log('Sending to backend:', { username, email, password, phone });
+    console.log('Sending to backend:', { fullName, email, password, phone });
 
     try {
       // 2. Send the fetch request
