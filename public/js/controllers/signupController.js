@@ -36,6 +36,7 @@ export class SignUpController {
     const username = this.main.querySelector('#signup-name').value;
     const email = this.main.querySelector('#signup-email').value;
     const password = this.main.querySelector('#signup-password').value;
+    const phone = this.main.querySelector('#signup-phone').value;
 
     try {
       // Send the fetch request to the Django API
@@ -48,7 +49,8 @@ export class SignUpController {
         body: JSON.stringify({ 
           username: username, 
           email: email, 
-          password: password 
+          password: password,
+          phone_number_write: phone
         }),
       });
 
