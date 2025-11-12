@@ -6,6 +6,8 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from .serializers import UserSerializer, MyTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 # --- User Sign Up View ---
 class SignUpView(generics.CreateAPIView):
@@ -39,3 +41,8 @@ class EstimateView(APIView):
             "year": 2020
         }
         return Response(mock_estimate)
+
+# --- Custom Login View ---
+# This view tells Django to use our new custom serializer
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

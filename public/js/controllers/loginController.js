@@ -18,7 +18,7 @@ export class LoginController {
   async handleLogin(event) {
     event.preventDefault();
 
-    const username = this.main.querySelector('#login-username').value;
+    const username = this.main.querySelector('#login-email').value;
     const password = this.main.querySelector('#login-password').value;
 
     try {

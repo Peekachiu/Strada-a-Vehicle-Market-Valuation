@@ -1,47 +1,68 @@
 export class SignUpController {
-  constructor(main, router) {
+  /**
+   * Initializes the controller.
+   * @param {HTMLElement} main The <main> element to render content into.
+   * @param {object} router The main application router.
+   * @param {object} appState The global application state.
+   * @param {function} renderHeader The function to re-render the header.
+   */
+  constructor(main, router, appState, renderHeader) {
     this.main = main;    // The <main> element
     this.router = router;  // The app.js router
-    this.form = this.main.querySelector('#signup-form'); // Find the form inside <main>
+    
+    // (We don't use appState or renderHeader here, but we accept them)
 
-    // Bind 'this' to our handler
+    // Find the form *inside* the <main> element
+    this.form = this.main.querySelector('#signup-form'); 
+
+    // Bind 'this' to our handler so it works in the event listener
     this.handleSignUp = this.handleSignUp.bind(this);
 
-    // Attach the listener
+    // Attach the event listener
     if (this.form) {
       this.form.addEventListener('submit', this.handleSignUp);
     } else {
-      console.error('Signup form not found');
+      console.error('Signup form not found. Check your view or form ID.');
     }
   }
 
+  /**
+   * Handles the signup form submission.
+   */
   async handleSignUp(event) {
-    event.preventDefault();
+    event.preventDefault(); // Stop the form from submitting normally
 
-    const username = this.main.querySelector('#signup-username').value;
+    // Get data from the form
+    const username = this.main.querySelector('#signup-name').value;
     const email = this.main.querySelector('#signup-email').value;
     const password = this.main.querySelector('#signup-password').value;
 
     try {
+      // Send the fetch request to the Django API
       const response = await fetch('/api/signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': this.getCookie('csrftoken'),
+          'X-CSRFToken': this.getCookie('csrftoken'), // Django security token
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ 
+          username: username, 
+          email: email, 
+          password: password 
+        }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok) { // Status 201 Created
         console.log('Sign up successful:', data);
         alert('Sign up successful! Please log in.');
         
-        // Use the router to navigate to the login page
+        // Use the router (from app.js) to navigate to the login page
         this.router.navigate('login');
         
       } else {
+        // Handle validation errors from the server
         console.error('Sign up failed:', data);
         let errorMessage = 'Sign up failed. ';
         if (data.username) errorMessage += `Username: ${data.username[0]} `;
@@ -49,18 +70,22 @@ export class SignUpController {
         alert(errorMessage);
       }
     } catch (error) {
+      // Handle network or other errors
       console.error('Network error:', error);
-      alert('An error occurred. Please try again.');
+      alert('A network error occurred. Please try again.');
     }
   }
 
-  // Helper function to get the CSRF cookie
+  /**
+   * Helper function to get Django's CSRF cookie.
+   */
   getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
       const cookies = document.cookie.split(';');
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
         if (cookie.substring(0, name.length + 1) === (name + '=')) {
           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           break;
