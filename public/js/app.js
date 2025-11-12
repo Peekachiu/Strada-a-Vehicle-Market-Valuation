@@ -75,17 +75,40 @@ function renderHeader(user) {
   const userInitial = userName.charAt(0).toUpperCase();
   
   if (loggedIn && user) {
-    // Render logged-in navbar (Same as your old code)
+    // Render logged-in navbar
     header.innerHTML = `
       <div class="container navbar">
         <a class="brand" href="#home" data-navigate="home">
-          <div class="brand-icon-box">...</div> <span class="brand-text">Strada</span>
+          <div class="brand-icon-box">
+            <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9L1.4 16.1c-.5 1.1.3 2.4 1.6 2.4H4c.6 0 1-.4 1-1v-1c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v1c0 .6.4 1 1 1h2c1.1 0 2.1-.8 2.1-1.9 0-.8-.5-1.5-1.2-1.8z"/>
+              <circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
+          </div>
+          <span class="brand-text">Strada</span>
         </a>
+        
         <nav class="nav-links" aria-label="Main navigation">
-          <a href="#home" class="nav-item" data-navigate="home">...<span>Home</span></a>
-          <a href="#about" class="nav-item" data-navigate="about">...<span>About Us</span></a>
-          <a href="#valuation" class="nav-item" data-navigate="valuation">...<span>Get Car Price</span></a>
+          <a href="#home" class="nav-item" data-navigate="home">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Home</span>
+          </a>
+          <a href="#about" class="nav-item" data-navigate="about">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+            </svg>
+            <span>About Us</span>
+          </a>
+          <a href="#valuation" class="nav-item" data-navigate="valuation">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span>Get Car Price</span>
+          </a>
         </nav>
+
         <div class="nav-auth user-menu">
           <button class="avatar-button" id="user-menu-btn" aria-label="User menu">
             <div class="avatar-fallback">${userInitial}</div>
@@ -96,20 +119,37 @@ function renderHeader(user) {
               <p class="dropdown-user-email">Manage your account</p>
             </div>
             <div class="dropdown-separator"></div>
-            <a href="#profile" class="dropdown-item" data-navigate="profile">...<span>Profile</span></a>
+            <a href="#profile" class="dropdown-item" data-navigate="profile">
+              <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>Profile</span>
+            </a>
             <div class="dropdown-separator"></div>
-            <a href="#" class="dropdown-item" id="logout-btn">...<span>Log out</span></a>
+            <a href="#" class="dropdown-item" id="logout-btn">
+              <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span>Log out</span>
+            </a>
           </div>
         </div>
       </div>
     `;
   } else {
-    // Render guest navbar (Same as your old code)
+    // Render guest navbar
     header.innerHTML = `
       <div class="container navbar">
         <a class="brand" href="#login" data-navigate="login">
-          <div class="brand-icon-box">...</div> <span class="brand-text">Strada</span>
+          <div class="brand-icon-box">
+            <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9L1.4 16.1c-.5 1.1.3 2.4 1.6 2.4H4c.6 0 1-.4 1-1v-1c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v1c0 .6.4 1 1 1h2c1.1 0 2.1-.8 2.1-1.9 0-.8-.5-1.5-1.2-1.8z"/>
+              <circle cx="6.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
+          </div>
+          <span class="brand-text">Strada</span>
         </a>
+        
         <nav class="nav-links nav-links-guest" aria-label="Main navigation">
           <a href="#login" class="nav-item" data-navigate="login">Login</a>
           <a href="#signup" class="btn btn-dark" data-navigate="signup">Sign Up</a>
