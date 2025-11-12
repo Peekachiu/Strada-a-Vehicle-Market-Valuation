@@ -46,3 +46,15 @@ class EstimateView(APIView):
 # This view tells Django to use our new custom serializer
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+# --- Get User Info View ---
+class GetUserView(APIView):
+    """
+    API view to get the current logged-in user's details.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # 'request.user' is automatically found from the token
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

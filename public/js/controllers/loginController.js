@@ -18,7 +18,8 @@ export class LoginController {
   async handleLogin(event) {
     event.preventDefault();
 
-    const username = this.main.querySelector('#login-email').value;
+    // 1. Get EMAIL from the form
+    const email = this.main.querySelector('#login-email').value;
     const password = this.main.querySelector('#login-password').value;
 
     try {
@@ -28,7 +29,8 @@ export class LoginController {
           'Content-Type': 'application/json',
           'X-CSRFToken': this.getCookie('csrftoken'),
         },
-        body: JSON.stringify({ username, password }),
+        // 2. Send the EMAIL as the 'username' (which our backend expects)
+        body: JSON.stringify({ username: email, password }),
       });
 
       const data = await response.json();
@@ -36,21 +38,24 @@ export class LoginController {
       if (response.ok) {
         console.log('Login successful');
 
-        // 1. Save tokens to localStorage
+        // 3. Save tokens to localStorage
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
 
-        // 2. Update the global appState
-        // We'll create a simple user object for now
+        // 4. --- THIS IS THE FIX ---
+        // Decode the token to get the user's REAL username
+        const tokenPayload = this.decodeToken(data.access);
+        const realUsername = tokenPayload.username; // This will be "Zanne"
+
+        // 5. Update the global appState with the REAL username
         this.appState.currentUser = {
-          displayName: username,
-          // We'll get more details later from a /api/user/me/ endpoint
+          displayName: realUsername, 
         };
 
-        // 3. Re-render the header as a logged-in user
+        // 6. Re-render the header as a logged-in user
         this.renderHeader(this.appState.currentUser);
 
-        // 4. Navigate to the homepage
+        // 7. Navigate to the homepage
         this.router.navigate('home');
         
       } else {
@@ -63,7 +68,20 @@ export class LoginController {
     }
   }
 
-  // Helper function (also needed for this controller)
+  // Helper function to decode the JWT payload
+  decodeToken(token) {
+    try {
+      // The token is in three parts: header.payload.signature
+      // The payload (the middle part) is Base64-encoded JSON
+      const payload = atob(token.split('.')[1]);
+      return JSON.parse(payload);
+    } catch (e) {
+      console.error('Failed to decode token:', e);
+      return null;
+    }
+  }
+
+  // Helper function to get Django's CSRF cookie
   getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
