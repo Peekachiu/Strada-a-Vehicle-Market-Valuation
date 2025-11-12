@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # 3rd Party Apps
     'rest_framework',
+    'rest_framework_simplejwt',
 
     # Local Apps
     'api',
@@ -141,3 +142,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --- JWT Configuration ---
+# (Add this at the bottom of your settings.py file)
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
