@@ -4,37 +4,56 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from .models import Profile
 
+# ... (all your other imports) ...
+
+# --- User Serializer (Now handles Full Name) ---
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[validators.UniqueValidator(queryset=User.objects.all())]
     )
-
-    # This field is for GET requests (like /api/me/)
-    # It reads the phone_number from the related Profile object.
     phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
     
-    # This field is for POST requests (like /api/signup/)
-    # It's write-only, not required, and we'll handle it in create()
+    # --- NEW FIELDS ---
+    # We will accept 'full_name' when writing (signup)
+    full_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    # We will return 'first_name' and 'last_name' when reading (api/me/)
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    # ---
+    
     phone_number_write = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'phone_number', 'phone_number_write')
+        fields = (
+            'id', 'username', 'email', 'password', 
+            'phone_number', 'phone_number_write',
+            'full_name', 'first_name', 'last_name' # Add all fields
+        )
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            # We don't need 'username' for input, but we'll read it
+            'username': {'read_only': True}, 
         }
 
     def create(self, validated_data):
-        # Pop our custom phone number field out of the data
-        phone_data = validated_data.pop('phone_number_write', '') # Defaults to empty string
+        phone_data = validated_data.pop('phone_number_write', '')
+        full_name = validated_data.pop('full_name', '')
         
-        # Create the user first
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
-        )
+        # Split the full name into first and last
+        first_name = full_name.split(' ')[0]
+        last_name = ' '.join(full_name.split(' ')[1:])
 
+        # Create the user, using the email as the username
+        user = User.objects.create_user(
+            username=validated_data['email'], # Use email as username
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=first_name, # Save the parsed name
+            last_name=last_name    # Save the parsed name
+        )
+        
+        # Create the profile
         Profile.objects.create(
             user=user,
             phone_number=phone_data
@@ -50,7 +69,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # This method is called after validation to create the token
         token = super().get_token(user)
         # --- Add custom claims ---
-        token['username'] = user.username
+        token['username'] = user.get_full_name() 
         token['email'] = user.email
         # ---
         return token

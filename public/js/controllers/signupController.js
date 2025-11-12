@@ -30,41 +30,42 @@ export class SignUpController {
    * Handles the signup form submission.
    */
   async handleSignUp(event) {
-    event.preventDefault(); // Stop the form from submitting normally
+    event.preventDefault(); 
 
-    // Get data from the form
-    const username = this.main.querySelector('#signup-name').value;
+    // 1. Get ALL data from the form
+    const fullName = this.main.querySelector('#signup-name').value;
     const email = this.main.querySelector('#signup-email').value;
     const password = this.main.querySelector('#signup-password').value;
-    const phone = this.main.querySelector('#signup-phone').value;
+    const phone = this.main.querySelector('#signup-phone').value; 
+
+    console.log('Sending to backend:', { username, email, password, phone });
 
     try {
-      // Send the fetch request to the Django API
+      // 2. Send the fetch request
       const response = await fetch('/api/signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': this.getCookie('csrftoken'), // Django security token
+          'X-CSRFToken': this.getCookie('csrftoken'),
         },
+        // --- THIS IS THE CHANGE ---
+        // We now send 'email' as the username
+        // and send 'full_name' as a new field.
         body: JSON.stringify({ 
-          username: username, 
           email: email, 
           password: password,
-          phone_number_write: phone
+          phone_number_write: phone,
+          full_name: fullName // Send the full name
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok) { // Status 201 Created
+      if (response.ok) {
         console.log('Sign up successful:', data);
         alert('Sign up successful! Please log in.');
-        
-        // Use the router (from app.js) to navigate to the login page
         this.router.navigate('login');
-        
       } else {
-        // Handle validation errors from the server
         console.error('Sign up failed:', data);
         let errorMessage = 'Sign up failed. ';
         if (data.username) errorMessage += `Username: ${data.username[0]} `;
@@ -72,7 +73,6 @@ export class SignUpController {
         alert(errorMessage);
       }
     } catch (error) {
-      // Handle network or other errors
       console.error('Network error:', error);
       alert('A network error occurred. Please try again.');
     }

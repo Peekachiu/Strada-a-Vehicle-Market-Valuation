@@ -56,9 +56,9 @@ export async function renderProfile(container) {
   }
 
   // 4. Set the data variables from the fetched user
-  const userName = user.username;
+  const userName = (user.first_name + ' ' + user.last_name).trim(); 
   const userEmail = user.email;
-  const userPhone = user.phone_number || '';
+  const userPhone = user.phone_number || ''; 
   const userInitial = userName.charAt(0).toUpperCase();
 
   // 5. Dummy valuation data (we will make this real later)
