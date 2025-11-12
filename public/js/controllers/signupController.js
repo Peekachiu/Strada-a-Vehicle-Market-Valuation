@@ -1,67 +1,72 @@
-// import { signUp } from '../auth.js'; // <-- REMOVED
-
 export class SignUpController {
-  constructor(container, router, appState, renderHeader) {
-    this.container = container;
-    this.router = router;
-    this.appState = appState; // <-- ADDED
-    this.renderHeader = renderHeader; // <-- ADDED
-    
-    this.form = container.querySelector('#signup-form');
-    this.errorContainer = container.querySelector('#auth-error');
-    
+  constructor(main, router) {
+    this.main = main;    // The <main> element
+    this.router = router;  // The app.js router
+    this.form = this.main.querySelector('#signup-form'); // Find the form inside <main>
+
+    // Bind 'this' to our handler
+    this.handleSignUp = this.handleSignUp.bind(this);
+
+    // Attach the listener
     if (this.form) {
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.form.addEventListener('submit', this.handleSignUp);
     } else {
-      console.error('Signup form #signup-form not found. Check view for typos.');
+      console.error('Signup form not found');
     }
   }
-  
-  async handleSubmit(e) {
-    e.preventDefault();
-    this.showError(""); // Clear old errors
-    
-    const name = this.form.querySelector('#signup-name').value;
-    const email = this.form.querySelector('#signup-email').value;
-    const password = this.form.querySelector('#signup-password').value;
-    const confirmPassword = this.form.querySelector('#signup-confirm-password').value;
 
-    if (password !== confirmPassword) {
-      this.showError("Passwords do not match.");
-      return;
-    }
-    
-    // --- Dummy Signup Logic ---
+  async handleSignUp(event) {
+    event.preventDefault();
+
+    const username = this.main.querySelector('#signup-username').value;
+    const email = this.main.querySelector('#signup-email').value;
+    const password = this.main.querySelector('#signup-password').value;
+
     try {
-      if (!name || !email || !password) {
-        throw new Error("Please fill out all fields.");
-      }
-      
-      // In dummy mode, signup is just like login.
-      console.log("Dummy signup successful:", name, email);
+      const response = await fetch('/api/signup/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': this.getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-      // 1. Set the fake user in the global state
-      this.appState.currentUser = { 
-        displayName: name, 
-        email: email 
-      };
-      
-      // 2. Manually re-render the header to show the logged-in state
-      this.renderHeader(this.appState.currentUser);
-      
-      // 3. Navigate to the home page
-      this.router.navigate('home');
-      
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Sign up successful:', data);
+        alert('Sign up successful! Please log in.');
+        
+        // Use the router to navigate to the login page
+        this.router.navigate('login');
+        
+      } else {
+        console.error('Sign up failed:', data);
+        let errorMessage = 'Sign up failed. ';
+        if (data.username) errorMessage += `Username: ${data.username[0]} `;
+        if (data.email) errorMessage += `Email: ${data.email[0]} `;
+        alert(errorMessage);
+      }
     } catch (error) {
-      console.error("Sign up failed:", error.message);
-      this.showError(error.message);
+      console.error('Network error:', error);
+      alert('An error occurred. Please try again.');
     }
   }
-  
-  showError(message) {
-    if (this.errorContainer) {
-      this.errorContainer.textContent = message;
-      this.errorContainer.style.display = message ? 'block' : 'none';
+
+  // Helper function to get the CSRF cookie
+  getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
     }
+    return cookieValue;
   }
 }

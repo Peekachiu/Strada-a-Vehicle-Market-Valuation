@@ -1,63 +1,81 @@
-// We remove the Firebase 'login' import
-// import { login } from '../auth.js'; 
-
 export class LoginController {
-  constructor(container, router, appState, renderHeader) {
-    this.container = container;
+  constructor(main, router, appState, renderHeader) {
+    this.main = main;
     this.router = router;
-    this.appState = appState; // <-- ADDED
-    this.renderHeader = renderHeader; // <-- ADDED
+    this.appState = appState;
+    this.renderHeader = renderHeader; // Function to re-render the header
+    this.form = this.main.querySelector('#login-form');
 
-    this.form = container.querySelector('#login-form');
-    this.errorContainer = container.querySelector('#auth-error');
-    
-    // ** IMPORTANT **
-    // This assumes you have fixed the 'login-formmmm' typo in loginView.js
-    // If not, this line will still fail
+    this.handleLogin = this.handleLogin.bind(this);
+
     if (this.form) {
-      this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+      this.form.addEventListener('submit', this.handleLogin);
     } else {
-      console.error('Login form #login-form not found. Check view for typos.');
+      console.error('Login form not found');
     }
   }
-  
-  async handleSubmit(e) {
-    e.preventDefault();
-    this.showError(""); // Clear old errors
-    
-    const email = this.form.querySelector('#login-email').value;
-    const password = this.form.querySelector('#login-password').value;
-    
-    // --- Dummy Credentials ---
-    const DUMMY_EMAIL = 'test@test.com';
-    const DUMMY_PASS = 'test';
 
-    if (email === DUMMY_EMAIL && password === DUMMY_PASS) {
-      // --- Manually simulate login ---
+  async handleLogin(event) {
+    event.preventDefault();
 
-      // 1. Set the fake user in the global state
-      this.appState.currentUser = { 
-        displayName: 'Test User', 
-        email: DUMMY_EMAIL 
-      };
-      
-      // 2. Manually re-render the header to show the logged-in state
-      this.renderHeader(this.appState.currentUser);
-      
-      // 3. Navigate to the home page
-      this.router.navigate('home');
+    const username = this.main.querySelector('#login-username').value;
+    const password = this.main.querySelector('#login-password').value;
 
-    } else {
-      // --- Show error for wrong credentials ---
-      console.error("Login failed: Invalid dummy credentials");
-      this.showError("Invalid credentials. Use test@test.com and 'test'");
+    try {
+      const response = await fetch('/api/token/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': this.getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Login successful');
+
+        // 1. Save tokens to localStorage
+        localStorage.setItem('accessToken', data.access);
+        localStorage.setItem('refreshToken', data.refresh);
+
+        // 2. Update the global appState
+        // We'll create a simple user object for now
+        this.appState.currentUser = {
+          displayName: username,
+          // We'll get more details later from a /api/user/me/ endpoint
+        };
+
+        // 3. Re-render the header as a logged-in user
+        this.renderHeader(this.appState.currentUser);
+
+        // 4. Navigate to the homepage
+        this.router.navigate('home');
+        
+      } else {
+        console.error('Login failed:', data);
+        alert(data.detail || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      alert('An error occurred. Please try again.');
     }
   }
-  
-  showError(message) {
-    if (this.errorContainer) {
-      this.errorContainer.textContent = message;
-      this.errorContainer.style.display = message ? 'block' : 'none';
+
+  // Helper function (also needed for this controller)
+  getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
     }
+    return cookieValue;
   }
 }
