@@ -7,6 +7,7 @@ export class LoginController {
     this.form = this.main.querySelector('#login-form');
 
     this.handleLogin = this.handleLogin.bind(this);
+    this.showMessage = this.showMessage.bind(this); // <-- NEW: Bind the new helper
 
     if (this.form) {
       this.form.addEventListener('submit', this.handleLogin);
@@ -15,8 +16,30 @@ export class LoginController {
     }
   }
 
+  // <-- NEW: This is the new helper function -->
+  /**
+   * Displays a success or error message in the login form.
+   */
+  showMessage(message, isError = false) {
+    const container = this.main.querySelector('#login-message-container');
+    if (!container) return; // Do nothing if the container isn't there
+    
+    // Set to empty string to clear the message
+    if (!message) {
+      container.innerHTML = '';
+      return;
+    }
+    
+    const messageType = isError ? 'error' : 'success';
+    container.innerHTML = `<div class="auth-message ${messageType}">${message}</div>`;
+  }
+
+
   async handleLogin(event) {
     event.preventDefault();
+
+    // <-- NEW: Clear any previous messages -->
+    this.showMessage(''); 
 
     // 1. Get EMAIL from the form
     const email = this.main.querySelector('#login-email').value;
@@ -38,14 +61,16 @@ export class LoginController {
       if (response.ok) {
         console.log('Login successful');
 
+        // <-- NEW: Show success message -->
+        this.showMessage('Login successful! Redirecting...', false);
+
         // 3. Save tokens to localStorage
         localStorage.setItem('accessToken', data.access);
         localStorage.setItem('refreshToken', data.refresh);
 
-        // 4. --- THIS IS THE FIX ---
-        // Decode the token to get the user's REAL username
+        // 4. Decode token and update appState
         const tokenPayload = this.decodeToken(data.access);
-        const realUsername = tokenPayload.username; // This will be "Zanne"
+        const realUsername = tokenPayload.username || 'User'; // <-- CHANGED: Added fallback
 
         // 5. Update the global appState with the REAL username
         this.appState.currentUser = {
@@ -55,16 +80,20 @@ export class LoginController {
         // 6. Re-render the header as a logged-in user
         this.renderHeader(this.appState.currentUser);
 
-        // 7. Navigate to the homepage
-        this.router.navigate('home');
+        // <-- NEW: Navigate to the homepage *after* a delay -->
+        setTimeout(() => {
+          this.router.navigate('home');
+        }, 1500); // 1.5-second delay
         
       } else {
         console.error('Login failed:', data);
-        alert(data.detail || 'Login failed. Please check your credentials.');
+        // <-- CHANGED: Show error message (no alert) -->
+        this.showMessage(data.detail || 'Login failed. Please check your credentials.', true);
       }
     } catch (error) {
       console.error('Network error:', error);
-      alert('An error occurred. Please try again.');
+      // <-- CHANGED: Show error message (no alert) -->
+      this.showMessage('An error occurred. Please try again.', true);
     }
   }
 
