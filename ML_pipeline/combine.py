@@ -4,7 +4,7 @@ import os
 # --- THIS IS THE CHANGE ---
 # Define the relative path to go "up one level" to the root,
 # then "down into" the datasets folder.
-DATA_FOLDER = '../datasets/'
+DATA_FOLDER = 'datasets/'
 OUTPUT_FILE = os.path.join(DATA_FOLDER, 'malaysia_master_dataset.csv')
 # ---
 
