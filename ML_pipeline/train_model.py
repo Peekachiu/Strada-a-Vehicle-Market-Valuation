@@ -54,15 +54,13 @@ preprocessor = ColumnTransformer(
 print("Preprocessing pipelines created.")
 
 # --- 6. Define the Model Pipeline ---
-# This is the same as before
 pipeline = Pipeline(steps=[
     ('preprocessor', preprocessor),
     ('regressor', RandomForestRegressor(random_state=42, n_jobs=-1))
 ])
 
 # --- 7. NEW: Define the Hyperparameter Grid ---
-# These are the "knobs" we want to test.
-# We're testing 3 (n_estimators) x 2 (max_depth) = 6 combinations
+# Testing 3 (n_estimators) x 2 (max_depth) = 6 combinations
 param_grid = {
     'regressor__n_estimators': [100, 200, 300],  # How many "trees" to build
     'regressor__max_depth': [None, 10]          # How "deep" each tree can be (None = as deep as possible)
@@ -77,8 +75,8 @@ grid_search = GridSearchCV(
     param_grid, 
     cv=3, 
     n_jobs=-1, 
-    scoring='r2', # We want to optimize for the R-squared score
-    verbose=2     # This will print progress updates
+    scoring='r2',
+    verbose=2
 )
 
 print("\n--- [Starting Hyperparameter Tuning] ---")
