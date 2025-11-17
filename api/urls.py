@@ -12,5 +12,5 @@ urlpatterns = [
     
     # --- App URLs ---
     path('estimate/', views.EstimateView.as_view(), name='estimate'),
-    path('me/', views.GetUserView.as_view(), name='get_user'), # <-- ADD THIS LINE
+    path('me/', views.GetUserView.as_view(), name='get_user'),
 ]
