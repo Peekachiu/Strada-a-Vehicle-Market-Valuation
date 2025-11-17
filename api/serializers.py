@@ -4,23 +4,16 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from .models import Profile
 
-# ... (all your other imports) ...
-
-# --- User Serializer (Now handles Full Name) ---
+# --- User Serializer  ---
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         validators=[validators.UniqueValidator(queryset=User.objects.all())]
     )
     phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
     
-    # --- NEW FIELDS ---
-    # We will accept 'full_name' when writing (signup)
     full_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
-    # We will return 'first_name' and 'last_name' when reading (api/me/)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
-    # ---
-    
     phone_number_write = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
@@ -28,11 +21,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'username', 'email', 'password', 
             'phone_number', 'phone_number_write',
-            'full_name', 'first_name', 'last_name' # Add all fields
+            'full_name', 'first_name', 'last_name'
         )
         extra_kwargs = {
             'password': {'write_only': True},
-            # We don't need 'username' for input, but we'll read it
             'username': {'read_only': True}, 
         }
 
@@ -49,8 +41,8 @@ class UserSerializer(serializers.ModelSerializer):
             username=validated_data['email'], # Use email as username
             email=validated_data['email'],
             password=validated_data['password'],
-            first_name=first_name, # Save the parsed name
-            last_name=last_name    # Save the parsed name
+            first_name=first_name,
+            last_name=last_name
         )
         
         # Create the profile
