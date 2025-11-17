@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 
-# --- THIS IS THE CHANGE ---
 # Define the relative path to go "up one level" to the root,
 # then "down into" the datasets folder.
 DATA_FOLDER = 'datasets/'
