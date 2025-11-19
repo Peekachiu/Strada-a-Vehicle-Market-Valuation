@@ -110,6 +110,7 @@ body {
   line-height: 1;
   padding-top: 2px; /* Optical alignment */
   background: linear-gradient(to right, #1e293b, #475569);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
