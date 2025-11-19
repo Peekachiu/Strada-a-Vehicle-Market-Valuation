@@ -150,38 +150,44 @@ export function renderBrandModal(container) {
             </div>
             <div class="brand-card" data-brand="Toyota">
               <div class="brand-icon-form">
-                <img src="static/assets/images/toyota_logo.jpg" alt="Honda">
+                <img src="static/assets/images/toyota_logo.jpg" alt="Toyota">
               </div>
               <span>Toyota</span>
             </div>
             <div class="brand-card" data-brand="Nissan">
               <div class="brand-icon-form">
-                <img src="static/assets/images/nissan_logo.png" alt="Honda">
+                <img src="static/assets/images/nissan_logo.png" alt="Nissan">
               </div>
               <span>Nissan</span>
             </div>
             <div class="brand-card" data-brand="Mazda">
               <div class="brand-icon-form">
-                <img src="static/assets/images/mazda_logo.jpeg" alt="Honda">
+                <img src="static/assets/images/mazda_logo.jpeg" alt="Mazda">
               </div>
               <span>Mazda</span>
             </div>
             <div class="brand-card" data-brand="Lexus">
               <div class="brand-icon-form">
-                <img src="static/assets/images/lexus_logo.webp" alt="Honda">
+                <img src="static/assets/images/lexus_logo.webp" alt="Lexus">
               </div>
               <span>Lexus</span>
             </div>
             <div class="brand-card disabled" data-brand="BMW">
-              <div class="brand-icon-form">B</div>
+              <div class="brand-icon-form">
+                <img src="static/assets/images/bmw_logo.png" alt="BMW">
+              </div>
               <span>BMW</span>
             </div>
             <div class="brand-card disabled" data-brand="Mercedes">
-              <div class="brand-icon-form">M</div>
+              <div class="brand-icon-form">
+                <img src="static/assets/images/mercedes_logo.png" alt="Mercedes">
+              </div>
               <span>Mercedes</span>
             </div>
              <div class="brand-card disabled" data-brand="Audi">
-              <div class="brand-icon-form">A</div>
+              <div class="brand-icon-form">
+                <img src="static/assets/images/audi_logo.png" alt="Audi">
+              </div>
               <span>Audi</span>
             </div>
           </div>
