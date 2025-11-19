@@ -50,58 +50,94 @@ init() {
 
       // --- NEW MODAL LOGIC ---
       this.setupModal();
-      this.setupModelModal(); // NEW method for model modal
+      this.setupModelModal();
+      this.setupSequentialInputs();
     }
 }
 
-// --- NEW METHOD ---
-setupModal() {
-    const trigger = this.main.querySelector('#make-input-trigger');
-    const modal = document.getElementById('brand-modal');
-    const closeBtn = document.getElementById('close-brand-modal');
-    const displayInput = this.main.querySelector('#val-make-display');
-    const hiddenInput = this.main.querySelector('#val-make');
-    const brandCards = document.querySelectorAll('.brand-card');
+setupBrandModal() {
+      const trigger = this.main.querySelector('#make-input-trigger');
+      const modal = document.getElementById('brand-modal');
+      const closeBtn = document.getElementById('close-brand-modal');
+      const displayInput = this.main.querySelector('#val-make-display');
+      const hiddenInput = this.main.querySelector('#val-make');
+      
+      // Note: We select using the NEW class name
+      const brandCards = document.querySelectorAll('.modal-brand-card');
+      
+      // Model inputs to reset
+      const modelDisplay = this.main.querySelector('#val-model-display');
+      const modelHidden = this.main.querySelector('#val-model');
+      const modelTrigger = this.main.querySelector('#model-input-trigger');
 
-    // Open Modal
-    trigger.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-    });
+      trigger.addEventListener('click', () => {
+          modal.classList.remove('hidden');
+          // Highlight currently selected brand
+          const currentBrand = hiddenInput.value;
+          brandCards.forEach(card => {
+             if (card.getAttribute('data-brand') === currentBrand) {
+                 card.classList.add('selected');
+             } else {
+                 card.classList.remove('selected');
+             }
+          });
+      });
 
-    // Close Modal
-    closeBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
+      closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
-    // Select Brand
-    brandCards.forEach(card => {
-        card.addEventListener('click', () => {
-            if (card.classList.contains('disabled')) return;
+      brandCards.forEach(card => {
+          card.addEventListener('click', (e) => {
+              // IMPORTANT: e.currentTarget ensures we get the .modal-brand-card element
+              // even if the user clicked on the image or text inside it.
+              const clickedCard = e.currentTarget;
 
-            const brand = card.getAttribute('data-brand');
+              if (clickedCard.classList.contains('disabled')) return;
 
-            // Update inputs
-            displayInput.value = brand;
-            hiddenInput.value = brand; // This is what gets sent to backend
+              // --- 1. VISUAL SELECTION ---
+              brandCards.forEach(c => c.classList.remove('selected'));
+              clickedCard.classList.add('selected');
+              
+              // --- 2. GET DATA ---
+              const brand = clickedCard.getAttribute('data-brand');
+              console.log("Selected Brand:", brand); // Debug log
 
-            // Close modal
-            modal.classList.add('hidden');
-        });
-    });
+              // --- 3. UPDATE INPUTS ---
+              if (displayInput && hiddenInput) {
+                  displayInput.value = brand;
+                  hiddenInput.value = brand;
+              } else {
+                  console.error("Make inputs not found!");
+              }
+              
+              // 4. Reset & Unlock Model
+              if (modelDisplay && modelHidden && modelTrigger) {
+                  modelDisplay.value = '';
+                  modelDisplay.placeholder = "Select Model";
+                  modelHidden.value = '';
+                  modelTrigger.classList.remove('is-disabled');
+              }
+              
+              // 5. Reset future steps
+              this.resetFormStartingFrom('year'); 
 
-    // Close if clicking outside
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
-}
+              // --- 6. DELAY CLOSING ---
+              setTimeout(() => {
+                  modal.classList.add('hidden');
+              }, 300);
+          });
+      });
+
+      modal.addEventListener('click', (e) => {
+          if (e.target === modal) modal.classList.add('hidden');
+      });
+  }
 
 setupModelModal() {
       const trigger = this.main.querySelector('#model-input-trigger');
-      const brandInput = this.main.querySelector('#val-make'); // Hidden input
+      const brandInput = this.main.querySelector('#val-make');
       const displayInput = this.main.querySelector('#val-model-display');
       const hiddenInput = this.main.querySelector('#val-model');
+      const yearInput = this.main.querySelector('#val-year');
 
       trigger.addEventListener('click', () => {
           const selectedBrand = brandInput.value;
@@ -133,13 +169,78 @@ setupModelModal() {
                   const model = card.getAttribute('data-model');
                   displayInput.value = model;
                   hiddenInput.value = model;
+
+                  // Reset & Unlock Year
+                  yearInput.disabled = false;
+                  yearInput.placeholder = 'e.g. Year';
+                  yearInput.disabled = false;
+
                   modal.classList.add('hidden');
               });
           });
       });
   }
 
-// ... (Rest of your handleEstimate code stays the same) ...
+// --- NEW: Handles Year -> Mileage -> Rest ---
+  setupSequentialInputs() {
+      const yearInput = this.main.querySelector('#val-year');
+      const mileageInput = this.main.querySelector('#val-mileage');
+      const others = [
+          this.main.querySelector('#val-condition'),
+          this.main.querySelector('#val-transmission'),
+          this.main.querySelector('#val-fuel')
+      ];
+      const submitBtn = this.main.querySelector('#val-submit-btn');
+
+      // 1. Year Input Logic
+      yearInput.addEventListener('input', (e) => {
+          if (e.target.value.length === 4) {
+              // If year looks valid (4 digits), unlock mileage
+              mileageInput.disabled = false;
+              mileageInput.placeholder = "e.g. 50000";
+          }
+      });
+
+      // 2. Mileage Input Logic
+      mileageInput.addEventListener('input', (e) => {
+          if (e.target.value.length > 0) {
+              // Unlock everything else
+              others.forEach(input => input.disabled = false);
+              submitBtn.classList.remove('is-disabled');
+          }
+      });
+  }
+  
+  // --- NEW Helper to reset form if user goes back ---
+  resetFormStartingFrom(field) {
+      const yearInput = this.main.querySelector('#val-year');
+      const mileageInput = this.main.querySelector('#val-mileage');
+      const others = [
+          this.main.querySelector('#val-condition'),
+          this.main.querySelector('#val-transmission'),
+          this.main.querySelector('#val-fuel')
+      ];
+      const submitBtn = this.main.querySelector('#val-submit-btn');
+
+      if (field === 'year') {
+          yearInput.value = '';
+          yearInput.disabled = true;
+          yearInput.placeholder = "Select Model First";
+      }
+      
+      // Always reset mileage and below if we reset year
+      mileageInput.value = '';
+      mileageInput.disabled = true;
+      mileageInput.placeholder = "Enter Year First";
+      
+      others.forEach(input => {
+          input.disabled = true;
+          // Optional: reset select to default
+          // input.selectedIndex = 0; 
+      });
+      
+      submitBtn.classList.add('is-disabled');
+  }
 
   /**
    * Handles the valuation form submission.

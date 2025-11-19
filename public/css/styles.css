@@ -1896,86 +1896,106 @@ Auth Message Styles
   color: #991b1b; /* Dark red */
 }
 
-/*
-========================================
-Valuation Form (Car Brand) Styles
-========================================
-*/
-
+/* ========================================
+   VALUATION FORM: MODAL OVERLAY & CONTENT
+   ======================================== */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000; /* On top of everything */
-  display: flex;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.4); /* Slightly lighter overlay */
+  backdrop-filter: blur(8px); /* More blur for a softer look */
+  z-index: 9999 !important;
+  
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  
   opacity: 1;
   transition: opacity 0.3s ease;
+  visibility: visible; 
 }
 
 .modal-overlay.hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .modal-content {
   background: white;
   width: 90%;
-  max-width: 600px;
+  max-width: 680px; /* Slightly wider */
+  max-height: 90vh;
   border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Softer, larger shadow */
   overflow: hidden;
-  transform: scale(1);
-  transition: transform 0.3s ease;
-}
-
-.modal-overlay.hidden .modal-content {
-  transform: scale(0.95);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px; 
 }
 
 .modal-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 2.5rem 2.5rem 0.5rem 2.5rem; /* More vertical padding, less bottom */
+  position: relative;
+  border-bottom: 1px solid #f3f4f6; /* Subtle separator */
+  text-align: left;
 }
 
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text-dark);
+.modal-title {
+  font-size: 1.8rem; /* Larger title */
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
 }
 
-.close-btn {
+.modal-subtitle {
+  font-size: 1.1rem; /* Clearer subtitle */
+  color: #6b7280;
+  margin-bottom: 1.5rem; /* Space before content */
+  margin-top: 0;
+}
+
+.modal-header .close-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
   background: none;
   border: none;
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
-  color: #999;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.modal-header .close-btn:hover {
+  color: #374151;
 }
 
 .modal-body {
-  padding: 2rem;
-  max-height: 70vh;
-  overflow-y: auto;
+  padding: 1.5rem 2.5rem 2.5rem 2.5rem; /* Consistent padding */
+  overflow-y: auto; /* Allow scrolling for grid if many items */
 }
+
+/* ========================================
+   BRAND GRID & CARD STYLES (The New Design)
+   ======================================== */
 
 .brand-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+  gap: 1.5rem; /* Consistent gap */
+  justify-items: center; /* Center cards in their grid cells */
 }
 
-.brand-card {
-  border: 1px solid #eee;
-  border-radius: 12px;
+.modal-brand-card {
+  position: relative; /* Needed for checkmark positioning */
+  border: 2px solid #e5e7eb; /* Thicker, lighter border */
+  border-radius: 14px; /* Slightly more rounded */
   padding: 1.5rem 0.5rem;
   text-align: center;
   cursor: pointer;
@@ -1983,77 +2003,113 @@ Valuation Form (Car Brand) Styles
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center; /* Vertically center content */
+  gap: 0.75rem; /* Space between icon and text */
+  background: white;
+  min-width: 140px; /* Minimum width for cards */
+  width: 100%;      /* Fill grid cell */
+  max-width: 180px; /* Max width to prevent stretching too much */
+  box-sizing: border-box;
 }
 
-.brand-card:hover {
-  border-color: var(--color-primary);
-  background-color: #f8faff;
-  transform: translateY(-2px);
+.modal-brand-card:hover {
+  border-color: #a7d3ff; /* Lighter blue on hover */
+  background-color: #f0f8ff; /* Very light blue */
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-.brand-card.disabled {
-  opacity: 0.5;
+/* --- SELECTED STATE --- */
+.modal-brand-card.selected {
+  border-color: #3b82f6; /* Primary blue for selected state */
+  background-color: #e0f2fe; /* Distinct background for selected */
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+/* --- DISABLED STATE --- */
+.modal-brand-card.disabled {
+  opacity: 0.6; /* Slightly less opaque */
   cursor: not-allowed;
-  background-color: #f9f9f9;
+  background-color: #f9fafb;
+  border-color: #f3f4f6;
+  box-shadow: none;
+  transform: none;
+}
+.modal-brand-card.disabled .modal-brand-icon img {
+    filter: grayscale(100%); /* Grayscale for disabled logos */
+    opacity: 0.7;
 }
 
-.brand-icon-form {
-  width: 60px;
+/* --- ICON CONTAINER --- */
+.modal-brand-icon {
+  width: 80px; /* Fixed size for the logo area */
   height: 60px;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.5rem;
   overflow: hidden;
+  margin-bottom: 0.5rem;
 }
 
-.brand-icon-form img {
+.modal-brand-icon img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  mix-blend-mode: multiply;
+  mix-blend-mode: multiply; /* Keeps colors, helps transparency */
 }
 
-/*
-========================================
-Valuation Form (Car Model) Styles
-========================================
-*/
-.modal-model-card {
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 1rem 0.5rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
+.modal-brand-card span {
+  font-weight: 600;
+  color: #374151;
+  font-size: 1rem;
 }
 
-.modal-model-card:hover {
-  border-color: var(--primary-blue);
-  background-color: #f8faff;
-  transform: translateY(-2px);
-}
-
-.modal-model-image {
-  width: 100px; /* Wider for cars */
-  height: 60px;
-  background: #f3f4f6;
-  border-radius: 8px;
+/* --- CHECKMARK ICON --- */
+.selected-checkmark {
+  position: absolute;
+  top: 10px; /* Position top-right within the card */
+  right: 10px;
+  width: 24px; /* Size of the checkmark circle */
+  height: 24px;
+  color: #3b82f6; /* Blue checkmark icon */
+  background: white;
+  border-radius: 50%; /* Circular background behind checkmark if needed */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.5rem;
-  overflow: hidden;
+  opacity: 0; /* Hidden by default */
+  transform: scale(0.5); /* Starts small */
+  transition: all 0.2s ease;
+  pointer-events: none; /* Make sure it doesn't block clicks */
 }
 
-.modal-model-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Override specifically for the svg inside checkmark if needed */
+.selected-checkmark svg {
+    fill: #3b82f6; /* Fill the checkmark circle with blue */
+    color: white;  /* Make the check mark itself white */
+}
+
+.modal-brand-card.selected .selected-checkmark {
+  opacity: 1; /* Show when selected */
+  transform: scale(1); /* Grow to full size */
+}
+
+.modal-brand-card.disabled .selected-checkmark {
+    display: none; /* Hide checkmark for disabled cards */
+}
+
+/* --- Disabled State for Sequential Form --- */
+.is-disabled {
+  opacity: 0.5;
+  pointer-events: none; /* Prevents clicking */
+  background-color: #f9fafb; /* Light gray background */
+  cursor: not-allowed;
+}
+
+/* Style for disabled standard inputs */
+input:disabled, select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  color: #9ca3af;
 }

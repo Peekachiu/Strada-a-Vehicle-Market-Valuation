@@ -120,28 +120,28 @@ export function renderValuationForm(formContainer) {
 
       <div class="form-group">
         <label for="val-model-display" class="form-label">Model</label>
-        <div class="input-with-icon" id="model-input-trigger" style="cursor: pointer;">
+        <div class="input-with-icon is-disabled" id="model-input-trigger" style="cursor: pointer;">
            <span class="input-icon">
              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
            </span>
-           <input id="val-model-display" type="text" class="form-input with-icon" placeholder="Select Model" readonly style="cursor: pointer; background: transparent;">
+           <input id="val-model-display" type="text" class="form-input with-icon" placeholder="Select Brand First" readonly style="cursor: pointer; background: transparent;">
            <input id="val-model" name="model" type="hidden">
         </div>
       </div>
 
       <div class="form-group">
         <label for="val-year" class="form-label">Year</label>
-        <input id="val-year" name="year" type="number" class="form-input" required placeholder="e.g. 2018" min="1950" max="${new Date().getFullYear()}" />
+        <input id="val-year" name="year" type="number" class="form-input" required placeholder="Select Model First" min="1950" max="${new Date().getFullYear()}" disabled />
       </div>
 
       <div class="form-group">
         <label for="val-mileage" class="form-label">Mileage (km)</label>
-        <input id="val-mileage" name="mileage" type="number" class="form-input" required placeholder="e.g. 50000" />
+        <input id="val-mileage" name="mileage" type="number" class="form-input" required placeholder="Enter Year First" disabled />
       </div>
 
       <div class="form-group">
         <label for="val-condition" class="form-label">Condition</label>
-        <select id="val-condition" name="condition" class="form-input">
+        <select id="val-condition" name="condition" class="form-input" disabled>
           <option value="excellent">Excellent</option>
           <option value="good" selected>Good</option>
           <option value="fair">Fair</option>
@@ -151,7 +151,7 @@ export function renderValuationForm(formContainer) {
       
       <div class="form-group">
         <label for="val-transmission" class="form-label">Transmission</label>
-        <select id="val-transmission" name="transmission" class="form-input">
+        <select id="val-transmission" name="transmission" class="form-input" disabled>
           <option value="automatic">Automatic</option>
           <option value="manual">Manual</option>
         </select>
@@ -159,7 +159,7 @@ export function renderValuationForm(formContainer) {
 
       <div class="form-group">
         <label for="val-fuel" class="form-label">Fuel Type</label>
-        <select id="val-fuel" name="fuelType" class="form-input">
+        <select id="val-fuel" name="fuelType" class="form-input" disabled>
           <option value="petrol">Petrol</option>
           <option value="diesel">Diesel</option>
           <option value="hybrid">Hybrid</option>
@@ -167,7 +167,7 @@ export function renderValuationForm(formContainer) {
         </select>
       </div>
 
-      <button class="btn btn-primary btn-full" type="submit">
+      <button id="val-submit-btn" class="btn btn-primary btn-full is-disabled" type="submit">
         Calculate Valuation
         <svg class="icon-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       </button>
@@ -179,63 +179,93 @@ export function renderValuationForm(formContainer) {
  * Renders the Brand Selection Modal.
  */
 export function renderBrandModal(container) {
+  // Reusable Checkmark Icon (Hidden by default via CSS)
+  const checkmarkHTML = `
+    <div class="selected-checkmark">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: white;">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+  `;
+
   const modalHTML = `
+    <!-- REMOVED INLINE STYLES - Relying on styles.css now -->
     <div id="brand-modal" class="modal-overlay hidden">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Select Vehicle Make</h3>
+          <h3 class="modal-title">Select Vehicle Make</h3>
+          <p class="modal-subtitle">Choose the manufacturer of your vehicle</p>
           <button type="button" id="close-brand-modal" class="close-btn">&times;</button>
         </div>
+        
         <div class="modal-body">
           <div class="brand-grid">
-            <div class="brand-card" data-brand="Honda">
-              <div class="brand-icon-form">
+            
+            <!-- Honda -->
+            <div class="modal-brand-card" data-brand="Honda">
+              ${checkmarkHTML}
+              <div class="modal-brand-icon">
                 <img src="static/assets/images/honda_logo.jpg" alt="Honda">
               </div>
               <span>Honda</span>
             </div>
-            <div class="brand-card" data-brand="Toyota">
-              <div class="brand-icon-form">
+            
+            <!-- Toyota -->
+            <div class="modal-brand-card" data-brand="Toyota">
+              ${checkmarkHTML}
+              <div class="modal-brand-icon">
                 <img src="static/assets/images/toyota_logo.jpg" alt="Toyota">
               </div>
               <span>Toyota</span>
             </div>
-            <div class="brand-card" data-brand="Nissan">
-              <div class="brand-icon-form">
+            
+            <!-- Nissan -->
+            <div class="modal-brand-card" data-brand="Nissan">
+              ${checkmarkHTML}
+              <div class="modal-brand-icon">
                 <img src="static/assets/images/nissan_logo.png" alt="Nissan">
               </div>
               <span>Nissan</span>
             </div>
-            <div class="brand-card" data-brand="Mazda">
-              <div class="brand-icon-form">
+            
+            <!-- Mazda -->
+            <div class="modal-brand-card" data-brand="Mazda">
+              ${checkmarkHTML}
+              <div class="modal-brand-icon">
                 <img src="static/assets/images/mazda_logo.jpeg" alt="Mazda">
               </div>
               <span>Mazda</span>
             </div>
-            <div class="brand-card" data-brand="Lexus">
-              <div class="brand-icon-form">
+            
+            <!-- Lexus -->
+            <div class="modal-brand-card" data-brand="Lexus">
+              ${checkmarkHTML}
+              <div class="modal-brand-icon">
                 <img src="static/assets/images/lexus_logo.webp" alt="Lexus">
               </div>
               <span>Lexus</span>
             </div>
-            <div class="brand-card disabled" data-brand="BMW">
-              <div class="brand-icon-form">
-                <img src="static/assets/images/bmw_logo.png" alt="BMW">
-              </div>
-              <span>BMW</span>
+
+            <!-- Disabled Brands -->
+            <div class="modal-brand-card disabled" data-brand="BMW">
+               <div class="modal-brand-icon">
+                 <img src="static/assets/images/bmw_logo.png" alt="BMW">
+               </div> 
+               <span>BMW</span>
             </div>
-            <div class="brand-card disabled" data-brand="Mercedes">
-              <div class="brand-icon-form">
-                <img src="static/assets/images/mercedes_logo.png" alt="Mercedes">
-              </div>
-              <span>Mercedes</span>
+             <div class="modal-brand-card disabled" data-brand="Mercedes">
+               <div class="modal-brand-icon">
+                 <img src="static/assets/images/mercedes_logo.png" alt="Mercedes">
+               </div>
+               <span>Mercedes</span>
             </div>
-             <div class="brand-card disabled" data-brand="Audi">
-              <div class="brand-icon-form">
-                <img src="static/assets/images/audi_logo.png" alt="Audi">
-              </div>
-              <span>Audi</span>
+             <div class="modal-brand-card disabled" data-brand="Audi">
+               <div class="modal-brand-icon">
+                 <img src="static/assets/images/audi_logo.png" alt="Audi">
+               </div>
+               <span>Audi</span>
             </div>
+
           </div>
         </div>
       </div>
