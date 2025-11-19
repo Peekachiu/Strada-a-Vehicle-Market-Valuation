@@ -1899,23 +1899,27 @@ Auth Message Styles
 /* ========================================
    VALUATION FORM: MODAL OVERLAY & CONTENT
    ======================================== */
+
 .modal-overlay {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
+  right: 0;
+  bottom: 0;
   width: 100vw !important;
   height: 100vh !important;
-  background: rgba(0, 0, 0, 0.4); /* Slightly lighter overlay */
-  backdrop-filter: blur(8px); /* More blur for a softer look */
+  background: rgba(0, 0, 0, 0.4); /* Dark overlay */
+  backdrop-filter: blur(8px);      /* Blur effect */
   z-index: 9999 !important;
   
+  /* Flexbox Centering */
   display: flex !important;
   align-items: center;
   justify-content: center;
   
   opacity: 1;
   transition: opacity 0.3s ease;
-  visibility: visible; 
+  visibility: visible;
 }
 
 .modal-overlay.hidden {
@@ -1927,39 +1931,43 @@ Auth Message Styles
 .modal-content {
   background: white;
   width: 90%;
-  max-width: 680px; /* Slightly wider */
-  max-height: 90vh;
+  max-width: 720px; /* Increased max-width for better spacing */
+  max-height: 85vh; /* Prevent going off-screen */
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Softer, larger shadow */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding-bottom: 20px; 
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}
+
+/* Optional: Add scale animation */
+.modal-overlay.hidden .modal-content {
+  transform: scale(0.95);
 }
 
 .modal-header {
-  padding: 2.5rem 2.5rem 0.5rem 2.5rem; /* More vertical padding, less bottom */
+  padding: 2rem 2rem 1rem; /* More padding */
+  border-bottom: 1px solid #f3f4f6;
+  text-align: center; /* Centered title like your image */
   position: relative;
-  border-bottom: 1px solid #f3f4f6; /* Subtle separator */
-  text-align: left;
 }
 
 .modal-title {
-  font-size: 1.8rem; /* Larger title */
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #111827;
   margin-bottom: 0.5rem;
-  margin-top: 0;
 }
 
 .modal-subtitle {
-  font-size: 1.1rem; /* Clearer subtitle */
+  font-size: 0.95rem;
   color: #6b7280;
-  margin-bottom: 1.5rem; /* Space before content */
-  margin-top: 0;
+  margin: 0;
 }
 
-.modal-header .close-btn {
+.close-btn {
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
@@ -1967,149 +1975,147 @@ Auth Message Styles
   border: none;
   font-size: 2rem;
   line-height: 1;
-  cursor: pointer;
   color: #9ca3af;
-  transition: color 0.2s ease;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.modal-header .close-btn:hover {
-  color: #374151;
+.close-btn:hover {
+  color: #111827;
 }
 
 .modal-body {
-  padding: 1.5rem 2.5rem 2.5rem 2.5rem; /* Consistent padding */
-  overflow-y: auto; /* Allow scrolling for grid if many items */
+  padding: 2rem;
+  overflow-y: auto; /* Scrollable content */
 }
 
+
 /* ========================================
-   BRAND GRID & CARD STYLES (The New Design)
+   UNIVERSAL GRID & CARD STYLES (Brand & Model)
    ======================================== */
 
 .brand-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-  gap: 1.5rem; /* Consistent gap */
-  justify-items: center; /* Center cards in their grid cells */
+  /* Min 160px ensures cards are wide enough */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
 }
 
-.modal-brand-card {
-  position: relative; /* Needed for checkmark positioning */
-  border: 2px solid #e5e7eb; /* Thicker, lighter border */
-  border-radius: 14px; /* Slightly more rounded */
-  padding: 1.5rem 0.5rem;
+/* Base Card Style (Used for both Brand & Model) */
+.modal-brand-card,
+.modal-model-card {
+  position: relative; /* Essential for absolute positioning of checkmark */
+  background: white;
+  border: 2px solid #e5e7eb; /* Light gray border */
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Vertically center content */
-  gap: 0.75rem; /* Space between icon and text */
-  background: white;
-  min-width: 140px; /* Minimum width for cards */
-  width: 100%;      /* Fill grid cell */
-  max-width: 180px; /* Max width to prevent stretching too much */
-  box-sizing: border-box;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
-.modal-brand-card:hover {
-  border-color: #a7d3ff; /* Lighter blue on hover */
-  background-color: #f0f8ff; /* Very light blue */
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+/* Hover State */
+.modal-brand-card:hover,
+.modal-model-card:hover {
+  border-color: #bfdbfe; /* Hover Blue */
+  background-color: #f8fafc;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 }
 
-/* --- SELECTED STATE --- */
-.modal-brand-card.selected {
-  border-color: #3b82f6; /* Primary blue for selected state */
-  background-color: #e0f2fe; /* Distinct background for selected */
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+/* --- SELECTED STATE (The Blue Checkmark Look) --- */
+.modal-brand-card.selected,
+.modal-model-card.selected {
+  border-color: #3b82f6; /* Primary Blue Border */
+  background-color: #eff6ff; /* Very Light Blue Background */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); /* Outer Glow Ring */
+}
+
+/* --- CHECKMARK ICON (Hidden by default) --- */
+.selected-checkmark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background-color: #3b82f6; /* Blue Circle */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  
+  /* Animation: Pop in */
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring effect */
+}
+
+/* Show checkmark when parent has .selected class */
+.modal-brand-card.selected .selected-checkmark,
+.modal-model-card.selected .selected-checkmark {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* --- DISABLED STATE --- */
 .modal-brand-card.disabled {
-  opacity: 0.6; /* Slightly less opaque */
+  opacity: 0.5;
   cursor: not-allowed;
   background-color: #f9fafb;
   border-color: #f3f4f6;
-  box-shadow: none;
-  transform: none;
+  pointer-events: none;
 }
-.modal-brand-card.disabled .modal-brand-icon img {
-    filter: grayscale(100%); /* Grayscale for disabled logos */
-    opacity: 0.7;
+.modal-brand-card.disabled img {
+  filter: grayscale(100%);
 }
 
-/* --- ICON CONTAINER --- */
+
+/* --- IMAGE CONTAINERS --- */
+
+/* Brand (Make) Icon Container */
 .modal-brand-icon {
-  width: 80px; /* Fixed size for the logo area */
-  height: 60px;
-  background: transparent;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   margin-bottom: 0.5rem;
 }
-
 .modal-brand-icon img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  mix-blend-mode: multiply; /* Keeps colors, helps transparency */
+  mix-blend-mode: multiply; /* Helps transparency on white */
 }
 
-.modal-brand-card span {
-  font-weight: 600;
-  color: #374151;
-  font-size: 1rem;
-}
-
-/* --- CHECKMARK ICON --- */
-.selected-checkmark {
-  position: absolute;
-  top: 10px; /* Position top-right within the card */
-  right: 10px;
-  width: 24px; /* Size of the checkmark circle */
-  height: 24px;
-  color: #3b82f6; /* Blue checkmark icon */
-  background: white;
-  border-radius: 50%; /* Circular background behind checkmark if needed */
+/* Model Icon Container */
+.modal-model-image {
+  width: 100%;
+  height: 100px; /* Wider/Rectangular for car photos */
+  background: #f3f4f6; /* Gray placeholder bg */
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0; /* Hidden by default */
-  transform: scale(0.5); /* Starts small */
-  transition: all 0.2s ease;
-  pointer-events: none; /* Make sure it doesn't block clicks */
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+.modal-model-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Override specifically for the svg inside checkmark if needed */
-.selected-checkmark svg {
-    fill: #3b82f6; /* Fill the checkmark circle with blue */
-    color: white;  /* Make the check mark itself white */
-}
-
-.modal-brand-card.selected .selected-checkmark {
-  opacity: 1; /* Show when selected */
-  transform: scale(1); /* Grow to full size */
-}
-
-.modal-brand-card.disabled .selected-checkmark {
-    display: none; /* Hide checkmark for disabled cards */
-}
-
-/* --- Disabled State for Sequential Form --- */
-.is-disabled {
-  opacity: 0.5;
-  pointer-events: none; /* Prevents clicking */
-  background-color: #f9fafb; /* Light gray background */
-  cursor: not-allowed;
-}
-
-/* Style for disabled standard inputs */
-input:disabled, select:disabled {
-  background-color: #f3f4f6;
-  cursor: not-allowed;
-  color: #9ca3af;
+/* Text Styles */
+.modal-brand-card span,
+.modal-model-card span {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #374151;
 }

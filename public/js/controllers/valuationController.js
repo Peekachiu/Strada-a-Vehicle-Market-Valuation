@@ -49,7 +49,7 @@ init() {
       this.form.addEventListener('submit', this.handleEstimate);
 
       // --- NEW MODAL LOGIC ---
-      this.setupModal();
+      this.setupBrandModal();
       this.setupModelModal();
       this.setupSequentialInputs();
     }
@@ -130,6 +130,16 @@ setupBrandModal() {
       modal.addEventListener('click', (e) => {
           if (e.target === modal) modal.classList.add('hidden');
       });
+
+      if (trigger) {
+          trigger.addEventListener('click', () => {
+              console.log("Make trigger clicked!"); // Debug log
+              modal.classList.remove('hidden');
+              // ...
+          });
+      } else {
+          console.error("Make input trigger not found!");
+      }
   }
 
 setupModelModal() {

@@ -2,13 +2,13 @@
 // You will update the image paths later.
 export const carData = {
   "Honda": [
-    { name: "Civic", img: "static/assets/models/civic.jpg" },
-    { name: "City", img: "static/assets/models/city.jpg" },
-    { name: "Accord", img: "static/assets/models/accord.jpg" },
-    { name: "Jazz", img: "static/assets/models/jazz.jpg" },
-    { name: "CR-V", img: "static/assets/models/crv.jpg" },
-    { name: "HR-V", img: "static/assets/models/hrv.jpg" },
-    { name: "BR-V", img: "static/assets/models/brv.jpg" }
+    { name: "Civic", img: "static/assets/images/civic.png" },
+    { name: "City", img: "static/assets/images/city.webp" },
+    { name: "Accord", img: "static/assets/images/accord.avif" },
+    { name: "Jazz", img: "static/assets/images/jazz.avif" },
+    { name: "CR-V", img: "static/assets/images/cr-v.png" },
+    { name: "HR-V", img: "static/assets/images/hr-v.png" },
+    { name: "BR-V", img: "static/assets/images/br-v.jpg" }
   ],
   "Toyota": [
     { name: "Vios", img: "static/assets/models/vios.jpg" },
@@ -113,7 +113,7 @@ export function renderValuationForm(formContainer) {
            <span class="input-icon">
              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
            </span>
-           <input id="val-make-display" type="text" class="form-input with-icon" placeholder="Select Brand" readonly style="cursor: pointer; background: transparent;">
+           <input id="val-make-display" type="text" class="form-input with-icon" placeholder="Select Brand" readonly style="cursor: pointer; background: transparent; pointer-events: none;">
            <input id="val-make" name="make" type="hidden">
         </div>
       </div>
