@@ -2,7 +2,8 @@ import {
   renderValuationForm, 
   renderValuationPlaceholder, 
   renderValuationResults,
-  renderBrandModal // <-- ADD THIS
+  renderBrandModal,
+  renderModelModal
 } from '../views/valuationView.js';
 
 export class ValuationController {
@@ -49,6 +50,7 @@ init() {
 
       // --- NEW MODAL LOGIC ---
       this.setupModal();
+      this.setupModelModal(); // NEW method for model modal
     }
 }
 
@@ -94,6 +96,48 @@ setupModal() {
         }
     });
 }
+
+setupModelModal() {
+      const trigger = this.main.querySelector('#model-input-trigger');
+      const brandInput = this.main.querySelector('#val-make'); // Hidden input
+      const displayInput = this.main.querySelector('#val-model-display');
+      const hiddenInput = this.main.querySelector('#val-model');
+
+      trigger.addEventListener('click', () => {
+          const selectedBrand = brandInput.value;
+          
+          // 1. Check if brand is selected first
+          if (!selectedBrand) {
+              alert("Please select a Brand first.");
+              return;
+          }
+
+          // 2. Render and Open the Model Modal dynamically
+          renderModelModal(selectedBrand);
+          const modal = document.getElementById('model-modal');
+          const closeBtn = document.getElementById('close-model-modal');
+          const modelCards = document.querySelectorAll('.modal-model-card');
+          
+          // Show modal
+          modal.classList.remove('hidden');
+
+          // Close listeners
+          closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+          modal.addEventListener('click', (e) => {
+              if (e.target === modal) modal.classList.add('hidden');
+          });
+
+          // Selection listeners
+          modelCards.forEach(card => {
+              card.addEventListener('click', () => {
+                  const model = card.getAttribute('data-model');
+                  displayInput.value = model;
+                  hiddenInput.value = model;
+                  modal.classList.add('hidden');
+              });
+          });
+      });
+  }
 
 // ... (Rest of your handleEstimate code stays the same) ...
 

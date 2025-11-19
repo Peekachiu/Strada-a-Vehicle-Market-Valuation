@@ -1,3 +1,43 @@
+// --- 1. DEFINE CAR DATA (Brand -> Models) ---
+// You will update the image paths later.
+export const carData = {
+  "Honda": [
+    { name: "Civic", img: "static/assets/models/civic.jpg" },
+    { name: "City", img: "static/assets/models/city.jpg" },
+    { name: "Accord", img: "static/assets/models/accord.jpg" },
+    { name: "Jazz", img: "static/assets/models/jazz.jpg" },
+    { name: "CR-V", img: "static/assets/models/crv.jpg" },
+    { name: "HR-V", img: "static/assets/models/hrv.jpg" },
+    { name: "BR-V", img: "static/assets/models/brv.jpg" }
+  ],
+  "Toyota": [
+    { name: "Vios", img: "static/assets/models/vios.jpg" },
+    { name: "Corolla", img: "static/assets/models/corolla.jpg" },
+    { name: "Camry", img: "static/assets/models/camry.jpg" },
+    { name: "Yaris", img: "static/assets/models/yaris.jpg" },
+    { name: "Hilux", img: "static/assets/models/hilux.jpg" },
+    { name: "Fortuner", img: "static/assets/models/fortuner.jpg" }
+  ],
+  "Nissan": [
+    { name: "Almera", img: "static/assets/models/almera.jpg" },
+    { name: "Serena", img: "static/assets/models/serena.jpg" },
+    { name: "X-Trail", img: "static/assets/models/xtrail.jpg" },
+    { name: "Navara", img: "static/assets/models/navara.jpg" }
+  ],
+  "Mazda": [
+    { name: "Mazda2", img: "static/assets/models/mazda2.jpg" },
+    { name: "Mazda3", img: "static/assets/models/mazda3.jpg" },
+    { name: "Mazda6", img: "static/assets/models/mazda6.jpg" },
+    { name: "CX-5", img: "static/assets/models/cx5.jpg" }
+  ],
+  "Lexus": [
+    { name: "ES", img: "static/assets/models/es.jpg" },
+    { name: "IS", img: "static/assets/models/is.jpg" },
+    { name: "RX", img: "static/assets/models/rx.jpg" },
+    { name: "NX", img: "static/assets/models/nx.jpg" }
+  ]
+};
+
 /**
  * Renders the main structure of the valuation page.
  */
@@ -79,8 +119,14 @@ export function renderValuationForm(formContainer) {
       </div>
 
       <div class="form-group">
-        <label for="val-model" class="form-label">Model</label>
-        <input id="val-model" name="model" type="text" class="form-input" required placeholder="e.g. Corolla" />
+        <label for="val-model-display" class="form-label">Model</label>
+        <div class="input-with-icon" id="model-input-trigger" style="cursor: pointer;">
+           <span class="input-icon">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+           </span>
+           <input id="val-model-display" type="text" class="form-input with-icon" placeholder="Select Model" readonly style="cursor: pointer; background: transparent;">
+           <input id="val-model" name="model" type="hidden">
+        </div>
       </div>
 
       <div class="form-group">
@@ -190,6 +236,51 @@ export function renderBrandModal(container) {
               </div>
               <span>Audi</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+/**
+ * Renders the Model Selection Modal (DYNAMIC).
+ */
+export function renderModelModal(brand) {
+  // 1. Remove existing model modal if it exists (to prevent duplicates)
+  const existingModal = document.getElementById('model-modal');
+  if (existingModal) existingModal.remove();
+
+  // 2. Get models for the selected brand from our data
+  // Note: Make sure 'carData' is imported or defined at the top of this file!
+  const models = carData[brand] || [];
+  
+  // 3. Generate HTML for model cards
+  let modelsHTML = '';
+  if (models.length > 0) {
+    modelsHTML = models.map(m => `
+      <div class="modal-model-card" data-model="${m.name}">
+        <div class="modal-model-image">
+           <img src="${m.img}" alt="${m.name}" onerror="this.style.display='none'">
+        </div>
+        <span>${m.name}</span>
+      </div>
+    `).join('');
+  } else {
+    modelsHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #666;">No models found for ${brand}. Please type manually.</p>`;
+  }
+
+  const modalHTML = `
+    <div id="model-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Select ${brand} Model</h3>
+          <button type="button" id="close-model-modal" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="brand-grid"> ${modelsHTML}
           </div>
         </div>
       </div>
