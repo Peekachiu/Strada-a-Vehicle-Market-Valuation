@@ -53,17 +53,20 @@ export class ValuationController {
    * Handles the valuation form submission.
    */
   async handleEstimate(event) {
-    event.preventDefault(); // Stop the form from submitting
+    event.preventDefault(); 
 
-    // --- 5. GET DATA USING THE CORRECT IDs ---
+    // 1. Get ALL data from the form using the correct IDs from valuationView.js
     const make = this.main.querySelector('#val-make').value;
     const model = this.main.querySelector('#val-model').value;
     const year = this.main.querySelector('#val-year').value;
     const mileage = this.main.querySelector('#val-mileage').value;
     
-    // (We're ignoring the other fields for the mock API, but you can get them here)
+    // --- NEW FIELDS REQUIRED BY MODEL ---
+    const condition = this.main.querySelector('#val-condition').value;     // e.g., "Good"
+    const transmission = this.main.querySelector('#val-transmission').value; // e.g., "Automatic"
+    const fuel = this.main.querySelector('#val-fuel').value;               // e.g., "Petrol"
     
-    // 6. Get the auth token
+    // 2. Get the auth token
     const token = this.getAuthToken();
     if (!token) {
       alert('You are not logged in. Redirecting to login.');
@@ -71,11 +74,10 @@ export class ValuationController {
       return;
     }
 
-    // 7. Show a loading state
     this.showLoading();
 
     try {
-      // 8. Send the fetch request to your Django API
+      // 3. Send to Django
       const response = await fetch('/api/estimate/', {
         method: 'POST',
         headers: {
@@ -86,22 +88,24 @@ export class ValuationController {
         body: JSON.stringify({
           make: make,
           model: model,
-          year: parseInt(year), 
-          mileage: parseInt(mileage)
+          year: year,
+          mileage: mileage,
+          // Send the new fields
+          condition: condition, 
+          transmission: transmission,
+          fuel_type: fuel // Backend expects 'fuel_type', make sure names match
         }),
       });
 
       if (response.ok) {
-        // We got our mock price!
         const data = await response.json();
         
-        // --- 6. USE YOUR NEW RENDER FUNCTION ---
-        // We create a "vehicle" object to match what renderValuationResults expects
+        // 4. Render Results
         const resultData = {
-          basePrice: data.estimated_price - 2000,
+          basePrice: data.estimated_price, // Simplification for now
           marketValue: data.estimated_price,
-          lowRange: data.estimated_price - 3000,
-          highRange: data.estimated_price + 3000,
+          lowRange: data.estimated_price * 0.95, // -5%
+          highRange: data.estimated_price * 1.05, // +5%
           vehicle: { year, make, model },
           factors: { condition: 0.9, mileage: 0.8, age: 0.7, demand: 1.1 } // Mock factors
         };
@@ -111,7 +115,8 @@ export class ValuationController {
         alert('Your session has expired. Please log in again.');
         window.location.hash = 'login';
       } else {
-        this.showError('An error occurred. Please try again.');
+        const err = await response.json();
+        this.showError(err.error || 'An error occurred.');
       }
     } catch (error) {
       console.error('Network error:', error);

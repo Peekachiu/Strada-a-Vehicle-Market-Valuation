@@ -1,60 +1,79 @@
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from .serializers import UserSerializer
-from rest_framework import generics, permissions
-from rest_framework import generics, permissions
+import os
+import joblib
+import pandas as pd
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-# --- User Sign Up View ---
+# --- Auth Views (Same as before) ---
+from rest_framework import generics, permissions
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
+
 class SignUpView(generics.CreateAPIView):
-    """
-    API view for creating a new user (Sign Up).
-    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
-# --- Vehicle Valuation View ---
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+class GetUserView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+# --- The Real ML Valuation View ---
 class EstimateView(APIView):
     """
-    API view for getting a vehicle valuation estimate.
-    Requires a valid JWT token.
+    API view that loads the trained model and predicts car price.
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # 1. Get the data from the request
-        #    (e.g., car_make = request.data.get('make'))
-        #    We will do this in the next step.
-        
-        # 2. For now, just print the user who made the request
-        print("Request made by user:", request.user.username)
-        
-        # 3. Return a mock (fake) response
-        mock_estimate = {
-            "estimated_price": 50000.00,
-            "model": "Placeholder Model",
-            "year": 2020
-        }
-        return Response(mock_estimate)
+        try:
+            # 1. Load the trained model
+            # We construct the path relative to the project base directory
+            model_path = os.path.join(settings.BASE_DIR, 'ml_pipeline', 'strada_model.joblib')
+            model = joblib.load(model_path)
 
-# --- Custom Login View ---
-# This view tells Django to use our new custom serializer
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+            # 2. Get data from the frontend request
+            data = request.data
+            
+            print(f"\n[DEBUG] Received Data: {data}")
+            # 3. Preprocess: Calculate 'age' 
+            # The model was trained on 'age', but the user inputs 'year'.
+            # We must use the same logic as train_model.py (2025 - year)
+            current_year = 2025
+            input_year = int(data.get('year'))
+            car_age = current_year - input_year
 
-# --- Get User Info View ---
-class GetUserView(APIView):
-    """
-    API view to get the current logged-in user's details.
-    """
-    permission_classes = [IsAuthenticated]
+            # 4. Create a DataFrame matching the training data columns
+            # The model expects: ['age', 'mileage_km', 'make', 'model', 'condition', 'transmission', 'fuel_type']
+            input_df = pd.DataFrame({
+                'age': [car_age],
+                'mileage_km': [float(data.get('mileage'))],
+                'make': [data.get('make')],
+                'model': [data.get('model')],
+                'condition': [data.get('condition')],
+                'transmission': [data.get('transmission')],
+                'fuel_type': [data.get('fuel_type')] 
+            })
 
-    def get(self, request):
-        # 'request.user' is automatically found from the token
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
+            # 5. Make the prediction
+            predicted_price = model.predict(input_df)[0]
+
+            # 6. Return the result
+            return Response({
+                "estimated_price": round(predicted_price, 2),
+                "model": data.get('model'),
+                "year": input_year
+            })
+
+        except Exception as e:
+            print(f"Prediction Error: {e}")
+            return Response({"error": str(e)}, status=400)
