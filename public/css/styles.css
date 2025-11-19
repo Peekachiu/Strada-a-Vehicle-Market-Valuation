@@ -43,234 +43,186 @@ body {
   padding: 0 2rem;
 }
 
-/* ========================================
-   3. LAYOUT: NAVBAR & FOOTER (NEW)
-   ======================================== */
+/* ==========================================================================
+   3. LAYOUT: NAVBAR (Placed at Top to Fix Loading)
+   ========================================================================== */
+
+/* 1. The Glass Strip */
 #site-header {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 50;
-  
-  /* Navbar glass effect */
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  background: rgba(255, 255, 255, 0.75); /* A slightly more opaque glass for readability */
-  
-  border-bottom: 1px solid #e5e7eb;
+  height: 70px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9); /* Increased opacity */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: block;
 }
 
+/* 2. The Flex Container */
 .navbar {
-  display: flex;
+  display: flex !important; /* FORCE flex layout */
   align-items: center;
   justify-content: space-between;
-  height: 4rem; /* 64px, (h-16 in tailwind) */
+  height: 100%;
+  width: 100%;
+  padding: 0 2rem;
+  box-sizing: border-box; /* Critical for padding */
 }
 
+/* 3. Brand / Logo */
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* gap-2 */
+  gap: 0.75rem;
   text-decoration: none;
-  cursor: pointer;
+  height: 100%;
 }
 
-/* NEW: Blue icon box from Figma */
 .brand-icon-box {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem; /* p-2 */
-  border-radius: 8px; /* rounded-lg */
-  background-color: var(--dark-navy); /* Assumed primary color */
-}
-
-/* NEW: SVG icon inside the blue box */
-.brand-icon {
-  width: 20px; /* w-5 */
-  height: 20px; /* h-5 */
-  color: white; /* text-primary-foreground */
-}
-
-/* UPDATED: Brand text style */
-.brand-text {
-  font-size: 1.25rem; /* text-xl */
-  font-weight: 600;
-  color: #111827; /* Dark gray */
-  /* text-transform: uppercase; -- Removed to match "Strada" not "STRADA" */
-}
-
-/* Hide old icon classes */
-.brand-icon-fallback {
-  display: none !important;
-}
-
-.nav-links {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 8px;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* gap-2 */
-  
-  /* This centers the nav links */
-  flex-grow: 1;
   justify-content: center;
 }
 
-/* Rule for guest (logged-out) nav */
+.navbar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+  margin: 0; /* Reset margins */
+}
+
+/* 4. Nav Links */
+.nav-links {
+  display: flex !important; /* FORCE flex */
+  flex-direction: row !important; /* FORCE horizontal */
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  list-style: none !important; /* Remove bullet points */
+  margin: 0;
+  padding: 0;
+}
+
 .nav-links-guest {
-  flex-grow: 0; /* Don't grow */
-  justify-content: flex-end; /* Align to the right */
-  gap: 0.5rem; /* gap-2 */
+  margin-left: auto;
 }
 
 .nav-item {
-  text-decoration: none;
-  color: #4B5563; /* Medium gray */
-  font-weight: 500;
-  font-size: 0.875rem; /* 14px, default button size */
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border: none;
-  background: transparent; /* This is the "ghost" variant */
-
-  /* NEW: For adding icons */
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem; /* gap-2 */
-}
-
-/* NEW: Icon in nav links */
-.nav-icon {
-  width: 16px; /* w-4 */
-  height: 16px; /* h-4 */
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background 0.2s;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .nav-item:hover {
-  background: #f3f4f6; /* Light gray bg on hover */
-  color: #111827; /* Darken text */
+  background: rgba(0,0,0,0.05);
+  color: #0f172a;
 }
 
-/* UPDATED: Active state now looks like the "default" button */
 .nav-item.active {
-  background: var(--dark-navy); /* Primary color */
+  background: #0f172a;
   color: white;
-  font-weight: 500;
-}
-.nav-item.active:hover {
-  background: var(--dark-navy);
-  color: white;
-  opacity: 0.9;
 }
 
-/* UPDATED: Auth section */
+/* 5. User Menu */
 .nav-auth {
-  flex-shrink: 0; /* Prevents shrinking */
-  margin-left: 1rem; /* ml-4 */
-  position: relative; /* For dropdown */
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  height: 100%;
+  position: relative;
 }
 
-/* NEW: Avatar button styles */
 .avatar-button {
-  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px; /* w-9 */
-  height: 36px; /* h-9 */
-  border-radius: 50%;
-  border: none;
+  font-weight: 600;
   cursor: pointer;
-  background-color: var(--dark-navy); /* bg-primary */
-  color: white; /* text-primary-foreground */
-  font-size: 1rem;
-  font-weight: 500;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  transition: all 0.2s;
 }
 
-.avatar-button:hover {
-  outline-color: rgba(11, 13, 32, 0.3); /* ring-primary/50 */
+/* 6. Dropdown */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 240px;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  padding: 0.5rem;
+  flex-direction: column;
+  z-index: 1100;
 }
 
-.avatar-fallback {
-  /* This just centers the initial */
-  line-height: 1;
+.dropdown-menu.active {
+  display: flex;
 }
 
-/* --- Keep Footer Styles --- */
-.site-footer {
-  background: var(--dark-navy);
-  color: rgba(255, 255, 255, 0.7);
-  padding: 2rem 0;
-  text-align: center;
-  font-size: 0.875rem;
+.dropdown-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0.5rem;
 }
 
-.footer-inner p {
-  margin: 0;
-}
-
-/* --- NEW: Dropdown styles from Figma --- */
-.dropdown-label {
-  padding: 0.5rem 1rem;
-}
 .dropdown-user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: #1e293b;
   margin: 0;
 }
+
 .dropdown-user-email {
-  font-size: 0.75rem;
-  color: #6B7280;
+  font-size: 0.8rem;
+  color: #64748b;
   margin: 0;
 }
-.dropdown-separator {
-  height: 1px;
-  background: #F3F4F6;
-  margin: 0.5rem 0;
-}
+
 .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* mr-2 */
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
+  gap: 10px;
+  padding: 0.6rem 1rem;
+  color: #475569;
   text-decoration: none;
-  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
 }
+
 .dropdown-item:hover {
-  background: #F3F4F6;
-}
-.dropdown-icon {
-  width: 16px; /* w-4 */
-  height: 16px; /* h-4 */
-  color: #6B7280;
-}
-
-/* --- FIX: Dropdown Menu Layout --- */
-
-/* This is the main container for the dropdown */
-.dropdown-menu {
-  display: none; /* Hide it by default */
-  position: absolute;
-  top: 100%; /* Position it right below the button */
-  right: 0;
-  z-index: 100;
-  margin-top: 0.5rem; /* Space from the button */
-  width: 14rem; /* w-56 from Figma */
-  background-color: white;
-  border: 1px solid #e5e7eb; /* Border */
-  border-radius: 8px; /* rounded-lg */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Shadow */
-  padding: 0.5rem 0; /* Vertical padding */
-}
-
-/* This shows the menu when app.js adds the 'active' class */
-.dropdown-menu.active {
-  display: block;
+  background: #f1f5f9;
 }
 
 /* ========================================
@@ -1889,7 +1841,11 @@ Auth Message Styles
   color: #991b1b; /* Dark red */
 }
 
-/* --- Brand Modal Styles --- */
+/*
+========================================
+Valuation Form (Car Model) Styles
+========================================
+*/
 
 .modal-overlay {
   position: fixed;
@@ -1987,22 +1943,20 @@ Auth Message Styles
   background-color: #f9f9f9;
 }
 
-/* Container for the logo image */
-.brand-icon {
-  width: 60px;        /* Made it slightly bigger for images */
+.brand-icon-form {
+  width: 60px;
   height: 60px;
-  background: transparent; /* No background color */
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 0.5rem;
-  overflow: hidden;   /* Keeps image inside the box */
+  overflow: hidden;
 }
 
-/* The logo image itself */
-.brand-icon img {
+.brand-icon-form img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Ensures the logo isn't stretched or cropped */
-  mix-blend-mode: multiply; /* Optional: helps white backgrounds blend in */
+  object-fit: contain;
+  mix-blend-mode: multiply;
 }
