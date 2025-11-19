@@ -1,8 +1,8 @@
-// --- 1. IMPORT THE RENDER FUNCTIONS ---
 import { 
   renderValuationForm, 
   renderValuationPlaceholder, 
-  renderValuationResults 
+  renderValuationResults,
+  renderBrandModal // <-- ADD THIS
 } from '../views/valuationView.js';
 
 export class ValuationController {
@@ -25,29 +25,77 @@ export class ValuationController {
    * Renders the form/placeholder and attaches listeners.
    * This is called by app.js.
    */
-  init() {
-    // --- 3. RENDER THE FORM AND PLACEHOLDER ---
+// ... inside ValuationController class ...
+
+init() {
+    // 1. Render Form & Placeholder (Same as before)
     if (this.formContainer) {
       renderValuationForm(this.formContainer);
-    } else {
-      console.error('Valuation form container not found');
     }
-    
     if (this.resultsContainer) {
       renderValuationPlaceholder(this.resultsContainer);
-    } else {
-      console.error('Valuation results container not found');
     }
 
-    // --- 4. FIND THE FORM (after it's been rendered) ---
-    this.form = this.main.querySelector('#valuation-form');
+    // 2. NEW: Render the Brand Modal
+    // Check if modal already exists to prevent duplicates
+    if (!document.getElementById('brand-modal')) {
+       renderBrandModal(document.body);
+    }
 
+    // 3. Attach Listeners (Same as before + NEW Modal logic)
+    this.form = this.main.querySelector('#valuation-form');
     if (this.form) {
       this.form.addEventListener('submit', this.handleEstimate);
-    } else {
-      console.error('Valuation form not found after render');
+
+      // --- NEW MODAL LOGIC ---
+      this.setupModal();
     }
-  }
+}
+
+// --- NEW METHOD ---
+setupModal() {
+    const trigger = this.main.querySelector('#make-input-trigger');
+    const modal = document.getElementById('brand-modal');
+    const closeBtn = document.getElementById('close-brand-modal');
+    const displayInput = this.main.querySelector('#val-make-display');
+    const hiddenInput = this.main.querySelector('#val-make');
+    const brandCards = document.querySelectorAll('.brand-card');
+
+    // Open Modal
+    trigger.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+    });
+
+    // Close Modal
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // Select Brand
+    brandCards.forEach(card => {
+        card.addEventListener('click', () => {
+            if (card.classList.contains('disabled')) return;
+
+            const brand = card.getAttribute('data-brand');
+
+            // Update inputs
+            displayInput.value = brand;
+            hiddenInput.value = brand; // This is what gets sent to backend
+
+            // Close modal
+            modal.classList.add('hidden');
+        });
+    });
+
+    // Close if clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+}
+
+// ... (Rest of your handleEstimate code stays the same) ...
 
   /**
    * Handles the valuation form submission.

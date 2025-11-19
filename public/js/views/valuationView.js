@@ -12,18 +12,13 @@ export function renderValuationPage(container) {
       </div>
 
       <div class="valuation-page-grid">
-        <!-- Left Column - Form -->
         <div id="valuation-form-container" class="form-card">
-          <!-- The controller will render the form here -->
-        </div>
+          </div>
 
-        <!-- Right Column - Results -->
         <div id="valuation-results-container">
-          <!-- The controller will render the placeholder or results here -->
-        </div>
+          </div>
       </div>
 
-      <!-- Tabs Section -->
       <div class="valuation-tabs-container">
         <div class="valuation-tabs-list">
           <button id="tab-trends" class="valuation-tab active" data-tab="trends">
@@ -37,11 +32,9 @@ export function renderValuationPage(container) {
         </div>
         
         <div id="valuation-tabs-content" class="valuation-tab-content">
-          <!-- The controller will render tab content here -->
-        </div>
+          </div>
       </div>
 
-      <!-- Info Cards Section -->
       <div class="valuation-info-cards">
         <div class="info-card">
           <h3 class="info-card-title">Accurate Valuations</h3>
@@ -67,7 +60,7 @@ export function renderValuationPage(container) {
 }
 
 /**
- * Renders the HTML for the valuation form itself.
+ * Renders the HTML for the valuation form itself (With Brand Modal Trigger).
  */
 export function renderValuationForm(formContainer) {
   formContainer.innerHTML = `
@@ -75,21 +68,14 @@ export function renderValuationForm(formContainer) {
     <form id="valuation-form" class="auth-form">
       
       <div class="form-group">
-        <label for="val-make" class="form-label">Make</label>
-        <select id="val-make" name="make" class="form-input">
-          <option>Toyota</option>
-          <option>Honda</option>
-          <option>Ford</option>
-          <option>Chevrolet</option>
-          <option>BMW</option>
-          <option>Mercedes-Benz</option>
-          <option>Audi</option>
-          <option>Volkswagen</option>
-          <option>Nissan</option>
-          <option>Hyundai</option>
-          <option>Kia</option>
-          <option>Mazda</option>
-        </select>
+        <label for="val-make-display" class="form-label">Make</label>
+        <div class="input-with-icon" id="make-input-trigger" style="cursor: pointer;">
+           <span class="input-icon">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
+           </span>
+           <input id="val-make-display" type="text" class="form-input with-icon" placeholder="Select Brand" readonly style="cursor: pointer; background: transparent;">
+           <input id="val-make" name="make" type="hidden">
+        </div>
       </div>
 
       <div class="form-group">
@@ -141,6 +127,70 @@ export function renderValuationForm(formContainer) {
       </button>
     </form>
   `;
+}
+
+/**
+ * Renders the Brand Selection Modal.
+ */
+export function renderBrandModal(container) {
+  const modalHTML = `
+    <div id="brand-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Select Vehicle Make</h3>
+          <button type="button" id="close-brand-modal" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="brand-grid">
+            <div class="brand-card" data-brand="Honda">
+              <div class="brand-icon">
+                <img src="static/assets/images/honda_logo.jpg" alt="Honda">
+              </div>
+              <span>Honda</span>
+            </div>
+            <div class="brand-card" data-brand="Toyota">
+              <div class="brand-icon">
+                <img src="static/assets/images/toyota_logo.jpg" alt="Honda">
+              </div>
+              <span>Toyota</span>
+            </div>
+            <div class="brand-card" data-brand="Nissan">
+              <div class="brand-icon">
+                <img src="static/assets/images/nissan_logo.png" alt="Honda">
+              </div>
+              <span>Nissan</span>
+            </div>
+            <div class="brand-card" data-brand="Mazda">
+              <div class="brand-icon">
+                <img src="static/assets/images/mazda_logo.jpeg" alt="Honda">
+              </div>
+              <span>Mazda</span>
+            </div>
+            <div class="brand-card" data-brand="Lexus">
+              <div class="brand-icon">
+                <img src="static/assets/images/lexus_logo.webp" alt="Honda">
+              </div>
+              <span>Lexus</span>
+            </div>
+            <div class="brand-card disabled" data-brand="BMW">
+              <div class="brand-icon">B</div>
+              <span>BMW</span>
+            </div>
+            <div class="brand-card disabled" data-brand="Mercedes">
+              <div class="brand-icon">M</div>
+              <span>Mercedes</span>
+            </div>
+             <div class="brand-card disabled" data-brand="Audi">
+              <div class="brand-icon">A</div>
+              <span>Audi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
 /**
@@ -212,16 +262,14 @@ export function renderTabContent(tabContainer, tabName, data) {
       <div class="form-card">
         <h3 class="auth-title" style="font-size: 1.5rem; text-align: left;">Market Trends</h3>
         <p class="text-muted-foreground">Historical valuation data for ${data ? `a ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}` : 'this vehicle'} will be shown here. This feature is coming soon.</p>
-        <!-- Placeholder for chart -->
-      </div>
+        </div>
     `;
   } else if (tabName === 'comparison') {
     tabContainer.innerHTML = `
       <div class="form-card">
         <h3 class="auth-title" style="font-size: 1.5rem; text-align: left;">Market Comparison</h3>
         <p class="text-muted-foreground">A comparison of ${data ? `a ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}` : 'this vehicle'} against similar models in the market will be shown here. This feature is coming soon.</p>
-        <!-- Placeholder for table -->
-      </div>
+        </div>
     `;
   }
 }
