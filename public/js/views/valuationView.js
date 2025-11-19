@@ -3,7 +3,7 @@
  */
 export function renderValuationPage(container) {
   container.innerHTML = `
-    <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+    <div class="container" style="padding-top: 0.5rem; padding-bottom: 4rem;">
       <div class="valuation-header">
         <h1 class="auth-title" style="text-align: left; font-size: 2.25rem;">Vehicle Valuation</h1>
         <p class="auth-sub" style="text-align: left; margin-bottom: 0;">

@@ -44,7 +44,7 @@ async function fetchUserData() {
 export async function renderProfile(container) {
   
   // 1. Show a simple loading state
-  container.innerHTML = `<div class="container" style="padding: 4rem 0;"><p>Loading profile...</p></div>`;
+  container.innerHTML = `<div class="container" style="padding: 1rem 0;"><p>Loading profile...</p></div>`;
   
   // 2. Fetch the real user data from the API
   const user = await fetchUserData();
@@ -84,7 +84,7 @@ export async function renderProfile(container) {
   // 6. Render the full page HTML with the REAL data
   container.innerHTML = `
     <div class="profile-page-wrapper">
-      <div class="container">
+      <div class="container" style="padding-top: 1rem;">
         <div class="card profile-header">
           <div class="profile-header-avatar">
             <div class="avatar-fallback">${userInitial}</div>
