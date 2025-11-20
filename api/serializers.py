@@ -98,5 +98,5 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class ValuationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Valuation
-        fields = ['id', 'make', 'model', 'year', 'predicted_price', 'created_at']
+        fields = ['id', 'make', 'model', 'year', 'mileage', 'predicted_price', 'created_at']
         # We only send back the essentials for the history list
