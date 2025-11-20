@@ -18,7 +18,7 @@ export function renderProfilePage(container, user) {
 
   // 2. Render the full page HTML
   container.innerHTML = `
-<div class="profile-page-wrapper">
+  <div class="profile-page-wrapper">
       <div class="container" style="padding-top: 2rem;">
         
         <div class="card profile-header" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 2rem;">
@@ -125,6 +125,14 @@ export function renderProfilePage(container, user) {
             <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">New Password (Optional)</label>
             <input name="password" type="password" placeholder="Leave blank to keep current" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
           </div>
+          <div style="margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid #f3f4f6;">
+            <label style="display: block; font-size: 0.875rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">
+              Confirm Current Password <span style="color: red;">*</span>
+            </label>
+            <input name="old_password" type="password" required placeholder="Enter current password to save" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; background: #fffbeb; border-color: #fcd34d;">
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Security check required for all updates.</p>
+          </div>
+
           <div style="display: flex; gap: 1rem; justify-content: flex-end;">
             <button type="button" id="cancel-edit-btn" style="padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 6px; color: #374151; font-weight: 600; cursor: pointer;">Cancel</button>
             <button type="submit" style="padding: 0.75rem 1.5rem; background: #3b82f6; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer;">Save Changes</button>

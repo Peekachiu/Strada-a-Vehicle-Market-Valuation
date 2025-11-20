@@ -10,11 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[validators.UniqueValidator(queryset=User.objects.all())]
     )
     phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
-    
     full_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     phone_number_write = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    old_password = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = User
@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'password', 
             'phone_number', 'phone_number_write',
             'full_name', 'first_name', 'last_name',
-            'date_joined'
+            'date_joined', 'old_password'
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -32,10 +32,9 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         phone_data = validated_data.pop('phone_number_write', '')
         full_name = validated_data.pop('full_name', '')
-        
-        # Split the full name into first and last
         first_name = full_name.split(' ')[0]
         last_name = ' '.join(full_name.split(' ')[1:])
+        validated_data.pop('old_password', None)  # Not needed for creation
 
         # Create the user, using the email as the username
         user = User.objects.create_user(
@@ -55,6 +54,15 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        # Verify Old Password
+        old_password = validated_data.get('old_password')
+        new_password = validated_data.get('password')
+        if new_password or old_password:
+            if not old_password:
+                raise serializers.ValidationError({"old_password": "Please enter your current password to confirm these changes."})
+            if not instance.check_password(old_password):
+                raise serializers.ValidationError({"old_password": "The current password you entered is incorrect."})
+
         # 1. Update Phone Number (if provided)
         phone = validated_data.pop('phone_number_write', None)
         if phone is not None:
