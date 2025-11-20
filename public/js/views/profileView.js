@@ -6,9 +6,15 @@ export function renderProfilePage(container, user) {
   // 1. Prepare User Data
   const userName = user.username || "User"; // Fallback if fields are missing
   const userEmail = user.email;
-  const userPhone = user.profile?.phone_number || ''; 
+  const userPhone = user.phone_number || 'Not set'; 
   const userInitial = userName.charAt(0).toUpperCase();
-  const dateJoined = new Date(user.date_joined).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  const dateJoined = user.date_joined
+    ? new Date(user.date_joined).toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'N/A';
+  let displayName = user.username;
+  if (user.first_name || user.last_name) {
+    displayName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+  }
 
   // 2. Render the full page HTML
   container.innerHTML = `
@@ -20,7 +26,7 @@ export function renderProfilePage(container, user) {
             <div class="avatar-fallback" style="width: 64px; height: 64px; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">${userInitial}</div>
           </div>
           <div class="profile-header-info" style="flex: 1;">
-            <h1 class="profile-header-name" style="margin: 0; font-size: 1.5rem; color: #1f2937;">${userName}</h1>
+            <h1 class="profile-header-name" style="margin: 0; font-size: 1.5rem; color: #1f2937;">${displayName}</h1>
             <p class="profile-header-meta" style="margin: 0.25rem 0 0.5rem; color: #6b7280;">Member since ${dateJoined}</p> 
             <div class="profile-header-badges">
               <span class="badge badge-secondary" style="background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Premium Member</span> 
@@ -45,7 +51,7 @@ export function renderProfilePage(container, user) {
               <div style="display: grid; gap: 1.5rem;">
                 <div>
                     <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Full Name</label>
-                    <input value="${userName}" readonly style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #f9fafb;">
+                    <input value="${displayName}" readonly style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: #f9fafb;">
                 </div>
                 <div>
                     <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Email</label>
