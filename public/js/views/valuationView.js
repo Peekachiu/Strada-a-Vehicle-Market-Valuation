@@ -11,30 +11,30 @@ export const carData = {
     { name: "BR-V", img: "static/assets/images/br-v.jpg" }
   ],
   "Toyota": [
-    { name: "Vios", img: "static/assets/models/vios.jpg" },
-    { name: "Corolla", img: "static/assets/models/corolla.jpg" },
-    { name: "Camry", img: "static/assets/models/camry.jpg" },
-    { name: "Yaris", img: "static/assets/models/yaris.jpg" },
-    { name: "Hilux", img: "static/assets/models/hilux.jpg" },
-    { name: "Fortuner", img: "static/assets/models/fortuner.jpg" }
+    { name: "Vios", img: "static/assets/images/vios.png" },
+    { name: "Corolla", img: "static/assets/images/corolla.png" },
+    { name: "Camry", img: "static/assets/images/camry.avif" },
+    { name: "Yaris", img: "static/assets/images/yaris.jpg" },
+    { name: "Hilux", img: "static/assets/images/hilux.png" },
+    { name: "Fortuner", img: "static/assets/images/fortuner.png" }
   ],
   "Nissan": [
-    { name: "Almera", img: "static/assets/models/almera.jpg" },
-    { name: "Serena", img: "static/assets/models/serena.jpg" },
-    { name: "X-Trail", img: "static/assets/models/xtrail.jpg" },
-    { name: "Navara", img: "static/assets/models/navara.jpg" }
+    { name: "Almera", img: "static/assets/images/almera.jpg" },
+    { name: "Serena", img: "static/assets/images/serena.png" },
+    { name: "X-Trail", img: "static/assets/images/xtrail.png" },
+    { name: "Navara", img: "static/assets/images/navara.jpg" }
   ],
   "Mazda": [
-    { name: "Mazda2", img: "static/assets/models/mazda2.jpg" },
-    { name: "Mazda3", img: "static/assets/models/mazda3.jpg" },
-    { name: "Mazda6", img: "static/assets/models/mazda6.jpg" },
-    { name: "CX-5", img: "static/assets/models/cx5.jpg" }
+    { name: "Mazda2", img: "static/assets/images/mazda2.webp" },
+    { name: "Mazda3", img: "static/assets/images/mazda3.webp" },
+    { name: "Mazda6", img: "static/assets/images/mazda6.jpg" },
+    { name: "CX-5", img: "static/assets/images/cx5.png" }
   ],
   "Lexus": [
-    { name: "ES", img: "static/assets/models/es.jpg" },
-    { name: "IS", img: "static/assets/models/is.jpg" },
-    { name: "RX", img: "static/assets/models/rx.jpg" },
-    { name: "NX", img: "static/assets/models/nx.jpg" }
+    { name: "ES", img: "static/assets/images/es.avif" },
+    { name: "IS", img: "static/assets/images/is.webp" },
+    { name: "RX", img: "static/assets/images/rx.webp" },
+    { name: "NX", img: "static/assets/images/nx.webp" }
   ]
 };
 
