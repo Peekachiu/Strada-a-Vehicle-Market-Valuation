@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers, validators
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import Profile
+from .models import Profile, Valuation
 
 # --- User Serializer  ---
 class UserSerializer(serializers.ModelSerializer):
@@ -93,3 +93,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # This will call get_token() for us and return the token data
         data = super().validate(attrs)
         return data
+    
+# --- Valuation Serializer ---
+class ValuationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Valuation
+        fields = ['id', 'make', 'model', 'year', 'predicted_price', 'created_at']
+        # We only send back the essentials for the history list

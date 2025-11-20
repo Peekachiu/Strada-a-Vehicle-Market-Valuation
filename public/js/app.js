@@ -3,10 +3,11 @@ import { renderAbout } from './views/aboutView.js';
 import { renderLogin } from './views/loginView.js';
 import { renderSignUp } from './views/signupView.js';
 import { renderValuationPage } from './views/valuationView.js';
-import { renderProfile } from './views/profileView.js';
 import { ValuationController } from './controllers/valuationController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
+import { HistoryController } from './controllers/historyController.js';
+import { ProfileController } from './controllers/profileController.js';
 
 // Global state for the app
 const appState = {
@@ -211,7 +212,9 @@ const router = {
     } else if (page === 'my-valuations') {
       main.innerHTML = `<div class="container" style="padding: 4rem 0;"><h1 class="auth-title">My Valuations</h1><p class="auth-sub">Your saved valuations will appear here.</p></div>`;
     } else if (page === 'profile') {
-      renderProfile(main, appState.currentUser);
+      // We use the Controller now, instead of calling the View directly
+      const profileController = new ProfileController(main);
+      profileController.init();
     } else {
       // 404
       this.navigate(isUserLoggedIn() ? 'home' : 'login'); // Default to home or login
