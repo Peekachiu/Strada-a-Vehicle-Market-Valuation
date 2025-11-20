@@ -54,6 +54,35 @@ class UserSerializer(serializers.ModelSerializer):
         
         return user
 
+    def update(self, instance, validated_data):
+        # 1. Update Phone Number (if provided)
+        phone = validated_data.pop('phone_number_write', None)
+        if phone is not None:
+            # Get or create ensures we don't crash if profile is missing
+            profile, created = Profile.objects.get_or_create(user=instance)
+            profile.phone_number = phone
+            profile.save()
+
+        # 2. Update Email & Username (Keep them synced)
+        new_email = validated_data.get('email')
+        if new_email:
+            instance.email = new_email
+            instance.username = new_email # We use email as username
+        
+        # 3. Update Name
+        full_name = validated_data.get('full_name')
+        if full_name:
+            instance.first_name = full_name.split(' ')[0] if ' ' in full_name else full_name
+            instance.last_name = ' '.join(full_name.split(' ')[1:]) if ' ' in full_name else ''
+
+        # 4. Update Password (Securely)
+        password = validated_data.get('password')
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance
+
 # --- Custom Login Serializer (Accepts Email & Adds Username to Token) ---
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     
