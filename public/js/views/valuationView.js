@@ -44,7 +44,7 @@ export const carData = {
 export function renderValuationPage(container) {
   container.innerHTML = `
     <div class="container" style="padding-top: 0.5rem; padding-bottom: 4rem;">
-      <div class="valuation-header">
+      <div class="valuation-header animate-fade-up">
         <h1 class="auth-title" style="text-align: left; font-size: 2.25rem;">Vehicle Valuation</h1>
         <p class="auth-sub" style="text-align: left; margin-bottom: 0;">
           Get instant, accurate market valuations for any vehicle
@@ -52,14 +52,14 @@ export function renderValuationPage(container) {
       </div>
 
       <div class="valuation-page-grid">
-        <div id="valuation-form-container" class="form-card">
+        <div id="valuation-form-container" class="form-card animate-fade-up stagger-1">
           </div>
 
-        <div id="valuation-results-container">
+        <div id="valuation-results-container" class="animate-fade-up stagger-2">
           </div>
       </div>
 
-      <div class="valuation-tabs-container">
+      <div class="valuation-tabs-container animate-fade-up stagger-3">
         <div class="valuation-tabs-list">
           <button id="tab-trends" class="valuation-tab active" data-tab="trends">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="4"></line><polyline points="6 10 12 4 18 10"></polyline></svg>
@@ -76,19 +76,19 @@ export function renderValuationPage(container) {
       </div>
 
       <div class="valuation-info-cards">
-        <div class="info-card">
+        <div class="info-card reveal-on-scroll stagger-1">
           <h3 class="info-card-title">Accurate Valuations</h3>
           <p class="info-card-desc">
             Our algorithm analyzes market data, condition, mileage, and demand to provide precise valuations
           </p>
         </div>
-        <div class="info-card">
+        <div class="info-card reveal-on-scroll stagger-2">
           <h3 class="info-card-title">Real-Time Data</h3>
           <p class="info-card-desc">
             Market trends and pricing updated regularly to reflect current market conditions
           </p>
         </div>
-        <div class="info-card">
+        <div class="info-card reveal-on-scroll stagger-3">
           <h3 class="info-card-title">Comprehensive Analysis</h3>
           <p class="info-card-desc">
             Detailed breakdowns show how each factor impacts your vehicle's market value
@@ -271,7 +271,7 @@ export function renderBrandModal(container) {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -286,7 +286,7 @@ export function renderModelModal(brand) {
   // 2. Get models for the selected brand from our data
   // Note: Make sure 'carData' is imported or defined at the top of this file!
   const models = carData[brand] || [];
-  
+
   // 3. Generate HTML for model cards
   let modelsHTML = '';
   if (models.length > 0) {
@@ -316,7 +316,7 @@ export function renderModelModal(brand) {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -342,7 +342,7 @@ export function renderValuationPlaceholder(resultContainer) {
  */
 export function renderValuationResults(resultContainer, data) {
   const { basePrice, marketValue, lowRange, highRange, factors, vehicle } = data;
-  
+
   resultContainer.innerHTML = `
     <div class="valuation-results-card form-card">
       <div class="result-header">

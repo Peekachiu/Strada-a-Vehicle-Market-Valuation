@@ -27,11 +27,11 @@ function isUserLoggedIn() {
 function getUserFromToken() {
   const token = localStorage.getItem('accessToken');
   if (!token) return null;
-  
+
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return {
-      displayName: payload.username || 'User' 
+      displayName: payload.username || 'User'
     };
   } catch (e) {
     console.error("Failed to decode token:", e);
@@ -63,7 +63,7 @@ function renderHeader(user) {
   const userName = user?.displayName || 'User';
   const userEmail = user?.email || 'Manage Account';
   const userInitial = userName.charAt(0).toUpperCase();
-  
+
   // Helper for active state
   const isActive = (page) => router.currentPage === page ? 'active' : '';
 
@@ -146,35 +146,35 @@ function renderHeader(user) {
 
 const router = {
   currentPage: null,
-  
+
   navigate(page) {
     if (page === this.currentPage) return;
 
     const loggedIn = isUserLoggedIn(); // Check token
     const authPages = ['login', 'signup'];
     const isAuthPage = authPages.includes(page);
-    
+
     // 1. If user is NOT logged in and tries to access a protected page
     if (!loggedIn && !isAuthPage) {
       console.log("Guest trying to access protected page. Redirecting to login.");
       this.navigate('login');
       return;
     }
-    
+
     // 2. If user IS logged in and tries to access login/signup
     if (loggedIn && isAuthPage) {
       console.log("User already logged in. Redirecting to home.");
       this.navigate('home');
       return;
     }
-    
+
     // 3. Allow navigation
     window.location.hash = page;
     this.currentPage = page;
     this.render();
     window.scrollTo(0, 0);
   },
-  
+
   render() {
     const main = document.getElementById('main-content');
     if (!main) {
@@ -182,7 +182,7 @@ const router = {
       return;
     }
     main.innerHTML = '';
-    
+
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
 
     const authPages = ['login', 'signup'];
@@ -199,13 +199,13 @@ const router = {
       renderHero(main);
     } else if (page === 'about') {
       renderAbout(main);
-    } else if (page === 'login') { 
+    } else if (page === 'login') {
       renderLogin(main);
       new LoginController(main, this, appState, renderHeader);
-    } else if (page === 'signup') { 
+    } else if (page === 'signup') {
       renderSignUp(main);
       new SignUpController(main, this, appState, renderHeader);
-    } else if (page === 'valuation') { 
+    } else if (page === 'valuation') {
       renderValuationPage(main);
       const valuationController = new ValuationController(main);
       valuationController.init();
@@ -220,9 +220,14 @@ const router = {
       this.navigate(isUserLoggedIn() ? 'home' : 'login'); // Default to home or login
       return;
     }
-    
+
     const activeNav = document.querySelector(activeNavSelector);
     if (activeNav) activeNav.classList.add('active');
+
+    // Re-initialize scroll animations for new content
+    if (window.initScrollAnimations) {
+      setTimeout(window.initScrollAnimations, 100); // Small delay to ensure DOM is ready
+    }
   }
 };
 
@@ -230,9 +235,9 @@ const router = {
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log("Strada app initializing...");
-  
+
   // 1. Set up navigation
-  document.body.addEventListener('click', (e) => { 
+  document.body.addEventListener('click', (e) => {
     const navTarget = e.target.closest('a[data-navigate], button[data-navigate]');
     if (navTarget) {
       e.preventDefault();
@@ -240,14 +245,14 @@ document.addEventListener('DOMContentLoaded', () => {
       router.navigate(page);
       return;
     }
-    
+
     // Handle REAL logout
     if (e.target.closest('#logout-btn')) {
       e.preventDefault();
       handleLogout();
       return;
     }
-    
+
     // Handle dropdown toggle
     if (e.target.closest('#user-menu-btn')) {
       document.getElementById('user-dropdown')?.classList.toggle('active');
@@ -260,14 +265,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const handleHashChange = () => {
     const page = window.location.hash.slice(1);
     const loggedIn = isUserLoggedIn();
-    
+
     // On first load, set the user state
     if (loggedIn) {
       appState.currentUser = getUserFromToken();
     } else {
       appState.currentUser = null;
     }
-    
+
     // Re-render header on every navigation
     renderHeader(appState.currentUser);
 
@@ -282,13 +287,38 @@ document.addEventListener('DOMContentLoaded', () => {
       router.navigate(page || (loggedIn ? 'home' : 'login'));
     }
   };
-  
+
   window.addEventListener('hashchange', handleHashChange);
-  
+
   // 5. Initial Page Load
   handleHashChange(); // This sets up the correct initial page
 
   // 6. Set footer year
   const year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();
+
+  // 7. Scroll Animation Observer
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target); // Only animate once
+      }
+    });
+  }, observerOptions);
+
+  // Function to observe elements (can be called after dynamic content loads)
+  window.initScrollAnimations = () => {
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+  };
+
+  // Initial check
+  window.initScrollAnimations();
 });
