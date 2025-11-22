@@ -68,7 +68,7 @@ function renderHeader(user) {
   const isActive = (page) => router.currentPage === page ? 'active' : '';
 
   // Your Logo Image
-  const logoHTML = `<img src="static/assets/images/strada_logo.jpg" alt="Strada" class="nav-logo-img">`;
+  const logoHTML = `<img src="assets/images/strada_logo.jpg" alt="Strada" class="nav-logo-img">`;
 
   // Icons
   const icons = {

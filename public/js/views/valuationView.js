@@ -2,39 +2,39 @@
 // You will update the image paths later.
 export const carData = {
   "Honda": [
-    { name: "Civic", img: "static/assets/images/civic.png" },
-    { name: "City", img: "static/assets/images/city.webp" },
-    { name: "Accord", img: "static/assets/images/accord.avif" },
-    { name: "Jazz", img: "static/assets/images/jazz.avif" },
-    { name: "CR-V", img: "static/assets/images/cr-v.png" },
-    { name: "HR-V", img: "static/assets/images/hr-v.png" },
-    { name: "BR-V", img: "static/assets/images/br-v.jpg" }
+    { name: "Civic", img: "assets/images/civic.png" },
+    { name: "City", img: "assets/images/city.webp" },
+    { name: "Accord", img: "assets/images/accord.avif" },
+    { name: "Jazz", img: "assets/images/jazz.avif" },
+    { name: "CR-V", img: "assets/images/cr-v.png" },
+    { name: "HR-V", img: "assets/images/hr-v.png" },
+    { name: "BR-V", img: "assets/images/br-v.jpg" }
   ],
   "Toyota": [
-    { name: "Vios", img: "static/assets/images/vios.png" },
-    { name: "Corolla", img: "static/assets/images/corolla.png" },
-    { name: "Camry", img: "static/assets/images/camry.avif" },
-    { name: "Yaris", img: "static/assets/images/yaris.jpg" },
-    { name: "Hilux", img: "static/assets/images/hilux.png" },
-    { name: "Fortuner", img: "static/assets/images/fortuner.png" }
+    { name: "Vios", img: "assets/images/vios.png" },
+    { name: "Corolla", img: "assets/images/corolla.png" },
+    { name: "Camry", img: "assets/images/camry.avif" },
+    { name: "Yaris", img: "assets/images/yaris.jpg" },
+    { name: "Hilux", img: "assets/images/hilux.png" },
+    { name: "Fortuner", img: "assets/images/fortuner.png" }
   ],
   "Nissan": [
-    { name: "Almera", img: "static/assets/images/almera.jpg" },
-    { name: "Serena", img: "static/assets/images/serena.png" },
-    { name: "X-Trail", img: "static/assets/images/xtrail.png" },
-    { name: "Navara", img: "static/assets/images/navara.jpg" }
+    { name: "Almera", img: "assets/images/almera.jpg" },
+    { name: "Serena", img: "assets/images/serena.png" },
+    { name: "X-Trail", img: "assets/images/xtrail.png" },
+    { name: "Navara", img: "assets/images/navara.jpg" }
   ],
   "Mazda": [
-    { name: "Mazda2", img: "static/assets/images/mazda2.webp" },
-    { name: "Mazda3", img: "static/assets/images/mazda3.webp" },
-    { name: "Mazda6", img: "static/assets/images/mazda6.jpg" },
-    { name: "CX-5", img: "static/assets/images/cx5.png" }
+    { name: "Mazda2", img: "assets/images/mazda2.webp" },
+    { name: "Mazda3", img: "assets/images/mazda3.webp" },
+    { name: "Mazda6", img: "assets/images/mazda6.jpg" },
+    { name: "CX-5", img: "assets/images/cx5.png" }
   ],
   "Lexus": [
-    { name: "ES", img: "static/assets/images/es.avif" },
-    { name: "IS", img: "static/assets/images/is.webp" },
-    { name: "RX", img: "static/assets/images/rx.webp" },
-    { name: "NX", img: "static/assets/images/nx.webp" }
+    { name: "ES", img: "assets/images/es.avif" },
+    { name: "IS", img: "assets/images/is.webp" },
+    { name: "RX", img: "assets/images/rx.webp" },
+    { name: "NX", img: "assets/images/nx.webp" }
   ]
 };
 
@@ -205,7 +205,7 @@ export function renderBrandModal(container) {
             <div class="modal-brand-card" data-brand="Honda">
               ${checkmarkHTML}
               <div class="modal-brand-icon">
-                <img src="static/assets/images/honda_logo.jpg" alt="Honda">
+                <img src="assets/images/honda_logo.jpg" alt="Honda">
               </div>
               <span>Honda</span>
             </div>
@@ -214,7 +214,7 @@ export function renderBrandModal(container) {
             <div class="modal-brand-card" data-brand="Toyota">
               ${checkmarkHTML}
               <div class="modal-brand-icon">
-                <img src="static/assets/images/toyota_logo.jpg" alt="Toyota">
+                <img src="assets/images/toyota_logo.jpg" alt="Toyota">
               </div>
               <span>Toyota</span>
             </div>
@@ -223,7 +223,7 @@ export function renderBrandModal(container) {
             <div class="modal-brand-card" data-brand="Nissan">
               ${checkmarkHTML}
               <div class="modal-brand-icon">
-                <img src="static/assets/images/nissan_logo.png" alt="Nissan">
+                <img src="assets/images/nissan_logo.png" alt="Nissan">
               </div>
               <span>Nissan</span>
             </div>
@@ -232,7 +232,7 @@ export function renderBrandModal(container) {
             <div class="modal-brand-card" data-brand="Mazda">
               ${checkmarkHTML}
               <div class="modal-brand-icon">
-                <img src="static/assets/images/mazda_logo.jpeg" alt="Mazda">
+                <img src="assets/images/mazda_logo.jpeg" alt="Mazda">
               </div>
               <span>Mazda</span>
             </div>
@@ -241,7 +241,7 @@ export function renderBrandModal(container) {
             <div class="modal-brand-card" data-brand="Lexus">
               ${checkmarkHTML}
               <div class="modal-brand-icon">
-                <img src="static/assets/images/lexus_logo.webp" alt="Lexus">
+                <img src="assets/images/lexus_logo.webp" alt="Lexus">
               </div>
               <span>Lexus</span>
             </div>
@@ -249,19 +249,19 @@ export function renderBrandModal(container) {
             <!-- Disabled Brands -->
             <div class="modal-brand-card disabled" data-brand="BMW">
                <div class="modal-brand-icon">
-                 <img src="static/assets/images/bmw_logo.png" alt="BMW">
+                 <img src="assets/images/bmw_logo.png" alt="BMW">
                </div> 
                <span>BMW</span>
             </div>
              <div class="modal-brand-card disabled" data-brand="Mercedes">
                <div class="modal-brand-icon">
-                 <img src="static/assets/images/mercedes_logo.png" alt="Mercedes">
+                 <img src="assets/images/mercedes_logo.png" alt="Mercedes">
                </div>
                <span>Mercedes</span>
             </div>
              <div class="modal-brand-card disabled" data-brand="Audi">
                <div class="modal-brand-icon">
-                 <img src="static/assets/images/audi_logo.png" alt="Audi">
+                 <img src="assets/images/audi_logo.png" alt="Audi">
                </div>
                <span>Audi</span>
             </div>
