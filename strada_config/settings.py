@@ -128,6 +128,9 @@ USE_TZ = True
 # We are using the standard, recommended value: 'static/'
 STATIC_URL = 'static/'
 
+import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 # This tells Django to find your files in the 'public' folder.
 STATICFILES_DIRS = [
     BASE_DIR / 'public'
