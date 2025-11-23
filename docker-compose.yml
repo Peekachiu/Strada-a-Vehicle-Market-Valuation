@@ -1,8 +1,10 @@
-
 services:
   # Service 1: The Django Backend
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile  # Assuming this is in the root directory
+    image: peekachiu/strada-backend:latest
     container_name: strada_backend
     volumes:
       - .:/app  # Syncs your code so you don't have to rebuild on every change
@@ -14,8 +16,11 @@ services:
 
   # Service 2: The Nginx Web Server
   nginx:
-    image: nginx:alpine
-    container_name: strada_nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile  # Updated path to the Dockerfile inside the nginx folder
+    image: peekachiu/strada-frontend:latest
+    container_name: strada_frontend
     ports:
       - "80:80" # Maps localhost:80 to Nginx
     volumes:
