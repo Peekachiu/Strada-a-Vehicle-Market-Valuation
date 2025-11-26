@@ -337,11 +337,26 @@ export function renderValuationPlaceholder(resultContainer) {
   `;
 }
 
-/**
- * Renders the valuation results card.
- */
 export function renderValuationResults(resultContainer, data) {
-  const { basePrice, marketValue, lowRange, highRange, factors, vehicle } = data;
+  const { marketValue, lowRange, highRange, vehicle, explanation } = data;
+
+  // Generate HTML for explanation items
+  const explanationHTML = explanation && explanation.length > 0
+    ? explanation.map(item => {
+      const parts = item.split(': RM ');
+      const label = parts[0];
+      const value = parts[1] ? `RM ${parts[1]}` : '';
+      const isNegative = value.includes('-');
+      const valueClass = isNegative ? 'text-red-500' : 'text-green-500';
+
+      return `
+          <div class="factor-item">
+            <span>${label}</span>
+            <span class="factor-value ${valueClass}">${value}</span>
+          </div>
+        `;
+    }).join('')
+    : '<p>No detailed explanation available.</p>';
 
   resultContainer.innerHTML = `
     <div class="valuation-results-card form-card">
@@ -354,27 +369,8 @@ export function renderValuationResults(resultContainer, data) {
       </div>
       
       <div class="result-factors">
-        <h4 class="result-factors-title">Valuation Factors</h4>
-        <div class="factor-item">
-          <span>Base Price</span>
-          <span class="factor-value">RM ${basePrice.toLocaleString()}</span>
-        </div>
-        <div class="factor-item">
-          <span>Condition Adjustment</span>
-          <span class="factor-value">${(factors.condition * 100).toFixed(0)}%</span>
-        </div>
-        <div class="factor-item">
-          <span>Mileage Adjustment</span>
-          <span class="factor-value">${(factors.mileage * 100).toFixed(0)}%</span>
-        </div>
-        <div class="factor-item">
-          <span>Age Adjustment</span>
-          <span class="factor-value">${(factors.age * 100).toFixed(0)}%</span>
-        </div>
-        <div class="factor-item">
-          <span>Market Demand</span>
-          <span class="factor-value">${(factors.demand * 100).toFixed(0)}%</span>
-        </div>
+        <h4 class="result-factors-title">Price Breakdown</h4>
+        ${explanationHTML}
       </div>
     </div>
   `;

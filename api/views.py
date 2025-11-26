@@ -83,6 +83,66 @@ class EstimateView(APIView):
             final_price = round(predicted_price, 2)
             print(f"[DEBUG] Predicted Price: RM {final_price}")
 
+            # --- EXPLANATION LOGIC ---
+            explanation = []
+            try:
+                # Access steps
+                regressor = model.named_steps['regressor']
+                preprocessor = model.named_steps['preprocessor']
+                
+                # Get Scaler info
+                scaler = preprocessor.named_transformers_['num']['scaler']
+                scaler_mean = scaler.mean_
+                scaler_scale = scaler.scale_
+                numeric_features = ['age', 'mileage_km']
+                
+                # Get Categorical info
+                ohe = preprocessor.named_transformers_['cat']['onehot']
+                categorical_features = ['make', 'model', 'condition', 'transmission', 'fuel_type']
+                
+                # Get Coefficients
+                coefs = regressor.coef_
+                intercept = regressor.intercept_
+                
+                # Map coefficients
+                ohe_feature_names = ohe.get_feature_names_out(categorical_features)
+                all_feature_names = numeric_features + list(ohe_feature_names)
+                coef_dict = dict(zip(all_feature_names, coefs))
+                
+                # Base Price
+                explanation.append(f"Base Price: RM {intercept:,.2f}")
+                
+                # Numeric Contributions
+                # age
+                age_val = car_age
+                age_scaled = (age_val - scaler_mean[0]) / scaler_scale[0]
+                age_contrib = coef_dict['age'] * age_scaled
+                explanation.append(f"Age ({age_val} years): RM {age_contrib:,.2f}")
+                
+                # mileage
+                mileage_val = float(data.get('mileage'))
+                mileage_scaled = (mileage_val - scaler_mean[1]) / scaler_scale[1]
+                mileage_contrib = coef_dict['mileage_km'] * mileage_scaled
+                explanation.append(f"Mileage ({mileage_val:,.0f} km): RM {mileage_contrib:,.2f}")
+
+                # Categorical Contributions
+                for feature in categorical_features:
+                    val = data.get(feature) # e.g. "Honda"
+                    if not val: continue
+                    # Construct OHE feature name, e.g. "make_Honda"
+                    # Note: OHE usually outputs "feature_value"
+                    target_col = f"{feature}_{val}"
+                    if target_col in coef_dict:
+                        contrib = coef_dict[target_col]
+                        explanation.append(f"{feature.capitalize()} ({val}): RM {contrib:,.2f}")
+                    else:
+                        # If not found, it might be a reference category or unseen
+                        pass
+
+            except Exception as exp_e:
+                print(f"Explanation Error: {exp_e}")
+                explanation.append("Could not generate detailed explanation.")
+
             # Save the valuation to the database
             Valuation.objects.create(
                 user=request.user,
@@ -100,7 +160,8 @@ class EstimateView(APIView):
             return Response({
                 "estimated_price": round(predicted_price, 2),
                 "model": data.get('model'),
-                "year": input_year
+                "year": input_year,
+                "explanation": explanation
             })
 
         except Exception as e:
