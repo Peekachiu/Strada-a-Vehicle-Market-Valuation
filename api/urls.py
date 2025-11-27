@@ -14,4 +14,5 @@ urlpatterns = [
     path('estimate/', views.EstimateView.as_view(), name='estimate'),
     path('me/', views.GetUserView.as_view(), name='get_user'),
     path('history/', views.HistoryView.as_view(), name='history'),
+    path('history/<int:pk>/', views.ValuationDetailView.as_view(), name='history_detail'),
 ]

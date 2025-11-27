@@ -6,7 +6,7 @@ export function renderProfilePage(container, user) {
   // 1. Prepare User Data
   const userName = user.username || "User"; // Fallback if fields are missing
   const userEmail = user.email;
-  const userPhone = user.phone_number || 'Not set'; 
+  const userPhone = user.phone_number || 'Not set';
   const userInitial = userName.charAt(0).toUpperCase();
   const dateJoined = user.date_joined
     ? new Date(user.date_joined).toLocaleDateString('en-MY', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -141,17 +141,17 @@ export function renderProfilePage(container, user) {
       </div>
     </div>
   `;
-  
+
   // 3. Attach Tab Switching Logic (Kept same)
   const tabTriggers = container.querySelectorAll('.tab-trigger');
   const tabPanes = container.querySelectorAll('.tab-pane');
-  
+
   tabTriggers.forEach(trigger => {
     trigger.addEventListener('click', () => {
       tabTriggers.forEach(t => {
-          t.classList.remove('active');
-          t.style.color = '#6b7280';
-          t.style.borderBottomColor = 'transparent';
+        t.classList.remove('active');
+        t.style.color = '#6b7280';
+        t.style.borderBottomColor = 'transparent';
       });
       tabPanes.forEach(pane => pane.style.display = 'none');
       trigger.classList.add('active');
@@ -167,13 +167,15 @@ export function renderProfilePage(container, user) {
  * Updates the History Tab with the list of valuations.
  * Called by the Controller after fetching data.
  */
-export function renderProfileHistoryRows(valuations) {
-    const container = document.getElementById('history-list-container');
-    if (!container) return;
+export function renderProfileHistoryRows(data, onNavigate, onDelete) {
+  const container = document.getElementById('history-list-container');
+  if (!container) return;
 
-    // Empty State (Your original SVG design)
-    if (!valuations || valuations.length === 0) {
-        container.innerHTML = `
+  const valuations = data.results || [];
+
+  // Empty State (Your original SVG design)
+  if (!valuations || valuations.length === 0) {
+    container.innerHTML = `
          <div class="profile-empty-state" style="text-align: center; padding: 3rem 1rem; color: #9ca3af;">
            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9L1.4 16.1c-.5 1.1.3 2.4 1.6 2.4H4c.6 0 1-.4 1-1v-1c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v1c0 .6.4 1 1 1h2c1.1 0 2.1-.8 2.1-1.9 0-.8-.5-1.5-1.2-1.8z"/>
@@ -183,52 +185,88 @@ export function renderProfileHistoryRows(valuations) {
            <p class="text-sm">Start by getting your first vehicle valuation</p>
          </div>
         `;
-        return;
-    }
+    return;
+  }
 
-    // Render List of Items
-    const listHTML = valuations.map(val => {
-        const price = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val.predicted_price);
-        const date = new Date(val.created_at).toLocaleDateString('en-MY');
-        
-        return `
+  // Render List of Items
+  const listHTML = valuations.map(val => {
+    const price = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val.predicted_price);
+    const date = new Date(val.created_at).toLocaleDateString('en-MY');
+
+    return `
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #f3f4f6;">
             <div>
                 <h4 style="margin: 0; font-size: 1rem; color: #1f2937;">${val.year} ${val.make} ${val.model}</h4>
                 <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6b7280;">${val.mileage.toLocaleString()} km • ${date}</p>
             </div>
-            <div style="text-align: right;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
                 <span style="font-weight: 700; color: #059669; font-size: 1.1rem;">${price}</span>
+                <button class="delete-valuation-btn" data-id="${val.id}" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 0.25rem; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
             </div>
         </div>
         `;
-    }).join('');
+  }).join('');
 
-    container.innerHTML = `<div style="border: 1px solid #e5e7eb; border-radius: 8px;">${listHTML}</div>`;
+  // Pagination Controls
+  let paginationHTML = '';
+  if (data.next || data.previous) {
+    paginationHTML = `
+        <div style="display: flex; justify-content: space-between; padding: 1rem; border-top: 1px solid #e5e7eb;">
+            <button id="prev-page-btn" ${!data.previous ? 'disabled' : ''} style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: ${!data.previous ? '#f3f4f6' : 'white'}; color: ${!data.previous ? '#9ca3af' : '#374151'}; cursor: ${!data.previous ? 'not-allowed' : 'pointer'};">
+                Previous
+            </button>
+            <button id="next-page-btn" ${!data.next ? 'disabled' : ''} style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: ${!data.next ? '#f3f4f6' : 'white'}; color: ${!data.next ? '#9ca3af' : '#374151'}; cursor: ${!data.next ? 'not-allowed' : 'pointer'};">
+                Next
+            </button>
+        </div>
+        `;
+  }
+
+  container.innerHTML = `<div style="border: 1px solid #e5e7eb; border-radius: 8px;">${listHTML}${paginationHTML}</div>`;
+
+  // Attach Event Listeners
+  if (data.previous) {
+    document.getElementById('prev-page-btn').addEventListener('click', () => onNavigate(data.previous));
+  }
+  if (data.next) {
+    document.getElementById('next-page-btn').addEventListener('click', () => onNavigate(data.next));
+  }
+
+  // Attach Delete Listeners
+  const deleteBtns = container.querySelectorAll('.delete-valuation-btn');
+  deleteBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      onDelete(id);
+    });
+    // Add hover effect
+    btn.addEventListener('mouseenter', () => btn.style.background = '#fee2e2');
+    btn.addEventListener('mouseleave', () => btn.style.background = 'none');
+  });
 }
 
 /**
  * Updates the Account Summary card with real statistics calculated from history.
  */
-export function updateProfileStats(valuations) {
+export function updateProfileStats(stats) {
   // 1. Find the container (we need to add an ID to the summary card first, see Step 2)
   const container = document.getElementById('account-stats-content');
   if (!container) return;
 
-  // 2. Calculate Stats
-  const totalCount = valuations.length;
-  
-  // Sum up the prices (handling strings vs numbers)
-  const totalValueRaw = valuations.reduce((sum, item) => {
-    return sum + parseFloat(item.predicted_price);
-  }, 0);
+  // 2. Use Stats from Backend
+  const totalCount = stats.total_count || 0;
 
   // Format Currency
-  const totalValue = new Intl.NumberFormat('en-MY', { 
-    style: 'currency', 
+  const totalValue = new Intl.NumberFormat('en-MY', {
+    style: 'currency',
     currency: 'MYR',
-    maximumFractionDigits: 0 
-  }).format(totalValueRaw);
+    maximumFractionDigits: 0
+  }).format(stats.total_value || 0);
 
   // 3. Render
   container.innerHTML = `

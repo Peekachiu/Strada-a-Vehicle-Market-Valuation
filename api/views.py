@@ -20,6 +20,9 @@ from .serializers import UserSerializer
 from .models import Profile, Valuation 
 from .serializers import UserSerializer, MyTokenObtainPairSerializer, ValuationSerializer
 
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Sum
+
 class SignUpView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -168,10 +171,50 @@ class EstimateView(APIView):
             print(f"Prediction Error: {e}")
             return Response({"error": str(e)}, status=400)
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class HistoryView(generics.ListAPIView):
     serializer_class = ValuationSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self) -> Any:
         # Return only the valuations that belong to the currently logged-in user
         return Valuation.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        # Calculate stats on the full queryset BEFORE pagination
+        total_count = queryset.count()
+        total_value = queryset.aggregate(Sum('predicted_price'))['predicted_price__sum'] or 0
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+            response.data['stats'] = {
+                'total_count': total_count,
+                'total_value': total_value
+            }
+            return response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'results': serializer.data,
+            'stats': {
+                'total_count': total_count,
+                'total_value': total_value
+            }
+        })
+
+class ValuationDetailView(generics.RetrieveDestroyAPIView):
+    serializer_class = ValuationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Ensure users can only delete their own valuations
+        return Valuation.objects.filter(user=self.request.user)
