@@ -3,6 +3,7 @@ import { renderAbout } from './views/aboutView.js';
 import { renderLogin } from './views/loginView.js';
 import { renderSignUp } from './views/signupView.js';
 import { renderValuationPage } from './views/valuationView.js';
+import { renderGallery } from './views/galleryView.js';
 import { ValuationController } from './controllers/valuationController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
