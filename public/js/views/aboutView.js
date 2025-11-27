@@ -40,12 +40,7 @@ export function renderAbout(container) {
           </div>
           <div class="story-image reveal-on-scroll stagger-2">
             <div class="story-placeholder">
-              <svg width="100%" height="100%" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="400" height="300" fill="#f3f4f6"/>
-                <path d="M200 120L160 180H240L200 120Z" fill="#9ca3af"/>
-                <circle cx="200" cy="150" r="30" fill="#d1d5db"/>
-                <text x="200" y="200" font-family="system-ui" font-size="16" fill="#6b7280" text-anchor="middle">Team Image</text>
-              </svg>
+              <img src="assets/images/IMG_0190.JPEG" alt="Our Team" style="width: 100%; height: auto; border-radius: 12px; object-fit: cover;">
             </div>
           </div>
         </div>
