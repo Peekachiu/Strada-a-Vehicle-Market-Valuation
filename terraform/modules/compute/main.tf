@@ -1,0 +1,81 @@
+# --- IAM Role for SSM ---
+resource "aws_iam_role" "ssm_role" {
+  name = "${var.project_name}-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm_profile" {
+  name = "${var.project_name}-ssm-profile"
+  role = aws_iam_role.ssm_role.name
+}
+
+# --- Key Pair ---
+resource "aws_key_pair" "deployer" {
+  key_name   = "${var.project_name}-key"
+  public_key = var.public_key
+}
+
+# --- Web Servers ---
+resource "aws_instance" "web" {
+  count                  = 2
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  subnet_id              = var.public_subnet_ids[count.index]
+  vpc_security_group_ids = [var.web_sg_id]
+  key_name               = aws_key_pair.deployer.key_name
+  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
+
+  tags = {
+    Name = "${var.project_name}-web-${count.index + 1}"
+    Role = "web"
+  }
+
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              amazon-linux-extras install docker -y
+              service docker start
+              usermod -a -G docker ec2-user
+              EOF
+}
+
+# --- API Servers ---
+resource "aws_instance" "api" {
+  count                  = 2
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  subnet_id              = var.private_subnet_ids[count.index]
+  vpc_security_group_ids = [var.api_sg_id]
+  key_name               = aws_key_pair.deployer.key_name
+  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
+
+  tags = {
+    Name = "${var.project_name}-api-${count.index + 1}"
+    Role = "api"
+  }
+
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              amazon-linux-extras install docker -y
+              service docker start
+              usermod -a -G docker ec2-user
+              EOF
+}
