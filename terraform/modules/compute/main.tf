@@ -43,10 +43,11 @@ resource "aws_instance" "web" {
 
   user_data = <<-EOF
               #!/bin/bash
-              yum update -y
-              amazon-linux-extras install docker -y
-              service docker start
-              usermod -a -G docker ec2-user
+              apt-get update -y
+              apt-get install -y docker.io
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ubuntu
               EOF
 }
 
@@ -67,9 +68,10 @@ resource "aws_instance" "api" {
 
   user_data = <<-EOF
               #!/bin/bash
-              yum update -y
-              amazon-linux-extras install docker -y
-              service docker start
-              usermod -a -G docker ec2-user
+              apt-get update -y
+              apt-get install -y docker.io
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ubuntu
               EOF
 }
