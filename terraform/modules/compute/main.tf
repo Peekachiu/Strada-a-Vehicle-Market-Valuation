@@ -59,7 +59,6 @@ resource "aws_instance" "api" {
   vpc_security_group_ids = [var.api_sg_id]
   key_name               = var.ssh_key_name
   iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
-  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
 
   tags = {
     Name = "${var.project_name}-api-${count.index + 1}"
