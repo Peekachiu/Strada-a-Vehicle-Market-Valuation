@@ -14,8 +14,8 @@ variable "ami_id" {
   type        = string
 }
 
-variable "public_key" {
-  description = "SSH Public Key"
+variable "ssh_key_name" {
+  description = "Name of the existing AWS Key Pair"
   type        = string
 }
 

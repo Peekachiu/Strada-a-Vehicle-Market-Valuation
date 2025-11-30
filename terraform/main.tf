@@ -29,7 +29,7 @@ module "compute" {
   project_name       = var.project_name
   instance_type      = var.instance_type
   ami_id             = var.ami_id
-  public_key         = var.public_key
+  ssh_key_name       = var.ssh_key_name
   public_subnet_ids  = module.vpc.public_subnet_ids
   private_subnet_ids = module.vpc.private_subnet_ids
   web_sg_id          = module.security.web_sg_id

@@ -28,8 +28,8 @@ variable "ami_id" {
   default     = "ami-0c55b159cbfafe1f0" # Update this for your region!
 }
 
-variable "public_key" {
-  description = "SSH Public Key"
+variable "ssh_key_name" {
+  description = "Name of the existing AWS Key Pair"
   type        = string
 }
 
