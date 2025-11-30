@@ -24,11 +24,26 @@ module "database" {
   db_password        = var.db_password
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 module "compute" {
   source             = "./modules/compute"
   project_name       = var.project_name
   instance_type      = var.instance_type
-  ami_id             = var.ami_id
+  ami_id             = data.aws_ami.ubuntu.id
   ssh_key_name       = var.ssh_key_name
   public_subnet_ids  = module.vpc.public_subnet_ids
   private_subnet_ids = module.vpc.private_subnet_ids
