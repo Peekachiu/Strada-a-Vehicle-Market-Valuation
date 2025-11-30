@@ -22,7 +22,7 @@ env:
 
 jobs:
   backend-bootstrap:
-    name: Deploy Backend Infrastructure
+    name: Terraform Deployment (Backend)
     if: github.event.inputs.scope == 'backend'
     runs-on: ubuntu-latest
     defaults:
@@ -58,7 +58,7 @@ jobs:
         run: terraform apply -auto-approve -input=false
 
   terraform:
-    name: Terraform Apply (Main)
+    name: Terraform Deployment (Main)
     if: github.event.inputs.scope == 'main' || github.event.inputs.scope == ''
     runs-on: ubuntu-latest
     defaults:
