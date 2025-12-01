@@ -4,9 +4,11 @@ import { renderLogin } from './views/loginView.js';
 import { renderSignUp } from './views/signupView.js';
 import { renderValuationPage } from './views/valuationView.js';
 import { renderCalculatorPage } from './views/calculatorView.js';
+import { renderRoadTaxPage } from './views/roadTaxView.js';
 import { renderGallery } from './views/galleryView.js';
 import { ValuationController } from './controllers/valuationController.js';
 import { CalculatorController } from './controllers/calculatorController.js';
+import { RoadTaxController } from './controllers/roadTaxController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
 import { ProfileController } from './controllers/profileController.js';
@@ -107,9 +109,20 @@ function renderHeader(user) {
           <button class="site-nav-item ${isActive('valuation')}" data-navigate="valuation">
             ${icons.money} Get Car Price
           </button>
-          <button class="site-nav-item ${isActive('calculator')}" data-navigate="calculator">
-            ${icons.calc} Loan Calculator
-          </button>
+          
+          <div class="nav-item-dropdown-wrapper">
+            <button class="site-nav-item ${isActive('calculator') || isActive('road-tax') ? 'active' : ''}" id="calc-menu-btn">
+              ${icons.calc} Calculation
+            </button>
+            <div class="nav-dropdown" id="calc-dropdown">
+               <a class="nav-dropdown-item" data-navigate="calculator">
+                Loan Calculator
+              </a>
+              <a class="nav-dropdown-item" data-navigate="road-tax">
+                Road Tax Calculator
+              </a>
+            </div>
+          </div>
         </div>
 
         <div class="nav-user-section">
@@ -223,6 +236,10 @@ const router = {
       renderCalculatorPage(main);
       const calculatorController = new CalculatorController(main);
       calculatorController.init();
+    } else if (page === 'road-tax') {
+      renderRoadTaxPage(main);
+      const roadTaxController = new RoadTaxController(main);
+      roadTaxController.init();
     } else if (page === 'gallery') {
       renderGallery(main);
     } else if (page === 'my-valuations') {
@@ -269,11 +286,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Handle dropdown toggle
+    // Handle dropdown toggle (User Menu)
     if (e.target.closest('#user-menu-btn')) {
       document.getElementById('user-dropdown')?.classList.toggle('active');
+      document.getElementById('calc-dropdown')?.classList.remove('active'); // Close other
+    }
+    // Handle dropdown toggle (Calculation Menu)
+    else if (e.target.closest('#calc-menu-btn')) {
+      document.getElementById('calc-dropdown')?.classList.toggle('active');
+      document.getElementById('user-dropdown')?.classList.remove('active'); // Close other
     } else {
+      // Close all if clicked outside
       document.getElementById('user-dropdown')?.classList.remove('active');
+      document.getElementById('calc-dropdown')?.classList.remove('active');
     }
   });
 
