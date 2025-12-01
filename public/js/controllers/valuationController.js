@@ -335,7 +335,8 @@ export class ValuationController {
           highRange: data.estimated_price * 1.05, // +5%
           vehicle: { year, make, model },
           explanation: data.explanation || [], // Pass the explanation list
-          history: this.generateMockHistory(data.estimated_price) // Generate mock history
+          history: this.generateMockHistory(data.estimated_price), // Generate mock history
+          comparisons: this.generateMockComparisons({ year, make, model, mileage }, data.estimated_price) // Generate mock comparisons
         };
 
         this.latestValuationData = resultData; // Store for tabs
@@ -384,6 +385,34 @@ export class ValuationController {
     }
 
     return { labels, prices };
+  }
+
+  generateMockComparisons(vehicle, currentPrice) {
+    const comparisons = [];
+    const numListings = 3;
+
+    for (let i = 0; i < numListings; i++) {
+      // Randomize mileage (+/- 20%)
+      const mileageVariation = 1 + ((Math.random() - 0.5) * 0.4);
+      const mockMileage = Math.round(vehicle.mileage * mileageVariation);
+
+      // Randomize price based on mileage (lower mileage = higher price)
+      // Inverse relationship: if mileage is 1.2x, price should be roughly 0.9x
+      const priceFactor = 1 / mileageVariation;
+      // Add some random noise to price (+/- 5%)
+      const priceNoise = 1 + ((Math.random() - 0.5) * 0.1);
+      const mockPrice = Math.round(currentPrice * priceFactor * priceNoise);
+
+      comparisons.push({
+        title: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+        mileage: mockMileage,
+        price: mockPrice,
+        difference: mockPrice - currentPrice
+      });
+    }
+
+    // Sort by price ascending
+    return comparisons.sort((a, b) => a.price - b.price);
   }
 
   /**

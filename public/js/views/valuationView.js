@@ -471,10 +471,63 @@ export function renderTabContent(tabContainer, tabName, data) {
     }
 
   } else if (tabName === 'comparison') {
+    let contentHTML = '';
+
+    if (data && data.comparisons && data.comparisons.length > 0) {
+      const cardsHTML = data.comparisons.map(item => {
+        const diffValue = item.difference;
+        const isCheaper = diffValue < 0;
+        const diffText = isCheaper
+          ? `RM ${Math.abs(diffValue).toLocaleString()} Lower`
+          : `RM ${Math.abs(diffValue).toLocaleString()} Higher`;
+        const diffClass = isCheaper ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+
+        // Simple car icon placeholder if no image
+        const imgHTML = `
+          <div style="width: 100%; height: 120px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 1rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9L1.4 16.1c-.5 1.1.3 2.4 1.6 2.4H4c.6 0 1-.4 1-1v-1c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v1c0 .6.4 1 1 1h2c1.1 0 2.1-.8 2.1-1.9 0-.8-.5-1.5-1.2-1.8z"></path>
+              <circle cx="6.5" cy="17.5" r="2.5"></circle>
+              <circle cx="17.5" cy="17.5" r="2.5"></circle>
+            </svg>
+          </div>
+        `;
+
+        return `
+          <div class="comparison-card" style="border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; background: white;">
+            ${imgHTML}
+            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">${item.title}</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span class="text-muted-foreground" style="font-size: 0.875rem;">${item.mileage.toLocaleString()} km</span>
+              <span style="font-weight: 700; color: #111827;">RM ${item.price.toLocaleString()}</span>
+            </div>
+            <div style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; ${isCheaper ? 'background-color: #ecfdf5; color: #059669;' : 'background-color: #fef2f2; color: #dc2626;'}">
+              ${diffText}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      contentHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+          ${cardsHTML}
+        </div>
+      `;
+    } else {
+      contentHTML = `
+        <p class="text-muted-foreground">
+          Perform a valuation to see similar listings here.
+        </p>
+      `;
+    }
+
     tabContainer.innerHTML = `
       <div class="form-card">
-        <h3 class="auth-title" style="font-size: 1.5rem; text-align: left;">Market Comparison</h3>
-        <p class="text-muted-foreground">A comparison of ${data ? `a ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}` : 'this vehicle'} against similar models in the market will be shown here. This feature is coming soon.</p>
+        <h3 class="auth-title" style="font-size: 1.5rem; text-align: left; margin-bottom: 1rem;">Market Comparison</h3>
+        <p class="text-muted-foreground" style="margin-bottom: 1.5rem;">
+          Similar vehicles currently on the market based on your valuation.
+        </p>
+        ${contentHTML}
       </div>
     `;
   }
