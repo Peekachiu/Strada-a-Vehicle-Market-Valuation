@@ -6,11 +6,15 @@ import { renderValuationPage } from './views/valuationView.js';
 import { renderCalculatorPage } from './views/calculatorView.js';
 import { renderRoadTaxPage } from './views/roadTaxView.js';
 import { renderInsurancePage } from './views/insuranceView.js';
+import { renderAffordabilityPage } from './views/affordabilityView.js';
+import { renderDepreciationPage } from './views/depreciationView.js';
 import { renderGallery } from './views/galleryView.js';
 import { ValuationController } from './controllers/valuationController.js';
 import { CalculatorController } from './controllers/calculatorController.js';
 import { RoadTaxController } from './controllers/roadTaxController.js';
 import { InsuranceController } from './controllers/insuranceController.js';
+import { AffordabilityController } from './controllers/affordabilityController.js';
+import { DepreciationController } from './controllers/depreciationController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
 import { ProfileController } from './controllers/profileController.js';
@@ -113,7 +117,7 @@ function renderHeader(user) {
           </button>
           
           <div class="nav-item-dropdown-wrapper">
-            <button class="site-nav-item ${isActive('calculator') || isActive('road-tax') || isActive('insurance-calculator') ? 'active' : ''}" id="calc-menu-btn">
+            <button class="site-nav-item ${isActive('calculator') || isActive('road-tax') || isActive('insurance-calculator') || isActive('affordability-calculator') || isActive('depreciation-calculator') ? 'active' : ''}" id="calc-menu-btn">
               ${icons.calc} Calculation
             </button>
             <div class="nav-dropdown" id="calc-dropdown">
@@ -125,6 +129,12 @@ function renderHeader(user) {
               </a>
               <a class="nav-dropdown-item" data-navigate="insurance-calculator">
                 Insurance Estimator
+              </a>
+              <a class="nav-dropdown-item" data-navigate="affordability-calculator">
+                Affordability Calculator
+              </a>
+              <a class="nav-dropdown-item" data-navigate="depreciation-calculator">
+                Depreciation Simulator
               </a>
             </div>
           </div>
@@ -249,6 +259,14 @@ const router = {
       renderInsurancePage(main);
       const insuranceController = new InsuranceController(main);
       insuranceController.init();
+    } else if (page === 'affordability-calculator') {
+      renderAffordabilityPage(main);
+      const affordabilityController = new AffordabilityController(main);
+      affordabilityController.init();
+    } else if (page === 'depreciation-calculator') {
+      renderDepreciationPage(main);
+      const depreciationController = new DepreciationController(main);
+      depreciationController.init();
     } else if (page === 'gallery') {
       renderGallery(main);
     } else if (page === 'my-valuations') {
