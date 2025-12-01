@@ -5,10 +5,12 @@ import { renderSignUp } from './views/signupView.js';
 import { renderValuationPage } from './views/valuationView.js';
 import { renderCalculatorPage } from './views/calculatorView.js';
 import { renderRoadTaxPage } from './views/roadTaxView.js';
+import { renderInsurancePage } from './views/insuranceView.js';
 import { renderGallery } from './views/galleryView.js';
 import { ValuationController } from './controllers/valuationController.js';
 import { CalculatorController } from './controllers/calculatorController.js';
 import { RoadTaxController } from './controllers/roadTaxController.js';
+import { InsuranceController } from './controllers/insuranceController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
 import { ProfileController } from './controllers/profileController.js';
@@ -111,7 +113,7 @@ function renderHeader(user) {
           </button>
           
           <div class="nav-item-dropdown-wrapper">
-            <button class="site-nav-item ${isActive('calculator') || isActive('road-tax') ? 'active' : ''}" id="calc-menu-btn">
+            <button class="site-nav-item ${isActive('calculator') || isActive('road-tax') || isActive('insurance-calculator') ? 'active' : ''}" id="calc-menu-btn">
               ${icons.calc} Calculation
             </button>
             <div class="nav-dropdown" id="calc-dropdown">
@@ -120,6 +122,9 @@ function renderHeader(user) {
               </a>
               <a class="nav-dropdown-item" data-navigate="road-tax">
                 Road Tax Calculator
+              </a>
+              <a class="nav-dropdown-item" data-navigate="insurance-calculator">
+                Insurance Estimator
               </a>
             </div>
           </div>
@@ -240,6 +245,10 @@ const router = {
       renderRoadTaxPage(main);
       const roadTaxController = new RoadTaxController(main);
       roadTaxController.init();
+    } else if (page === 'insurance-calculator') {
+      renderInsurancePage(main);
+      const insuranceController = new InsuranceController(main);
+      insuranceController.init();
     } else if (page === 'gallery') {
       renderGallery(main);
     } else if (page === 'my-valuations') {
