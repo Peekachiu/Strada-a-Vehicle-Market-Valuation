@@ -3,11 +3,12 @@ import { renderAbout } from './views/aboutView.js';
 import { renderLogin } from './views/loginView.js';
 import { renderSignUp } from './views/signupView.js';
 import { renderValuationPage } from './views/valuationView.js';
+import { renderCalculatorPage } from './views/calculatorView.js';
 import { renderGallery } from './views/galleryView.js';
 import { ValuationController } from './controllers/valuationController.js';
+import { CalculatorController } from './controllers/calculatorController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
-import { HistoryController } from './controllers/historyController.js';
 import { ProfileController } from './controllers/profileController.js';
 
 // Global state for the app
@@ -77,6 +78,7 @@ function renderHeader(user) {
     info: `<svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
     gallery: `<svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
     money: `<svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+    calc: `<svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="18" x2="16" y2="18"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg>`,
     user: `<svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
     logout: `<svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
   };
@@ -104,6 +106,9 @@ function renderHeader(user) {
           </button>
           <button class="site-nav-item ${isActive('valuation')}" data-navigate="valuation">
             ${icons.money} Get Car Price
+          </button>
+          <button class="site-nav-item ${isActive('calculator')}" data-navigate="calculator">
+            ${icons.calc} Loan Calculator
           </button>
         </div>
 
@@ -214,6 +219,10 @@ const router = {
       renderValuationPage(main);
       const valuationController = new ValuationController(main);
       valuationController.init();
+    } else if (page === 'calculator') {
+      renderCalculatorPage(main);
+      const calculatorController = new CalculatorController(main);
+      calculatorController.init();
     } else if (page === 'gallery') {
       renderGallery(main);
     } else if (page === 'my-valuations') {
