@@ -383,16 +383,99 @@ export function renderTabContent(tabContainer, tabName, data) {
   if (tabName === 'trends') {
     tabContainer.innerHTML = `
       <div class="form-card">
-        <h3 class="auth-title" style="font-size: 1.5rem; text-align: left;">Market Trends</h3>
-        <p class="text-muted-foreground">Historical valuation data for ${data ? `a ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}` : 'this vehicle'} will be shown here. This feature is coming soon.</p>
+        <h3 class="auth-title" style="font-size: 1.5rem; text-align: left; margin-bottom: 1rem;">Market Trends</h3>
+        <p class="text-muted-foreground" style="margin-bottom: 1.5rem;">
+          Historical valuation data for ${data ? `a ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}` : 'this vehicle'}.
+        </p>
+        <div style="position: relative; height: 300px; width: 100%;">
+          <canvas id="trendsChart"></canvas>
         </div>
+      </div>
     `;
+
+    // Render the chart if data is available
+    if (data && data.history) {
+      setTimeout(() => {
+        const ctx = document.getElementById('trendsChart');
+        if (ctx) {
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: data.history.labels,
+              datasets: [{
+                label: 'Estimated Market Value (RM)',
+                data: data.history.prices,
+                borderColor: '#2563eb', // Primary Blue
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4, // Smooth curves
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#2563eb',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  mode: 'index',
+                  intersect: false,
+                  callbacks: {
+                    label: function (context) {
+                      let label = context.dataset.label || '';
+                      if (label) {
+                        label += ': ';
+                      }
+                      if (context.parsed.y !== null) {
+                        label += new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(context.parsed.y);
+                      }
+                      return label;
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: false,
+                  grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                  },
+                  ticks: {
+                    callback: function (value) {
+                      return 'RM ' + (value / 1000).toFixed(0) + 'k';
+                    }
+                  }
+                },
+                x: {
+                  grid: {
+                    display: false
+                  }
+                }
+              },
+              interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+              }
+            }
+          });
+        }
+      }, 0);
+    }
+
   } else if (tabName === 'comparison') {
     tabContainer.innerHTML = `
       <div class="form-card">
         <h3 class="auth-title" style="font-size: 1.5rem; text-align: left;">Market Comparison</h3>
         <p class="text-muted-foreground">A comparison of ${data ? `a ${data.vehicle.year} ${data.vehicle.make} ${data.vehicle.model}` : 'this vehicle'} against similar models in the market will be shown here. This feature is coming soon.</p>
-        </div>
+      </div>
     `;
   }
 }

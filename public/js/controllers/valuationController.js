@@ -3,7 +3,8 @@ import {
   renderValuationPlaceholder,
   renderValuationResults,
   renderBrandModal,
-  renderModelModal
+  renderModelModal,
+  renderTabContent
 } from '../views/valuationView.js';
 
 export class ValuationController {
@@ -20,6 +21,9 @@ export class ValuationController {
 
     // Bind 'this' to our handler
     this.handleEstimate = this.handleEstimate.bind(this);
+
+    // Store latest data for tabs
+    this.latestValuationData = null;
   }
 
   /**
@@ -51,6 +55,28 @@ export class ValuationController {
       this.setupModelModal();
       this.setupSequentialInputs();
     }
+
+    // 4. Setup Tabs
+    this.setupTabs();
+  }
+
+  setupTabs() {
+    const tabs = this.main.querySelectorAll('.valuation-tab');
+    const contentContainer = this.main.querySelector('#valuation-tabs-content');
+
+    if (!tabs.length || !contentContainer) return;
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // 1. Toggle Active State
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // 2. Render Content
+        const tabName = tab.getAttribute('data-tab');
+        renderTabContent(contentContainer, tabName, this.latestValuationData);
+      });
+    });
   }
 
   setupBrandModal() {
@@ -308,9 +334,23 @@ export class ValuationController {
           lowRange: data.estimated_price * 0.95, // -5%
           highRange: data.estimated_price * 1.05, // +5%
           vehicle: { year, make, model },
-          explanation: data.explanation || [] // Pass the explanation list
+          explanation: data.explanation || [], // Pass the explanation list
+          history: this.generateMockHistory(data.estimated_price) // Generate mock history
         };
+
+        this.latestValuationData = resultData; // Store for tabs
+
         renderValuationResults(this.resultsContainer, resultData);
+
+        // Refresh active tab content
+        const activeTab = this.main.querySelector('.valuation-tab.active');
+        if (activeTab) {
+          activeTab.click();
+        } else {
+          // Default to trends if none active (shouldn't happen usually)
+          const trendsTab = this.main.querySelector('[data-tab="trends"]');
+          if (trendsTab) trendsTab.click();
+        }
 
       } else if (response.status === 401) {
         alert('Your session has expired. Please log in again.');
@@ -323,6 +363,27 @@ export class ValuationController {
       console.error('Network error:', error);
       this.showError('A network error occurred. Please try again.');
     }
+  }
+
+  generateMockHistory(currentPrice) {
+    const labels = [];
+    const prices = [];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const today = new Date();
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      labels.push(months[d.getMonth()] + ' ' + d.getFullYear());
+
+      // Generate a random price variation within +/- 10% of current price
+      // Trend: slightly higher in the past (depreciation)
+      const depreciationFactor = 1 + (i * 0.005); // 0.5% depreciation per month approx
+      const randomVariation = 1 + ((Math.random() - 0.5) * 0.02); // +/- 1% random noise
+
+      prices.push(Math.round(currentPrice * depreciationFactor * randomVariation));
+    }
+
+    return { labels, prices };
   }
 
   /**
