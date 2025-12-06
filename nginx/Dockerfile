@@ -2,7 +2,8 @@
 FROM nginx:alpine
 
 # Copy your custom configuration
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Copy your custom configuration template
+COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 
 # Copy your website files INSIDE the container
 COPY public /usr/share/nginx/html
