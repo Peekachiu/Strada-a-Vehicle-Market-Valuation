@@ -57,6 +57,30 @@ resource "aws_launch_template" "web" {
               systemctl start docker
               systemctl enable docker
               usermod -aG docker ubuntu
+
+              # Create Dummy Web Page
+              mkdir -p /home/ubuntu/html
+              echo '<h1>Strada Web - Dummy Landing</h1><p>Connecting to API...</p><iframe src="/api/" width="100%" height="400px"></iframe>' > /home/ubuntu/html/index.html
+
+              # Create Nginx Config
+              cat <<EOT > /home/ubuntu/default.conf
+              server {
+                  listen 80;
+                  location / {
+                      root /usr/share/nginx/html;
+                      index index.html;
+                  }
+                  location /api/ {
+                      proxy_pass http://${var.internal_alb_dns_name}:80; 
+                  }
+              }
+              EOT
+
+              # Run Nginx
+              docker run -d --restart=always -p 80:80 --name dummy-web \
+                -v /home/ubuntu/html:/usr/share/nginx/html \
+                -v /home/ubuntu/default.conf:/etc/nginx/conf.d/default.conf \
+                nginx:alpine
               EOF
   )
 }
@@ -115,6 +139,10 @@ resource "aws_launch_template" "api" {
               systemctl start docker
               systemctl enable docker
               usermod -aG docker ubuntu
+              
+              # Run Dummy API
+              # nginxdemos/hello runs on port 80 inside container. We map host 8000 -> container 80
+              docker run -d --restart=always -p 8000:80 --name dummy-api nginxdemos/hello
               EOF
   )
 }
