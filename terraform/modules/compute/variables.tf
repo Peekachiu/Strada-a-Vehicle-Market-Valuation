@@ -48,3 +48,8 @@ variable "internal_target_group_arn" {
   description = "ARN of the Internal ALB Target Group"
   type        = string
 }
+
+variable "internal_alb_dns_name" {
+  description = "DNS Name of the Internal ALB"
+  type        = string
+}
