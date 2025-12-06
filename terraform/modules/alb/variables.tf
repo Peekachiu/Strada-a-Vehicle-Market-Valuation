@@ -18,10 +18,7 @@ variable "security_group_id" {
   type        = string
 }
 
-variable "target_instance_ids" {
-  description = "List of Target Instance IDs"
-  type        = list(string)
-}
+
 
 variable "internal" {
   description = "Whether the ALB is internal"

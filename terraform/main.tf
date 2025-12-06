@@ -48,7 +48,9 @@ module "compute" {
   public_subnet_ids  = module.vpc.public_subnet_ids
   private_subnet_ids = module.vpc.private_subnet_ids
   web_sg_id          = module.security.web_sg_id
-  api_sg_id          = module.security.api_sg_id
+  api_sg_id                 = module.security.api_sg_id
+  public_target_group_arn   = module.public_alb.target_group_arn
+  internal_target_group_arn = module.internal_alb.target_group_arn
 }
 
 module "public_alb" {
@@ -57,7 +59,7 @@ module "public_alb" {
   vpc_id              = module.vpc.vpc_id
   subnet_ids          = module.vpc.public_subnet_ids
   security_group_id   = module.security.alb_sg_id
-  target_instance_ids = module.compute.web_instance_ids
+
   name_prefix         = "public-alb"
 }
 
@@ -67,7 +69,17 @@ module "internal_alb" {
   vpc_id              = module.vpc.vpc_id
   subnet_ids          = module.vpc.private_subnet_ids
   security_group_id   = module.security.internal_alb_sg_id
-  target_instance_ids = module.compute.api_instance_ids
+
   internal            = true
   name_prefix         = "internal-alb"
+}
+
+module "cdn" {
+  source       = "./modules/cdn"
+  project_name = var.project_name
+  alb_dns_name = module.public_alb.alb_dns_name
+  
+  providers = {
+    aws.waf_region = aws.us_east_1
+  }
 }

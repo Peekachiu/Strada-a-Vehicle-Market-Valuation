@@ -26,22 +26,31 @@ resource "aws_iam_instance_profile" "ssm_profile" {
   role = aws_iam_role.ssm_role.name
 }
 
-# --- Web Servers ---
-resource "aws_instance" "web" {
-  count                  = 2
-  ami                    = var.ami_id
-  instance_type          = var.instance_type
-  subnet_id              = var.public_subnet_ids[count.index]
-  vpc_security_group_ids = [var.web_sg_id]
-  key_name               = var.ssh_key_name
-  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
+# --- Web Servers (Launch Template & ASG) ---
+resource "aws_launch_template" "web" {
+  name_prefix   = "${var.project_name}-web-lt"
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.ssh_key_name
 
-  tags = {
-    Name = "${var.project_name}-web-${count.index + 1}"
-    Role = "web"
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [var.web_sg_id]
   }
 
-  user_data = <<-EOF
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssm_profile.name
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "${var.project_name}-web"
+      Role = "web"
+    }
+  }
+
+  user_data = base64encode(<<-EOF
               #!/bin/bash
               apt-get update -y
               apt-get install -y docker.io
@@ -49,24 +58,57 @@ resource "aws_instance" "web" {
               systemctl enable docker
               usermod -aG docker ubuntu
               EOF
+  )
 }
 
-# --- API Servers ---
-resource "aws_instance" "api" {
-  count                  = 2
-  ami                    = var.ami_id
-  instance_type          = var.instance_type
-  subnet_id              = var.private_subnet_ids[count.index]
-  vpc_security_group_ids = [var.api_sg_id]
-  key_name               = var.ssh_key_name
-  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
+resource "aws_autoscaling_group" "web" {
+  name                = "${var.project_name}-web-asg"
+  vpc_zone_identifier = var.public_subnet_ids
+  target_group_arns   = [var.public_target_group_arn]
+  health_check_type   = "ELB"
+  health_check_grace_period = 300
 
-  tags = {
-    Name = "${var.project_name}-api-${count.index + 1}"
-    Role = "api"
+  desired_capacity = 2
+  min_size         = 1
+  max_size         = 3
+
+  launch_template {
+    id      = aws_launch_template.web.id
+    version = "$Latest"
   }
 
-  user_data = <<-EOF
+  tag {
+    key                 = "Name"
+    value               = "${var.project_name}-web-asg"
+    propagate_at_launch = true
+  }
+}
+
+# --- API Servers (Launch Template & ASG) ---
+resource "aws_launch_template" "api" {
+  name_prefix   = "${var.project_name}-api-lt"
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.ssh_key_name
+
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = [var.api_sg_id]
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssm_profile.name
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "${var.project_name}-api"
+      Role = "api"
+    }
+  }
+
+  user_data = base64encode(<<-EOF
               #!/bin/bash
               apt-get update -y
               apt-get install -y docker.io
@@ -74,4 +116,28 @@ resource "aws_instance" "api" {
               systemctl enable docker
               usermod -aG docker ubuntu
               EOF
+  )
+}
+
+resource "aws_autoscaling_group" "api" {
+  name                = "${var.project_name}-api-asg"
+  vpc_zone_identifier = var.private_subnet_ids
+  target_group_arns   = [var.internal_target_group_arn]
+  health_check_type   = "ELB"
+  health_check_grace_period = 300
+
+  desired_capacity = 2
+  min_size         = 1
+  max_size         = 3
+
+  launch_template {
+    id      = aws_launch_template.api.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "${var.project_name}-api-asg"
+    propagate_at_launch = true
+  }
 }

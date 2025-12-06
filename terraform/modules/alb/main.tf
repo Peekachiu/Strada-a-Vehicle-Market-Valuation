@@ -34,9 +34,4 @@ resource "aws_lb_listener" "front_end" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "main" {
-  count            = length(var.target_instance_ids)
-  target_group_arn = aws_lb_target_group.main.arn
-  target_id        = var.target_instance_ids[count.index]
-  port             = var.internal ? 8000 : 80 # API listens on 8000, Web on 80. Simple logic for now.
-}
+

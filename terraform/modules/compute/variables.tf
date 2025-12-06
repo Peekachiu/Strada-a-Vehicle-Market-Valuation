@@ -38,3 +38,13 @@ variable "api_sg_id" {
   description = "Security Group ID for API Servers"
   type        = string
 }
+
+variable "public_target_group_arn" {
+  description = "ARN of the Public ALB Target Group"
+  type        = string
+}
+
+variable "internal_target_group_arn" {
+  description = "ARN of the Internal ALB Target Group"
+  type        = string
+}
