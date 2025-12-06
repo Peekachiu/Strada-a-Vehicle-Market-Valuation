@@ -10,8 +10,12 @@ resource "aws_lb" "main" {
   }
 }
 
+resource "random_id" "tg_suffix" {
+  byte_length = 2
+}
+
 resource "aws_lb_target_group" "main" {
-  name     = "${var.project_name}-${var.name_prefix}-tg"
+  name     = "${var.project_name}-${var.name_prefix}-tg-${random_id.tg_suffix.hex}"
   port     = var.target_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -20,6 +24,10 @@ resource "aws_lb_target_group" "main" {
     path                = "/"
     healthy_threshold   = 2
     unhealthy_threshold = 10
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
