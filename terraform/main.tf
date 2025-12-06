@@ -55,7 +55,6 @@ module "compute" {
   web_sg_id          = module.security.web_sg_id
   api_sg_id                 = module.security.api_sg_id
   public_target_group_arn   = module.public_alb.target_group_arn
-  public_target_group_arn   = module.public_alb.target_group_arn
   internal_target_group_arn = module.internal_alb.target_group_arn
   internal_alb_dns_name     = module.internal_alb.alb_dns_name
 }
