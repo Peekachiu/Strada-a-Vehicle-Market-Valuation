@@ -78,6 +78,7 @@ module "internal_alb" {
 
   internal            = true
   name_prefix         = "internal-alb"
+  target_port         = 8000
 }
 
 module "cdn" {
