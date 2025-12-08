@@ -1,3 +1,6 @@
+#####################################################################
+# Root Configuration
+#####################################################################
 variable "region" {
   description = "AWS Region"
   type        = string
@@ -10,12 +13,18 @@ variable "project_name" {
   default     = "strada"
 }
 
+#####################################################################
+# Virtual Private Cloud (VPC)
+#####################################################################
 variable "vpc_cidr" {
   description = "VPC CIDR"
   type        = string
   default     = "10.0.0.0/16"
 }
 
+#####################################################################
+# Compute (EC2)
+#####################################################################
 variable "instance_type" {
   description = "EC2 Instance Type"
   type        = string
@@ -33,6 +42,9 @@ variable "ssh_key_name" {
   type        = string
 }
 
+#####################################################################
+# Database (RDS)
+#####################################################################
 variable "db_name" {
   description = "Database Name"
   type        = string
