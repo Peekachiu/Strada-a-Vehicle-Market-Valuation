@@ -94,7 +94,7 @@ resource "aws_autoscaling_group" "web" {
 
   desired_capacity = 2
   min_size         = 1
-  max_size         = 3
+  max_size         = 2
 
   launch_template {
     id      = aws_launch_template.web.id
@@ -156,7 +156,7 @@ resource "aws_autoscaling_group" "api" {
 
   desired_capacity = 2
   min_size         = 1
-  max_size         = 3
+  max_size         = 2
 
   launch_template {
     id      = aws_launch_template.api.id

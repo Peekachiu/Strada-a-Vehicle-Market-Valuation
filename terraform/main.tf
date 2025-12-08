@@ -100,14 +100,24 @@ module "internal_alb" {
 }
 
 #####################################################################
-# Cloudfront CDN
+# Web Application Firewall (WAF)
+#####################################################################
+
+module "waf" {
+  source       = "./modules/waf"
+  project_name = var.project_name
+
+  providers = {
+    aws.waf_region = aws.us_east_1
+  }
+}
+
+#####################################################################
+# Cloudfront (CDN)
 #####################################################################
 module "cdn" {
   source       = "./modules/cdn"
   project_name = var.project_name
   alb_dns_name = module.public_alb.alb_dns_name
-  
-  providers = {
-    aws.waf_region = aws.us_east_1
-  }
+  web_acl_id   = module.waf.web_acl_arn
 }
