@@ -53,3 +53,30 @@ variable "internal_alb_dns_name" {
   description = "DNS Name of the Internal ALB"
   type        = string
 }
+
+# DB Variables
+variable "db_host" {
+  description = "Database Host Address"
+  type        = string
+}
+
+variable "db_port" {
+  description = "Database Port"
+  type        = number
+}
+
+variable "db_name" {
+  description = "Database Name"
+  type        = string
+}
+
+variable "db_username" {
+  description = "Database Username"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Database Password"
+  type        = string
+  sensitive   = true
+}

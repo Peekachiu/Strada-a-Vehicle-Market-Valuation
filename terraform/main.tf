@@ -91,6 +91,13 @@ module "compute" {
   public_target_group_arn   = module.public_alb.target_group_arn
   internal_target_group_arn = module.internal_alb.target_group_arn
   internal_alb_dns_name     = module.internal_alb.alb_dns_name
+
+  # Database Connection
+  db_host     = module.database.db_address
+  db_port     = module.database.db_port
+  db_name     = var.db_name
+  db_username = var.db_username
+  db_password = var.db_password
 }
 
 #####################################################################

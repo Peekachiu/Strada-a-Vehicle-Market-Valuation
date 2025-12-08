@@ -62,29 +62,14 @@ resource "aws_launch_template" "web" {
               systemctl enable docker
               usermod -aG docker ubuntu
 
-              # Create Dummy Web Page
-              mkdir -p /home/ubuntu/html
-              echo '<h1>Strada Web - Dummy Landing</h1><p>Connecting to API...</p><iframe src="/api/" width="100%" height="400px"></iframe>' > /home/ubuntu/html/index.html
+              # Login to Docker Hub (Public, so no login needed usually, but good practice if private later)
+              # docker login -u ... -p ...
 
-              # Create Nginx Config
-              cat <<EOT > /home/ubuntu/default.conf
-              server {
-                  listen 80;
-                  location / {
-                      root /usr/share/nginx/html;
-                      index index.html;
-                  }
-                  location /api/ {
-                      proxy_pass http://${var.internal_alb_dns_name}:80; 
-                  }
-              }
-              EOT
-
-              # Run Nginx
-              docker run -d --restart=always -p 80:80 --name dummy-web \
-                -v /home/ubuntu/html:/usr/share/nginx/html \
-                -v /home/ubuntu/default.conf:/etc/nginx/conf.d/default.conf \
-                nginx:alpine
+              # Run Frontend Container
+              # The Nginx image is configured to substitute API_HOST in default.conf.template
+              docker run -d --restart=always -p 80:80 \
+                -e API_HOST=${var.internal_alb_dns_name} \
+                peekachiu/strada-frontend:latest
               EOF
   )
 }
@@ -146,9 +131,15 @@ resource "aws_launch_template" "api" {
               systemctl enable docker
               usermod -aG docker ubuntu
               
-              # Run Dummy API
-              # nginxdemos/hello runs on port 80 inside container. We map host 8000 -> container 80
-              docker run -d --restart=always -p 8000:80 --name dummy-api nginxdemos/hello
+              # Run Backend Container
+              # Passing DB credentials via Environment Variables
+              docker run -d --restart=always -p 8000:8000 \
+                -e DB_HOST=${var.db_host} \
+                -e DB_PORT=${var.db_port} \
+                -e DB_NAME=${var.db_name} \
+                -e DB_USER=${var.db_username} \
+                -e DB_PASSWORD=${var.db_password} \
+                peekachiu/strada-backend:latest
               EOF
   )
 }
