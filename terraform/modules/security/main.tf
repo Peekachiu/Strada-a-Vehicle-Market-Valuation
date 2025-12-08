@@ -1,4 +1,6 @@
-# --- ALB Security Group ---
+#####################################################################
+# ALB Security Group
+#####################################################################
 resource "aws_security_group" "alb" {
   name        = "${var.project_name}-alb-sg"
   description = "Security group for Application Load Balancer"
@@ -24,7 +26,9 @@ resource "aws_security_group" "alb" {
   }
 }
 
-# --- Web Server Security Group ---
+#####################################################################
+# Web Server Security Group
+#####################################################################
 resource "aws_security_group" "web" {
   name        = "${var.project_name}-web-sg"
   description = "Security group for Web Servers"
@@ -50,7 +54,9 @@ resource "aws_security_group" "web" {
   }
 }
 
-# --- Internal ALB Security Group ---
+#####################################################################
+# Internal ALB Security Group
+#####################################################################
 resource "aws_security_group" "internal_alb" {
   name        = "${var.project_name}-internal-alb-sg"
   description = "Security group for Internal Application Load Balancer"
@@ -76,7 +82,9 @@ resource "aws_security_group" "internal_alb" {
   }
 }
 
-# --- API Server Security Group ---
+#####################################################################
+# API Server Security Group
+#####################################################################
 resource "aws_security_group" "api" {
   name        = "${var.project_name}-api-sg"
   description = "Security group for API Servers"
@@ -102,7 +110,9 @@ resource "aws_security_group" "api" {
   }
 }
 
-# --- RDS Security Group ---
+#####################################################################
+# RDS Security Group
+#####################################################################
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-rds-sg"
   description = "Security group for RDS Database"

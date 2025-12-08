@@ -7,6 +7,9 @@ resource "aws_db_subnet_group" "main" {
   }
 }
 
+#####################################################################
+# Database (RDS)
+#####################################################################
 resource "aws_db_instance" "main" {
   identifier        = "${var.project_name}-db"
   engine            = "postgres"

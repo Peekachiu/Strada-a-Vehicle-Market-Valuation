@@ -1,3 +1,6 @@
+#####################################################################
+# WAF Web ACL (Global/US-East-1)
+#####################################################################
 terraform {
   required_providers {
     aws = {
@@ -7,7 +10,9 @@ terraform {
   }
 }
 
-# --- WAF Web ACL (Global/US-East-1) ---
+#####################################################################
+# WAF Web ACL (Global/US-East-1)
+#####################################################################
 resource "aws_wafv2_web_acl" "main" {
   provider = aws.waf_region # Must be us-east-1
 

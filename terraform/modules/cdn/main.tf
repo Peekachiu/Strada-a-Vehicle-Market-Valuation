@@ -1,6 +1,6 @@
-
-
-# --- CloudFront Distribution ---
+#####################################################################
+# Cloudfront (CDN)
+#####################################################################
 resource "aws_cloudfront_distribution" "main" {
   origin {
     domain_name = var.alb_dns_name

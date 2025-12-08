@@ -1,4 +1,6 @@
-# --- IAM Role for SSM ---
+#####################################################################
+# IAM Role for SSM
+#####################################################################
 resource "aws_iam_role" "ssm_role" {
   name = "${var.project_name}-ssm-role"
 
@@ -26,7 +28,9 @@ resource "aws_iam_instance_profile" "ssm_profile" {
   role = aws_iam_role.ssm_role.name
 }
 
-# --- Web Servers (Launch Template & ASG) ---
+#####################################################################
+# Web Servers (Launch Template & ASG)
+#####################################################################
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-lt"
   image_id      = var.ami_id
@@ -108,7 +112,9 @@ resource "aws_autoscaling_group" "web" {
   }
 }
 
-# --- API Servers (Launch Template & ASG) ---
+#####################################################################
+# API Servers (Launch Template & ASG)
+#####################################################################
 resource "aws_launch_template" "api" {
   name_prefix   = "${var.project_name}-api-lt"
   image_id      = var.ami_id

@@ -13,7 +13,9 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-# --- Public Subnets ---
+#####################################################################
+# Public Subnets
+#####################################################################
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -26,7 +28,9 @@ resource "aws_subnet" "public" {
   }
 }
 
-# --- Private Subnets ---
+#####################################################################
+# Private Subnets
+#####################################################################
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.main.id
@@ -38,7 +42,9 @@ resource "aws_subnet" "private" {
   }
 }
 
-# --- Internet Gateway ---
+#####################################################################
+# Internet Gateway
+#####################################################################
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -47,7 +53,9 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# --- NAT Gateways ---
+#####################################################################
+# NAT Gateways
+#####################################################################
 # Elastic IP for NAT Gateway
 resource "aws_eip" "nat" {
   count  = 2
@@ -70,9 +78,12 @@ resource "aws_nat_gateway" "main" {
   depends_on = [aws_internet_gateway.main]
 }
 
-# --- Route Tables ---
-
+#####################################################################
+# Route Tables
+#####################################################################
+#####################################################################
 # Public Route Table
+#####################################################################
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -92,7 +103,9 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
+#####################################################################
 # Private Route Tables (One per AZ for HA NAT)
+#####################################################################
 resource "aws_route_table" "private" {
   count  = 2
   vpc_id = aws_vpc.main.id
