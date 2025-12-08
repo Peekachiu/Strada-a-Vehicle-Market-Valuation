@@ -24,6 +24,7 @@ resource "aws_lb_target_group" "main" {
     path                = "/"
     healthy_threshold   = 2
     unhealthy_threshold = 10
+    matcher             = "200-499" # Accept 404s, 301s, etc. as "Healthy" (app is running)
   }
 
   lifecycle {

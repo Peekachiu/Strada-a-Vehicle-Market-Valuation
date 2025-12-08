@@ -139,6 +139,7 @@ resource "aws_launch_template" "api" {
                 -e DB_NAME=${var.db_name} \
                 -e DB_USER=${var.db_username} \
                 -e DB_PASSWORD=${var.db_password} \
+                -e ALLOWED_HOSTS='*' \
                 peekachiu/strada-backend:latest
               EOF
   )
