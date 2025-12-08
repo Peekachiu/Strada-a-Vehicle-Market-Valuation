@@ -74,7 +74,6 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 }
-
 #####################################################################
 # EC2 Instances
 #####################################################################
@@ -83,7 +82,7 @@ module "compute" {
   project_name       = var.project_name
   instance_type      = var.instance_type
   ami_id             = data.aws_ami.ubuntu.id
-  ssh_key_name       = var.ssh_key_name
+  # ssh_key_name removed as we use SSM
   public_subnet_ids  = module.vpc.public_subnet_ids
   private_subnet_ids = module.vpc.private_subnet_ids
   web_sg_id          = module.security.web_sg_id

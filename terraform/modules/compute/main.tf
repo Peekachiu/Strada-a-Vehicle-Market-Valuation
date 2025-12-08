@@ -35,7 +35,7 @@ resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-web-lt"
   image_id      = var.ami_id
   instance_type = var.instance_type
-  key_name      = var.ssh_key_name
+
 
   network_interfaces {
     associate_public_ip_address = true
@@ -104,7 +104,7 @@ resource "aws_launch_template" "api" {
   name_prefix   = "${var.project_name}-api-lt"
   image_id      = var.ami_id
   instance_type = var.instance_type
-  key_name      = var.ssh_key_name
+
 
   network_interfaces {
     associate_public_ip_address = false

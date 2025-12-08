@@ -14,10 +14,7 @@ variable "ami_id" {
   type        = string
 }
 
-variable "ssh_key_name" {
-  description = "Name of the existing AWS Key Pair"
-  type        = string
-}
+
 
 variable "public_subnet_ids" {
   description = "List of public subnet IDs"
