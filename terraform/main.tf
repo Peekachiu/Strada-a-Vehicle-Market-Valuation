@@ -7,18 +7,27 @@ provider "aws" {
   region = "us-east-1"
 }
 
+#####################################################################
+# Virtual Private Cloud
+#####################################################################
 module "vpc" {
   source       = "./modules/vpc"
   project_name = var.project_name
   vpc_cidr     = var.vpc_cidr
 }
 
+#####################################################################
+# Security Groups
+#####################################################################
 module "security" {
   source       = "./modules/security"
   project_name = var.project_name
   vpc_id       = module.vpc.vpc_id
 }
 
+#####################################################################
+# RDS Database
+#####################################################################
 module "database" {
   source             = "./modules/database"
   project_name       = var.project_name
@@ -44,6 +53,9 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+#####################################################################
+# EC2 Instances
+#####################################################################
 module "compute" {
   source             = "./modules/compute"
   project_name       = var.project_name
@@ -59,6 +71,9 @@ module "compute" {
   internal_alb_dns_name     = module.internal_alb.alb_dns_name
 }
 
+#####################################################################
+# Public Load Balancers
+#####################################################################
 module "public_alb" {
   source              = "./modules/alb"
   project_name        = var.project_name
@@ -69,6 +84,9 @@ module "public_alb" {
   name_prefix         = "public-alb"
 }
 
+#####################################################################
+# Internal Load Balancers
+#####################################################################
 module "internal_alb" {
   source              = "./modules/alb"
   project_name        = var.project_name
@@ -81,6 +99,9 @@ module "internal_alb" {
   target_port         = 8000
 }
 
+#####################################################################
+# Cloudfront CDN
+#####################################################################
 module "cdn" {
   source       = "./modules/cdn"
   project_name = var.project_name
