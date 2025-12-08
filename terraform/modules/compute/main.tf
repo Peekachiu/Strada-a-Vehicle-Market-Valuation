@@ -95,6 +95,13 @@ resource "aws_autoscaling_group" "web" {
     value               = "${var.project_name}-web-asg"
     propagate_at_launch = true
   }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+  }
 }
 
 #####################################################################
@@ -165,5 +172,12 @@ resource "aws_autoscaling_group" "api" {
     key                 = "Name"
     value               = "${var.project_name}-api-asg"
     propagate_at_launch = true
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
   }
 }
