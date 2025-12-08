@@ -124,7 +124,6 @@ module "internal_alb" {
 #####################################################################
 # Web Application Firewall (WAF)
 #####################################################################
-
 module "waf" {
   source       = "./modules/waf"
   project_name = var.project_name
