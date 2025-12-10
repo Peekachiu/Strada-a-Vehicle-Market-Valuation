@@ -4,6 +4,7 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import Ridge 
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
@@ -33,7 +34,11 @@ y = df[target]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # --- 5. Preprocessing ---
-numeric_transformer = Pipeline(steps=[('scaler', StandardScaler())])
+numeric_transformer = Pipeline(steps=[
+    ('scaler', StandardScaler()),
+    ('poly', PolynomialFeatures(degree=2, include_bias=False))
+])
+
 categorical_transformer = Pipeline(steps=[
     ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
 ])
@@ -46,16 +51,26 @@ preprocessor = ColumnTransformer(
     remainder='passthrough'
 )
 
-# --- 6. Define Model (Ridge) ---
-model = Ridge(alpha=1.0)
+# --- 6. Define Model (Ridge with Log-Target) ---
+# We use TransformedTargetRegressor to handle the log-transform automatically
+from sklearn.compose import TransformedTargetRegressor
+import numpy as np
+
+model_base = Ridge(alpha=1.0)
 
 # --- 7. Create Pipeline ---
-final_pipeline = Pipeline(steps=[
+final_pipeline_inner = Pipeline(steps=[
     ('preprocessor', preprocessor),
-    ('regressor', model)
+    ('regressor', model_base)
 ])
 
-print("\n--- [Training Linear Model] ---")
+final_pipeline = TransformedTargetRegressor(
+    regressor=final_pipeline_inner,
+    func=np.log1p,
+    inverse_func=np.expm1
+)
+
+print("\n--- [Training Improved Model (Poly+Ridge+Log)] ---")
 final_pipeline.fit(X_train, y_train)
 print("--- [Training Complete] ---")
 
@@ -65,27 +80,4 @@ print(f"\nModel Evaluation (R-squared score): {score:.4f}")
 
 # --- 9. Save ---
 joblib.dump(final_pipeline, MODEL_FILE)
-
-# --- 10. NEW: INSPECT THE MATH ---
-# Let's look at the coefficients to prove the model respects mileage/age
-print("\n--- [Model Logic Proof] ---")
-# Access the trained model inside the pipeline
-trained_model = final_pipeline.named_steps['regressor']
-# Get feature names from preprocessor
-feature_names_num = numeric_features
-feature_names_cat = final_pipeline.named_steps['preprocessor'].named_transformers_['cat']['onehot'].get_feature_names_out(categorical_features)
-all_features = list(feature_names_num) + list(feature_names_cat)
-
-# Create a dictionary of Feature -> Coefficient
-coefs = pd.Series(trained_model.coef_, index=all_features)
-
-# We need to un-scale the numeric coefficients to make them readable in RM
-# (Because we used StandardScaler, the raw coefficients are for "Standard Deviations", not "KM")
-# This is a rough approximation for display purposes:
-scaler = final_pipeline.named_steps['preprocessor'].named_transformers_['num']['scaler']
-mileage_scale = scaler.scale_[1] # Scale factor for mileage
-age_scale = scaler.scale_[0]     # Scale factor for age
-
-print(f"Impact of Mileage: For every 10,000 km added, Price drops by approx RM {abs(coefs['mileage_km'] / mileage_scale * 10000):.2f}")
-print(f"Impact of Age:     For every 1 year older, Price drops by approx RM {abs(coefs['age'] / age_scale):.2f}")
-print("---------------------------")
+print(f"Model saved to {MODEL_FILE}")
