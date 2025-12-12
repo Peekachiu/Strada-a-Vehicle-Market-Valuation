@@ -9,12 +9,25 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
 # --- 1. Define File Paths ---
-DATA_FILE = 'ML_pipeline/malaysia_master_dataset.csv'
+DATA_FILE = 'ML_pipeline/malaysia_used_cars_synthetic.csv'
 MODEL_FILE = 'ML_pipeline/strada_model.joblib'
 
 print(f"Loading data from '{DATA_FILE}'...")
 try:
     df = pd.read_csv(DATA_FILE)
+    
+    # Rename columns to match the expected feature names
+    df = df.rename(columns={
+        'Resale Price (RM)': 'price_rm',
+        'Brand Make': 'make',
+        'Model': 'model',
+        'Year of Manufacturer': 'year',
+        'Mileage (KM)': 'mileage_km',
+        'Condition': 'condition',
+        'Petrol Type': 'fuel_type',
+        'Transmission Type': 'transmission'
+    })
+    
 except FileNotFoundError:
     print(f"Error: '{DATA_FILE}' not found.")
     exit()
