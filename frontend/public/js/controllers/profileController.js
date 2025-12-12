@@ -162,8 +162,52 @@ export class ProfileController {
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
 
-      // Remove empty password so it doesn't overwrite with blank
-      if (!data.password) delete data.password;
+      // --- VALIDATION START ---
+
+      // 1. Phone Number Validation
+      let phone = data.phone_number_write;
+      if (phone) {
+        // Remove spaces
+        phone = phone.replace(/\s/g, '');
+
+        if (!/^(\+)?\d+$/.test(phone)) {
+          showNotification('Phone number must contain only digits (and optional leading +).', 'error');
+          return;
+        }
+        if (phone.length < 9 || phone.length > 15) {
+          showNotification('Phone number length is invalid.', 'error');
+          return;
+        }
+        // Auto-format prefix
+        if (!phone.startsWith('+')) {
+          if (phone.startsWith('60') && phone.length > 9) {
+            phone = '+' + phone;
+          } else {
+            phone = '+60' + phone;
+          }
+        }
+        data.phone_number_write = phone; // Update data with formatted phone
+      }
+
+      // 2. Password Validation (Only if provided)
+      if (data.password) {
+        const password = data.password;
+        if (password.length < 8) {
+          showNotification('New password must be at least 8 characters long.', 'error');
+          return;
+        }
+        if (!/[A-Z]/.test(password)) {
+          showNotification('New password must contain at least one uppercase letter.', 'error');
+          return;
+        }
+        if (!/[^A-Za-z0-9]/.test(password)) {
+          showNotification('New password must contain at least one special character.', 'error');
+          return;
+        }
+      } else {
+        delete data.password; // Remove empty password so it doesn't overwrite
+      }
+      // --- VALIDATION END ---
 
       try {
         const token = localStorage.getItem('accessToken');
@@ -177,17 +221,26 @@ export class ProfileController {
         });
 
         if (response.ok) {
-          alert("Profile updated successfully!");
+          showNotification("Profile updated successfully!", "success");
           modal.style.display = 'none';
           this.init(); // Reload the page to show changes
         } else {
           const err = await response.json();
           console.error(err);
-          alert("Failed to update: " + JSON.stringify(err));
+          let errMsg = "Failed to update.";
+          if (err.detail) errMsg = err.detail;
+          else if (err.error) errMsg = err.error;
+          else if (err.old_password) errMsg = err.old_password[0]; // Specific common error
+          else if (typeof err === 'object') {
+            // Try to grab the first error message available
+            const keys = Object.keys(err);
+            if (keys.length > 0) errMsg = `${keys[0]}: ${err[keys[0]]}`;
+          }
+          showNotification(errMsg, "error");
         }
       } catch (error) {
         console.error("Update error:", error);
-        alert("An error occurred while updating.");
+        showNotification("An error occurred while updating.", "error");
       }
     });
   }
