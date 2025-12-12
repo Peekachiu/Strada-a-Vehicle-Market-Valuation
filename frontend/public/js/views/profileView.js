@@ -32,6 +32,10 @@ export function renderProfilePage(container, user) {
               <span class="badge badge-secondary" style="background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Premium Member</span> 
             </div>
           </div>
+          <button id="open-delete-account-modal" style="padding: 0.5rem 1rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 6px; color: #dc2626; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; transition: all 0.2s;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+            Delete Account
+          </button>
         </div>
 
         <div class="profile-tabs">
@@ -214,6 +218,34 @@ export function renderProfilePage(container, user) {
           <div style="display: flex; gap: 1rem; justify-content: flex-end;">
             <button type="button" id="cancel-add-vehicle-btn" style="padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 6px; color: #374151; font-weight: 600; cursor: pointer;">Cancel</button>
             <button type="submit" style="padding: 0.75rem 1.5rem; background: #3b82f6; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer;">Add Vehicle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+ 
+     <!-- Delete Account Confirmation Modal -->
+    <div id="delete-account-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050;">
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);"></div>
+      <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 450px; margin: 10vh auto; padding: 2rem; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #fee2e2;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="width: 50px; height: 50px; background: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h2 style="margin: 0; color: #1f2937; font-size: 1.5rem;">Delete Account?</h2>
+            <p style="margin: 0.5rem 0 0; color: #6b7280; line-height: 1.5;">
+                This action is <strong style="color: #dc2626;">irreversible</strong>. Please enter your password to confirm deletion.
+            </p>
+        </div>
+        
+        <form id="delete-account-form">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Password</label>
+            <input name="confirm_password" type="password" required placeholder="Enter your password" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <button type="button" id="cancel-delete-account-btn" style="padding: 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 6px; color: #374151; font-weight: 600; cursor: pointer;">Cancel</button>
+            <button type="submit" style="padding: 0.75rem; background: #dc2626; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);">Delete Forever</button>
           </div>
         </form>
       </div>

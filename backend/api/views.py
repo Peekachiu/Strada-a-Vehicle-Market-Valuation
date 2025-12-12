@@ -44,6 +44,23 @@ class GetUserView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
+    def delete(self, request):
+        # 1. Get password from request body
+        password = request.data.get('password')
+        if not password:
+            return Response({"error": "Password is required to delete account."}, status=400)
+        
+        # 2. Verify password
+        if not request.user.check_password(password):
+            return Response({"error": "Incorrect password."}, status=400)
+        
+        # 3. Delete user
+        try:
+            request.user.delete()
+            return Response(status=204)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
 # --- The Real ML Valuation View ---
 class EstimateView(APIView):
     """

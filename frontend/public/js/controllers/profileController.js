@@ -1,4 +1,5 @@
 import { renderProfilePage, renderProfileHistoryRows, updateProfileStats, renderMyVehicles } from '../views/profileView.js';
+import { showNotification } from '../utils/notification.js';
 
 export class ProfileController {
   constructor(main) {
@@ -28,6 +29,7 @@ export class ProfileController {
       // 3. Setup Modals
       this.setupEditModal(userData);
       this.setupAddVehicleModal();
+      this.setupDeleteAccountModal();
 
       // 4. Fetch Data
       await Promise.all([
@@ -206,6 +208,60 @@ export class ProfileController {
       const data = Object.fromEntries(new FormData(form).entries());
       await this.handleAddVehicle(data);
       form.reset();
+    });
+  }
+
+  setupDeleteAccountModal() {
+    const modal = document.getElementById('delete-account-modal');
+    const openBtn = document.getElementById('open-delete-account-modal');
+    const cancelBtn = document.getElementById('cancel-delete-account-btn');
+    const form = document.getElementById('delete-account-form');
+
+    if (!modal || !openBtn) return;
+
+    openBtn.addEventListener('click', () => modal.style.display = 'block');
+    cancelBtn.addEventListener('click', () => modal.style.display = 'none');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const password = formData.get('confirm_password');
+
+      if (!password) {
+        showNotification('Please enter your password.', 'error');
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch('/api/me/', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ password })
+        });
+
+        if (res.status === 204) {
+          showNotification('Account deleted successfully. Goodbye!', 'success');
+          // Logout logic
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          // Redirect
+          setTimeout(() => {
+            window.location.href = '#home'; // Or wherever handled
+            window.location.reload(); // Force full reload to reset app state
+          }, 1500);
+        } else {
+          const data = await res.json();
+          showNotification(data.error || 'Failed to delete account.', 'error');
+        }
+      } catch (error) {
+        console.error('Delete Account Error:', error);
+        showNotification('An error occurred during deletion.', 'error');
+      }
     });
   }
 }
