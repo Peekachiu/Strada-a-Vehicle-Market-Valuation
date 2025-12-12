@@ -131,62 +131,88 @@ class EstimateView(APIView):
             final_price = round(predicted_price, 2)
             print(f"[DEBUG] Predicted Price: RM {final_price}")
 
-            # --- EXPLANATION LOGIC ---
+            # --- EXPLANATION LOGIC (Refined Waterfall) ---
             explanation = []
             try:
-                # Access steps
-                regressor = model.named_steps['regressor']
-                preprocessor = model.named_steps['preprocessor']
-                
-                # Get Scaler info
-                scaler = preprocessor.named_transformers_['num']['scaler']
-                scaler_mean = scaler.mean_
-                scaler_scale = scaler.scale_
-                numeric_features = ['age', 'mileage_km']
-                
-                # Get Categorical info
-                ohe = preprocessor.named_transformers_['cat']['onehot']
-                categorical_features = ['make', 'model', 'condition', 'transmission', 'fuel_type']
-                
-                # Get Coefficients
-                coefs = regressor.coef_
-                intercept = regressor.intercept_
-                
-                # Map coefficients
-                ohe_feature_names = ohe.get_feature_names_out(categorical_features)
-                all_feature_names = numeric_features + list(ohe_feature_names)
-                coef_dict = dict(zip(all_feature_names, coefs))
-                
-                # Base Price
-                explanation.append(f"Base Price: RM {intercept:,.2f}")
-                
-                # Numeric Contributions
-                # age
-                age_val = car_age
-                age_scaled = (age_val - scaler_mean[0]) / scaler_scale[0]
-                age_contrib = coef_dict['age'] * age_scaled
-                explanation.append(f"Age ({age_val} years): RM {age_contrib:,.2f}")
-                
-                # mileage
-                mileage_val = float(data.get('mileage'))
-                mileage_scaled = (mileage_val - scaler_mean[1]) / scaler_scale[1]
-                mileage_contrib = coef_dict['mileage_km'] * mileage_scaled
-                explanation.append(f"Mileage ({mileage_val:,.0f} km): RM {mileage_contrib:,.2f}")
+                # Helper to quickly predict price for a specific configuration
+                def get_price_for_config(y, m_km, c, t, f):
+                    # Normalized data is already title-cased in raw variables above
+                    # raw_make and raw_model capture the user's specific car type
+                    d = pd.DataFrame({
+                        'age': [2025 - y],
+                        'mileage_km': [float(m_km)],
+                        'make': [raw_make],
+                        'model': [raw_model],
+                        'condition': [c],
+                        'transmission': [t],
+                        'fuel_type': [f]
+                    })
+                    return model.predict(d)[0]
 
-                # Categorical Contributions
-                for feature in categorical_features:
-                    val = data.get(feature) # e.g. "Honda"
-                    if not val: continue
-                    # Construct OHE feature name, e.g. "make_Honda"
-                    # Note: OHE usually outputs "feature_value"
-                    target_col = f"{feature}_{val}"
-                    if target_col in coef_dict:
-                        contrib = coef_dict[target_col]
-                        explanation.append(f"{feature.capitalize()} ({val}): RM {contrib:,.2f}")
-                    else:
-                        # If not found, it might be a reference category or unseen
-                        pass
+                # 1. Define Baseline (Standard Reference Car)
+                # 2020 Model, 50k km, Good Condition, Automatic, Petrol
+                base_year = 2020
+                base_mileage = 50000
+                base_cond = 'Good'
+                base_trans = 'Automatic'
+                base_fuel = 'Petrol'
 
+                # P0: Base Price
+                p0 = get_price_for_config(base_year, base_mileage, base_cond, base_trans, base_fuel)
+                explanation.append(f"Base Value (Standard 2020 Model): RM {p0:,.2f}")
+
+                # P1: Apply Year
+                p1 = get_price_for_config(input_year, base_mileage, base_cond, base_trans, base_fuel)
+                diff_year = p1 - p0
+                explanation.append(f"Year Adjustment ({input_year}): RM {diff_year:+,.2f}")
+
+                # P2: Apply Mileage (On top of Year)
+                # Note: Using input_year here ensures we capture the mileage impact relevant to that age if there were interactions,
+                # but mostly it isolates mileage.
+                input_mileage = float(data.get('mileage'))
+                p2 = get_price_for_config(input_year, input_mileage, base_cond, base_trans, base_fuel)
+                diff_mileage = p2 - p1
+                explanation.append(f"Mileage Adjustment ({input_mileage:,.0f} km): RM {diff_mileage:+,.2f}")
+
+                # P3: Apply Condition
+                p3 = get_price_for_config(input_year, input_mileage, raw_condition, base_trans, base_fuel)
+                diff_cond = p3 - p2
+                explanation.append(f"Condition ({raw_condition}): RM {diff_cond:+,.2f}")
+
+                # P4: Apply Transmission
+                p4 = get_price_for_config(input_year, input_mileage, raw_condition, raw_transmission, base_fuel)
+                diff_trans = p4 - p3
+                if raw_transmission != base_trans: # Only show if different/relevant
+                     explanation.append(f"Transmission ({raw_transmission}): RM {diff_trans:+,.2f}")
+                
+                # P5: Apply Fuel
+                p5 = get_price_for_config(input_year, input_mileage, raw_condition, raw_transmission, raw_fuel)
+                diff_fuel = p5 - p4
+                if raw_fuel != base_fuel:
+                    explanation.append(f"Fuel ({raw_fuel}): RM {diff_fuel:+,.2f}")
+                
+                # --- Qualitative Summary ---
+                summary_parts = []
+                if input_year > base_year:
+                    summary_parts.append("Newer model year boosts value.")
+                elif input_year < base_year:
+                    summary_parts.append("Depreciation due to age.")
+                
+                if input_mileage < 40000:
+                    summary_parts.append("Low mileage is a strong asset.")
+                elif input_mileage > 80000:
+                    summary_parts.append("High mileage lowers value.")
+                
+                if raw_condition in ['Excellent', 'Very Good']:
+                    summary_parts.append("Excellent condition adds premium.")
+                elif raw_condition in ['Fair', 'Poor']:
+                    summary_parts.append("Condition impacts resale value.")
+
+                if summary_parts:
+                    explanation.append(f"Analysis: {' '.join(summary_parts)}")
+
+                # The final P5 should ideally equal predicted_price (within float error)
+                
             except Exception as exp_e:
                 print(f"Explanation Error: {exp_e}")
                 explanation.append("Could not generate detailed explanation.")
