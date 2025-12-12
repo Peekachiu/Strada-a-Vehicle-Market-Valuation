@@ -1,3 +1,5 @@
+import { showNotification } from '../utils/notification.js';
+
 export class SignUpController {
   /**
    * Initializes the controller.
@@ -50,13 +52,13 @@ export class SignUpController {
     // --- 2. CHECK FOR TERMS & CONDITIONS ---
     if (!termsCheckbox.checked) {
       console.log('Validation Error: Terms of Service must be accepted.');
-      alert('You must agree to the Terms of Service and Privacy Policy to create an account.');
+      showNotification('You must agree to the Terms of Service and Privacy Policy to create an account.', 'error');
       return;
     }
 
     // --- 3. CHECK FOR EMPTY FIELDS ---
     if (!fullName.trim() || !email.trim() || !phone.trim() || !password.trim()) {
-      alert('Please fill out all required fields.');
+      showNotification('Please fill out all required fields.', 'error');
       return;
     }
 
@@ -64,37 +66,37 @@ export class SignUpController {
     // Must be integer only or start with + and integer
     // Regex: Optional + at start, then digits
     if (!/^(\+)?\d+$/.test(phone)) {
-      alert('Phone number must contain only digits (and optional leading +).');
+      showNotification('Phone number must contain only digits (and optional leading +).', 'error');
       return;
     }
 
     // Check reasonable length (9 to 15 to cover various inputs including country code)
     if (phone.length < 9 || phone.length > 15) {
-      alert('Phone number length is invalid.');
+      showNotification('Phone number length is invalid.', 'error');
       return;
     }
 
     // --- 5. PASSWORD VALIDATION ---
     // Length >= 8
     if (password.length < 8) {
-      alert('Password must be at least 8 characters long.');
+      showNotification('Password must be at least 8 characters long.', 'error');
       return;
     }
     // Uppercase
     if (!/[A-Z]/.test(password)) {
-      alert('Password must contain at least one uppercase letter.');
+      showNotification('Password must contain at least one uppercase letter.', 'error');
       return;
     }
     // Special Symbol
     if (!/[^A-Za-z0-9]/.test(password)) {
-      alert('Password must contain at least one special character.');
+      showNotification('Password must contain at least one special character.', 'error');
       return;
     }
 
     // --- 6. PASSWORD CONFIRMATION CHECK ---
     const passwordsMatch = this.validatePasswords();
     if (!passwordsMatch) {
-      alert('Passwords do not match. Please check and try again.');
+      showNotification('Passwords do not match. Please check and try again.', 'error');
       return;
     }
 
@@ -138,29 +140,35 @@ export class SignUpController {
 
       if (response.ok) {
         console.log('Sign up successful:', data);
-        alert('Sign up successful! Please log in.');
+        showNotification('Sign up successful! Please log in.', 'success');
         this.router.navigate('login');
       } else {
         console.error('Sign up failed:', data);
         let errorMessage = 'Sign up failed.\n';
 
         // Handle all possible backend errors
-        if (data.email) errorMessage += `Email: ${data.email[0]}\n`;
-        if (data.full_name) errorMessage += `Name: ${data.full_name[0]}\n`;
-        if (data.password) errorMessage += `Password: ${data.password[0]}\n`;
-        if (data.phone_number_write) errorMessage += `Phone: ${data.phone_number_write[0]}\n`;
-        if (data.non_field_errors) errorMessage += `${data.non_field_errors[0]}\n`;
+        if (data.email) errorMessage = `${data.email[0]}`; // Use cleaner message without prefix if possible, or keep as is
+        else if (data.full_name) errorMessage = `${data.full_name[0]}`;
+        else if (data.password) errorMessage = `${data.password[0]}`;
+        else if (data.phone_number_write) errorMessage = `${data.phone_number_write[0]}`;
+        else if (data.non_field_errors) errorMessage = `${data.non_field_errors[0]}`;
+        else {
+          if (data.email) errorMessage += `Email: ${data.email[0]}\n`;
+          if (data.full_name) errorMessage += `Name: ${data.full_name[0]}\n`;
+          if (data.password) errorMessage += `Password: ${data.password[0]}\n`;
+          if (data.phone_number_write) errorMessage += `Phone: ${data.phone_number_write[0]}\n`;
+        }
 
         // Fallback
         if (errorMessage === 'Sign up failed.\n') {
-          errorMessage += 'Please check your input and try again.';
+          errorMessage = 'Please check your input and try again.';
         }
 
-        alert(errorMessage);
+        showNotification(errorMessage, 'error');
       }
     } catch (error) {
       console.error('Network error:', error);
-      alert('A network error occurred. Please try again.');
+      showNotification('A network error occurred. Please try again.', 'error');
     }
   }
 
