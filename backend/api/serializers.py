@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers, validators
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
-from .models import Profile, Valuation
+from .models import Profile, Valuation, Vehicle
 
 # --- User Serializer  ---
 class UserSerializer(serializers.ModelSerializer):
@@ -138,3 +138,12 @@ class ValuationSerializer(serializers.ModelSerializer):
         model = Valuation
         fields = ['id', 'make', 'model', 'year', 'mileage', 'predicted_price', 'created_at']
         # We only send back the essentials for the history list
+
+# --- Vehicle Serializer ---
+class VehicleSerializer(serializers.ModelSerializer):
+    next_service_date = serializers.DateField(read_only=True)
+
+    class Meta:
+        model = Vehicle
+        fields = '__all__'
+        read_only_fields = ('user', 'created_at', 'next_service_date')

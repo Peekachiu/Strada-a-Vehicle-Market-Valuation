@@ -218,3 +218,24 @@ class ValuationDetailView(generics.RetrieveDestroyAPIView):
     def get_queryset(self):
         # Ensure users can only delete their own valuations
         return Valuation.objects.filter(user=self.request.user)
+
+# --- My Vehicle Views ---
+from .models import Vehicle
+from .serializers import VehicleSerializer
+
+class VehicleListCreateView(generics.ListCreateAPIView):
+    serializer_class = VehicleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Vehicle.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class VehicleDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = VehicleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Vehicle.objects.filter(user=self.request.user)

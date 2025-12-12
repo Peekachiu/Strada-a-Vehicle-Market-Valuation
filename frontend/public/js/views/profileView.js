@@ -42,9 +42,14 @@ export function renderProfilePage(container, user) {
             <button class="tab-trigger" data-tab-target="#profile-history" style="padding: 0.75rem 1rem; background: none; border: none; border-bottom: 2px solid transparent; color: #6b7280; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
               <span>Valuation History</span>
             </button>
+            <button class="tab-trigger" data-tab-target="#my-vehicles" style="padding: 0.75rem 1rem; background: none; border: none; border-bottom: 2px solid transparent; color: #6b7280; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+              <span>My Vehicles</span>
+            </button>
           </div>
 
+          <!-- Profile Info Tab -->
           <div id="profile-info" class="tab-pane active" style="display: block;">
+            <!-- ... (Keep existing Profile Info content) ... -->
             <div class="profile-grid" style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
               
               <div class="card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -92,6 +97,7 @@ export function renderProfilePage(container, user) {
             </div>
           </div>
 
+          <!-- Valuation History Tab -->
           <div id="profile-history" class="tab-pane" style="display: none;">
             <div class="card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
               <div id="history-list-container">
@@ -100,11 +106,29 @@ export function renderProfilePage(container, user) {
             </div>
           </div>
 
+          <!-- My Vehicle Tab -->
+          <div id="my-vehicles" class="tab-pane" style="display: none;">
+             <div class="card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                  <h3 class="card-title" style="margin: 0; color: #1f2937; font-size: 1.1rem; font-weight: 700;">My Vehicles</h3>
+                  <button id="open-add-vehicle-modal" style="padding: 0.5rem 1rem; background: #3b82f6; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add Vehicle
+                  </button>
+               </div>
+               <div id="my-vehicles-list-container">
+                 <p style="text-align: center; color: #6b7280; padding: 2rem;">Loading vehicles...</p>
+               </div>
+             </div>
+          </div>
+
         </div>
       </div>
     </div>
 
+    <!-- Edit Profile Modal -->
     <div id="edit-profile-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;">
+      <!-- ... (Keep Edit Profile Modal) ... -->
       <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);"></div>
       <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 500px; margin: 5vh auto; padding: 2rem; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
         <h2 style="margin-top: 0; margin-bottom: 1.5rem; color: #1f2937;">Edit Profile</h2>
@@ -136,6 +160,60 @@ export function renderProfilePage(container, user) {
           <div style="display: flex; gap: 1rem; justify-content: flex-end;">
             <button type="button" id="cancel-edit-btn" style="padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 6px; color: #374151; font-weight: 600; cursor: pointer;">Cancel</button>
             <button type="submit" style="padding: 0.75rem 1.5rem; background: #3b82f6; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer;">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div id="add-vehicle-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000;">
+      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);"></div>
+      <div class="modal-content" style="position: relative; background: white; width: 90%; max-width: 500px; margin: 5vh auto; padding: 2rem; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto;">
+        <h2 style="margin-top: 0; margin-bottom: 1.5rem; color: #1f2937;">Add My Vehicle</h2>
+        <form id="add-vehicle-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+             <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Make</label>
+                <input name="make" required placeholder="e.g. Honda" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+             </div>
+             <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Model</label>
+                <input name="model" required placeholder="e.g. Civic" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+             </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+             <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Year</label>
+                <input name="year" type="number" required placeholder="e.g. 2020" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+             </div>
+             <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Mileage (km)</label>
+                <input name="mileage" type="number" required placeholder="e.g. 50000" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+             </div>
+          </div>
+          
+          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 1rem 0;">
+          <h4 style="margin: 0 0 1rem; color: #4b5563; font-size: 0.9rem;">Maintenance Info (Optional)</h4>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+             <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Last Service Date</label>
+                <input name="last_service_date" type="date" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+             </div>
+             <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Last Service Mileage</label>
+                <input name="last_service_mileage" type="number" placeholder="km" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+             </div>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+             <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Repair History / Notes</label>
+             <textarea name="repair_history" rows="3" placeholder="e.g. Engine rebuilt in 2023, new tires..." class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit;"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" id="cancel-add-vehicle-btn" style="padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 6px; color: #374151; font-weight: 600; cursor: pointer;">Cancel</button>
+            <button type="submit" style="padding: 0.75rem 1.5rem; background: #3b82f6; border: none; border-radius: 6px; color: white; font-weight: 600; cursor: pointer;">Add Vehicle</button>
           </div>
         </form>
       </div>
@@ -287,4 +365,63 @@ export function updateProfileStats(stats) {
         <span style="font-weight: 700; color: #78350f; font-size: 1.25rem;">${totalValue}</span>
     </div>
   `;
+}
+
+/**
+ * Renders the My Vehicles list.
+ */
+export function renderMyVehicles(vehicles, onDelete) {
+  const container = document.getElementById('my-vehicles-list-container');
+  if (!container) return;
+
+  if (!vehicles || vehicles.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="text-align: center; padding: 3rem 1rem; color: #9ca3af;">
+        <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #4b5563;">No vehicles added yet</p>
+        <p class="text-sm">Add your car details to track maintenance and history.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = vehicles.map(v => {
+    const nextService = v.next_service_date
+      ? new Date(v.next_service_date).toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' })
+      : 'Not Scheduled';
+
+    const lastService = v.last_service_date
+      ? new Date(v.last_service_date).toLocaleDateString('en-MY')
+      : 'N/A';
+
+    return `
+      <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #f9fafb;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+           <div>
+              <h4 style="margin: 0; font-size: 1.1rem; color: #1f2937; font-weight: 700;">${v.year} ${v.make} ${v.model}</h4>
+              <p style="margin: 0.25rem 0 0; color: #6b7280; font-size: 0.9rem;">${v.mileage.toLocaleString()} km</p>
+           </div>
+           <button class="delete-vehicle-btn" data-id="${v.id}" style="color: #ef4444; background: white; border: 1px solid #fee2e2; padding: 0.4rem; border-radius: 6px; cursor: pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+           </button>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+           <div>
+              <span style="display: block; font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Last Service</span>
+              <span style="font-weight: 600; color: #374151;">${lastService}</span>
+           </div>
+           <div>
+              <span style="display: block; font-size: 0.75rem; color: #6b7280; text-transform: uppercase;">Next Service (Est.)</span>
+              <span style="font-weight: 600; color: #059669;">${nextService}</span>
+           </div>
+        </div>
+        ${v.repair_history ? `<div style="margin-top: 0.75rem; font-size: 0.85rem; color: #4b5563; background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #f3f4f6;"><strong>Notes:</strong> ${v.repair_history}</div>` : ''}
+      </div>
+      `;
+  }).join('');
+
+  // Attach delete listeners
+  container.querySelectorAll('.delete-vehicle-btn').forEach(btn => {
+    btn.addEventListener('click', () => onDelete(btn.getAttribute('data-id')));
+  });
 }

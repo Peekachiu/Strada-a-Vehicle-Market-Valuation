@@ -15,4 +15,6 @@ urlpatterns = [
     path('me/', views.GetUserView.as_view(), name='get_user'),
     path('history/', views.HistoryView.as_view(), name='history'),
     path('history/<int:pk>/', views.ValuationDetailView.as_view(), name='history_detail'),
+    path('vehicles/', views.VehicleListCreateView.as_view(), name='vehicle_list_create'),
+    path('vehicles/<int:pk>/', views.VehicleDetailView.as_view(), name='vehicle_detail'),
 ]
