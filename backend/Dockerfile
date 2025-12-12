@@ -10,7 +10,8 @@ WORKDIR /app
 
 # Install dependencies
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
 # Copy the entire project into the container
 COPY . /app/

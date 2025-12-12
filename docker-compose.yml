@@ -2,30 +2,31 @@ services:
   # Service 1: The Django Backend
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile  # Assuming this is in the root directory
+      context: ./backend
+      dockerfile: Dockerfile
     image: peekachiu/strada-backend:latest
     container_name: strada_backend
     volumes:
-      - .:/app  # Syncs your code so you don't have to rebuild on every change
+      - ./backend:/app # Syncs your code so you don't have to rebuild on every change
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=1  # Keep debug on for development
+      - DEBUG=1 # Keep debug on for development
     command: python manage.py runserver 0.0.0.0:8000 # Use dev server for now for auto-reload
 
   # Service 2: The Nginx Web Server
   nginx:
     build:
-      context: .
-      dockerfile: nginx/Dockerfile  # Updated path to the Dockerfile inside the nginx folder
+      context: ./frontend
+      dockerfile: nginx/Dockerfile
     image: peekachiu/strada-frontend:latest
     container_name: strada_frontend
     ports:
       - "80:80" # Maps localhost:80 to Nginx
+    environment:
+      - API_HOST=backend:8000
     volumes:
-      - ./public:/usr/share/nginx/html # Mount your frontend folder
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf # Mount config
-      - ./static:/app/static # Mount static files (for admin)
+      - ./frontend/public:/usr/share/nginx/html # Mount your frontend folder
+      - ./backend/static:/app/static # Mount static files (for admin)
     depends_on:
       - backend

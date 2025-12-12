@@ -66,7 +66,7 @@ ROOT_URLCONF = 'strada_config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'public'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -147,9 +147,7 @@ import os
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # This tells Django to find your files in the 'public' folder.
-STATICFILES_DIRS = [
-    BASE_DIR / 'public'
-]
+STATICFILES_DIRS = []
 
 # This is for user-uploaded files (we'll use it later).
 # It's different from STATIC_URL, so there is no conflict.

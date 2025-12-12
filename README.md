@@ -29,3 +29,31 @@ docker build -t peekachiu/strada-frontend:v1 -f Dockerfile.nginx .
 
 # Push it to Docker Hub
 docker push peekachiu/strada-frontend:v1
+
+################################################
+Step 1: Export Local Data
+################################################
+
+python manage.py dumpdata --natural-foreign --natural-primary --exclude contenttypes --exclude auth.permission --exclude admin.logentry --exclude sessions.session --indent 2 > strada_database.json
+
+################################################
+Step 2: Connect to SSM (API Server)
+################################################
+
+Go to AWS Console > EC2 > Instances.
+Select your API instance (e.g., strada-api...).
+Click Connect -> Session Manager -> Connect.
+
+################################################
+Step 3: Import Data on Server
+################################################
+
+sudo nano strada_database.json
+
+sudo docker ps
+
+sudo docker cp strada_database.json <CONTAINER_ID>:/app/strada_database.json
+
+sudo docker exec -it <CONTAINER_ID> python manage.py migrate
+
+sudo docker exec -it <CONTAINER_ID> python manage.py loaddata strada_database.json
