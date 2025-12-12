@@ -47,44 +47,76 @@ export class SignUpController {
     // Get the terms checkbox
     const termsCheckbox = this.main.querySelector('#signup-terms');
 
-    // --- 2. NEW: CHECK FOR TERMS & CONDITIONS ---
+    // --- 2. CHECK FOR TERMS & CONDITIONS ---
     if (!termsCheckbox.checked) {
-      // REQUIREMENT MET: Log validation error to the console
       console.log('Validation Error: Terms of Service must be accepted.');
-      
-      // TODO: Later, you can show this on the UI
       alert('You must agree to the Terms of Service and Privacy Policy to create an account.');
-      return; // Stop the form submission
+      return;
     }
 
     // --- 3. CHECK FOR EMPTY FIELDS ---
     if (!fullName.trim() || !email.trim() || !phone.trim() || !password.trim()) {
-      if (!fullName.trim()) {
-        console.log('Validation Error: Full Name cannot be empty.');
-      }
-      if (!email.trim()) {
-        console.log('Validation Error: Email cannot be empty.');
-      }
-      if (!phone.trim()) {
-        console.log('Validation Error: Phone Number cannot be empty.');
-      }
-      if (!password.trim()) {
-        console.log('Validation Error: Password cannot be empty.');
-      }
       alert('Please fill out all required fields.');
-      return; // Stop the form submission
+      return;
     }
 
-    // --- 4. PASSWORD CONFIRMATION CHECK ---
+    // --- 4. PHONE VALIDATION ---
+    // Must be integer only or start with + and integer
+    // Regex: Optional + at start, then digits
+    if (!/^(\+)?\d+$/.test(phone)) {
+      alert('Phone number must contain only digits (and optional leading +).');
+      return;
+    }
+
+    // Check reasonable length (9 to 15 to cover various inputs including country code)
+    if (phone.length < 9 || phone.length > 15) {
+      alert('Phone number length is invalid.');
+      return;
+    }
+
+    // --- 5. PASSWORD VALIDATION ---
+    // Length >= 8
+    if (password.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return;
+    }
+    // Uppercase
+    if (!/[A-Z]/.test(password)) {
+      alert('Password must contain at least one uppercase letter.');
+      return;
+    }
+    // Special Symbol
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      alert('Password must contain at least one special character.');
+      return;
+    }
+
+    // --- 6. PASSWORD CONFIRMATION CHECK ---
     const passwordsMatch = this.validatePasswords();
     if (!passwordsMatch) {
-      // The error is already logged to the console by validatePasswords()
       alert('Passwords do not match. Please check and try again.');
-      return; // Stop the form submission
+      return;
     }
 
-    // --- 5. SEND TO BACKEND (if all checks pass) ---
-    console.log('Sending to backend:', { fullName, email, password, phone });
+    // --- 7. SEND TO BACKEND ---
+    // Logic: If user typed +60 or 60 at the start, don't add prefix.
+    let phoneToSend = phone;
+    // Remove all spaces just in case
+    phoneToSend = phoneToSend.replace(/\s/g, '');
+
+    if (!phoneToSend.startsWith('+')) {
+      // If it starts with 60, just add + ? Or assume it is full?
+      // If user typed '601234...', likely meant +60.
+      if (phoneToSend.startsWith('60') && phoneToSend.length > 9) {
+        phoneToSend = '+' + phoneToSend;
+      } else {
+        // Append static prefix
+        phoneToSend = '+60' + phoneToSend;
+      }
+    }
+    // If it already starts with +, we trust it.
+
+    console.log('Sending to backend:', { fullName, email, password, phone: phoneToSend });
 
     try {
       // Send the fetch request
@@ -97,7 +129,7 @@ export class SignUpController {
         body: JSON.stringify({
           email: email,
           password: password,
-          phone_number_write: phone,
+          phone_number_write: phoneToSend,
           full_name: fullName
         }),
       });
@@ -110,9 +142,20 @@ export class SignUpController {
         this.router.navigate('login');
       } else {
         console.error('Sign up failed:', data);
-        let errorMessage = 'Sign up failed. ';
-        if (data.username) errorMessage += `Username: ${data.username[0]} `;
-        if (data.email) errorMessage += `Email: ${data.email[0]} `;
+        let errorMessage = 'Sign up failed.\n';
+
+        // Handle all possible backend errors
+        if (data.email) errorMessage += `Email: ${data.email[0]}\n`;
+        if (data.full_name) errorMessage += `Name: ${data.full_name[0]}\n`;
+        if (data.password) errorMessage += `Password: ${data.password[0]}\n`;
+        if (data.phone_number_write) errorMessage += `Phone: ${data.phone_number_write[0]}\n`;
+        if (data.non_field_errors) errorMessage += `${data.non_field_errors[0]}\n`;
+
+        // Fallback
+        if (errorMessage === 'Sign up failed.\n') {
+          errorMessage += 'Please check your input and try again.';
+        }
+
         alert(errorMessage);
       }
     } catch (error) {

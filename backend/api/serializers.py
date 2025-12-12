@@ -29,12 +29,62 @@ class UserSerializer(serializers.ModelSerializer):
             'username': {'read_only': True}, 
         }
 
+    def validate_full_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Full name cannot be empty.")
+        
+        # Check if a user with this first and last name already exists
+        first_name = value.split(' ')[0] if ' ' in value else value
+        last_name = ' '.join(value.split(' ')[1:]) if ' ' in value else ''
+        
+        if User.objects.filter(first_name=first_name, last_name=last_name).exists():
+            raise serializers.ValidationError("A user with this name already exists.")
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        if not any(char.isupper() for char in value):
+            raise serializers.ValidationError("Password must contain at least one uppercase letter.")
+        if not any(not char.isalnum() for char in value):
+            raise serializers.ValidationError("Password must contain at least one special character.")
+        return value
+
+    def validate_phone_number_write(self, value):
+        # Value comes in as string from frontend
+        # Allow + at the start, otherwise digits only
+        if not value.isdigit() and not (value.startswith('+') and value[1:].isdigit()):
+             raise serializers.ValidationError("Phone number must contain only digits and optional '+' prefix.")
+        
+        # Strip + for length check if present
+        clean_value = value
+        if value.startswith('+'):
+            clean_value = value[1:]
+        
+        # User defined length "between 10 or 11" 
+        # Case 1: User enters 9-10 digits (no prefix) -> we add +60 later -> Total 11-12
+        # Case 2: User enters +60... (full number) -> Total length 12-13?
+        # Let's trust the refined check:
+        # If it's just local digits: 9-10.
+        # If it includes country code (assuming +60): 11-12 digits (excluding +).
+        
+        # Let's simplify: Check if reasonable length.
+        if len(clean_value) < 9 or len(clean_value) > 13:
+             raise serializers.ValidationError("Phone number length is invalid.")
+        
+        return value
+
     def create(self, validated_data):
         phone_data = validated_data.pop('phone_number_write', '')
         full_name = validated_data.pop('full_name', '')
         first_name = full_name.split(' ')[0]
         last_name = ' '.join(full_name.split(' ')[1:])
         validated_data.pop('old_password', None)  # Not needed for creation
+        
+        # Format phone number with +60 prefix if not already present
+        # Frontend might send raw digits "123456789"
+        if phone_data and not phone_data.startswith('+60'):
+             phone_data = f"+60{phone_data}"
 
         # Create the user, using the email as the username
         user = User.objects.create_user(
@@ -66,10 +116,13 @@ class UserSerializer(serializers.ModelSerializer):
         # 1. Update Phone Number (if provided)
         phone = validated_data.pop('phone_number_write', None)
         if phone is not None:
-            # Get or create ensures we don't crash if profile is missing
-            profile, created = Profile.objects.get_or_create(user=instance)
-            profile.phone_number = phone
-            profile.save()
+             if phone and not phone.startswith('+60'):
+                phone = f"+60{phone}"
+             
+             # Get or create ensures we don't crash if profile is missing
+             profile, created = Profile.objects.get_or_create(user=instance)
+             profile.phone_number = phone
+             profile.save()
 
         # 2. Update Email & Username (Keep them synced)
         new_email = validated_data.get('email')
