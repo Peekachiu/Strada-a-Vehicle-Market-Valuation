@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
 # --- 1. Define File Paths ---
-DATA_FILE = 'datasets/malaysia_master_dataset.csv'
+DATA_FILE = 'malaysia_master_dataset.csv'
 MODEL_FILE = 'ml_pipeline/strada_model.joblib'
 
 print(f"Loading data from '{DATA_FILE}'...")

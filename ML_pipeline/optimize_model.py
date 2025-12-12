@@ -11,7 +11,7 @@ from sklearn.preprocessing import OrdinalEncoder
 
 # 1. Load Data
 # Using the clean master dataset (no scraped noise)
-df = pd.read_csv('datasets/malaysia_master_dataset.csv')
+df = pd.read_csv('malaysia_master_dataset.csv')
 
 # 2. Feature Engineering (Same as best model)
 df['age'] = 2025 - df['year']
