@@ -95,3 +95,71 @@ print(f"\nModel Evaluation (R-squared score): {score:.4f}")
 # --- 9. Save ---
 joblib.dump(final_pipeline, MODEL_FILE)
 print(f"Model saved to {MODEL_FILE}")
+
+# --- 10. Model Behavior Validation (What-If Analysis) ---
+def validate_model_behavior(pipeline):
+    print("\n--- [Model Behavior Validation Report] ---")
+    print("Baseline Car: 2020 Honda City, 50,000km, Good Condition, Petrol, Automatic")
+    
+    # Define Baseline
+    baseline_data = {
+        'make': ['Honda'], 'model': ['City'], 'year': [2020], 
+        'mileage_km': [50000], 'condition': ['Good'], 
+        'fuel_type': ['Petrol'], 'transmission': ['Automatic']
+    }
+    
+    # Helper to predict
+    def get_price(data_dict):
+        df = pd.DataFrame(data_dict)
+        df['age'] = 2025 - df['year']
+        return pipeline.predict(df)[0]
+
+    base_price = get_price(baseline_data)
+    print(f"Baseline Price: RM {base_price:,.2f}")
+    
+    # 1. Year Impact
+    print("\n1. Impact of Year (Depreciation):")
+    for y_chk in [2024, 2022, 2020, 2015, 2010]:
+        test_data = baseline_data.copy()
+        test_data['year'] = [y_chk]
+        price = get_price(test_data)
+        diff = price - base_price
+        print(f"   Year {y_chk}: RM {price:,.2f} ({diff:+,.2f} vs Baseline)")
+
+    # 2. Mileage Impact
+    print("\n2. Impact of Mileage:")
+    for m_chk in [10000, 50000, 100000, 200000]:
+        test_data = baseline_data.copy()
+        test_data['mileage_km'] = [m_chk]
+        price = get_price(test_data)
+        diff = price - base_price
+        print(f"   {m_chk:,} km: RM {price:,.2f} ({diff:+,.2f} vs Baseline)")
+        
+    # 3. Condition Impact
+    print("\n3. Impact of Condition:")
+    for c_chk in ['Excellent', 'Good', 'Fair', 'Poor']:
+        test_data = baseline_data.copy()
+        test_data['condition'] = [c_chk]
+        price = get_price(test_data)
+        diff = price - base_price
+        print(f"   {c_chk}: RM {price:,.2f} ({diff:+,.2f} vs Baseline)")
+
+    # 4. Transmission Impact
+    print("\n4. Impact of Transmission:")
+    for t_chk in ['Automatic', 'Manual', 'CVT']:
+        test_data = baseline_data.copy()
+        test_data['transmission'] = [t_chk]
+        price = get_price(test_data)
+        diff = price - base_price
+        print(f"   {t_chk}: RM {price:,.2f} ({diff:+,.2f} vs Baseline)")
+        
+    # 5. Fuel Impact
+    print("\n5. Impact of Fuel Type:")
+    for f_chk in ['Petrol', 'Hybrid', 'Diesel']:
+        test_data = baseline_data.copy()
+        test_data['fuel_type'] = [f_chk]
+        price = get_price(test_data)
+        diff = price - base_price
+        print(f"   {f_chk}: RM {price:,.2f} ({diff:+,.2f} vs Baseline)")
+
+validate_model_behavior(final_pipeline)

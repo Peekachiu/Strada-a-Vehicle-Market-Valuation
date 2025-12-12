@@ -143,6 +143,7 @@ export function renderValuationForm(formContainer) {
         <label for="val-condition" class="form-label">Condition</label>
         <select id="val-condition" name="condition" class="form-input" disabled>
           <option value="excellent">Excellent</option>
+          <option value="very good">Very Good</option>
           <option value="good" selected>Good</option>
           <option value="fair">Fair</option>
           <option value="poor">Poor</option>
@@ -154,6 +155,7 @@ export function renderValuationForm(formContainer) {
         <select id="val-transmission" name="transmission" class="form-input" disabled>
           <option value="automatic">Automatic</option>
           <option value="manual">Manual</option>
+          <option value="cvt">CVT</option>
         </select>
       </div>
 

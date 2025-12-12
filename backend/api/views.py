@@ -79,6 +79,34 @@ class EstimateView(APIView):
             data = request.data
             
             print(f"\n[DEBUG] Received Data: {data}")
+
+            # --- NORMALIZATION ---
+            # The model is trained on specific capitalized strings.
+            # We must map frontend inputs (e.g., "poor", "cvt") to model classes (e.g., "Poor", "CVT").
+            
+            def normalize_text(text):
+                if not text: return text
+                return str(text).strip().title() # Default to Title Case: "honda" -> "Honda"
+
+            raw_make = normalize_text(data.get('make'))
+            raw_model = normalize_text(data.get('model'))
+            
+            # Condition: Map simple keys to Model keys if needed
+            # Training keys: ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor']
+            raw_condition = normalize_text(data.get('condition'))
+            # Fix "Very good" -> "Very Good" if title() messed it up or if input is different
+            if raw_condition.lower() == 'very good': 
+                raw_condition = 'Very Good'
+
+            # Transmission: ['Automatic', 'Manual', 'CVT']
+            raw_transmission = normalize_text(data.get('transmission'))
+            if raw_transmission.upper() == 'CVT':
+                raw_transmission = 'CVT'
+
+            # Fuel: ['Petrol', 'Diesel', 'Hybrid']
+            # Note: "Electric" is not in training data, but we normalize it anyway.
+            raw_fuel = normalize_text(data.get('fuel_type'))
+            
             # 3. Preprocess: Calculate 'age' 
             # The model was trained on 'age', but the user inputs 'year'.
             # We must use the same logic as train_model.py (2025 - year)
@@ -91,11 +119,11 @@ class EstimateView(APIView):
             input_df = pd.DataFrame({
                 'age': [car_age],
                 'mileage_km': [float(data.get('mileage'))],
-                'make': [data.get('make')],
-                'model': [data.get('model')],
-                'condition': [data.get('condition')],
-                'transmission': [data.get('transmission')],
-                'fuel_type': [data.get('fuel_type')] 
+                'make': [raw_make],
+                'model': [raw_model],
+                'condition': [raw_condition],
+                'transmission': [raw_transmission],
+                'fuel_type': [raw_fuel] 
             })
 
             # 5. Make the prediction
