@@ -9,8 +9,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 
 # --- 1. Define File Paths ---
-DATA_FILE = 'malaysia_master_dataset.csv'
-MODEL_FILE = 'ml_pipeline/strada_model.joblib'
+DATA_FILE = 'ML_pipeline/malaysia_master_dataset.csv'
+MODEL_FILE = 'ML_pipeline/strada_model.joblib'
 
 print(f"Loading data from '{DATA_FILE}'...")
 try:
@@ -56,7 +56,8 @@ preprocessor = ColumnTransformer(
 from sklearn.compose import TransformedTargetRegressor
 import numpy as np
 
-model_base = Ridge(alpha=1.0)
+# Optimized Params from GridSearchCV: alpha=0.1
+model_base = Ridge(alpha=0.1)
 
 # --- 7. Create Pipeline ---
 final_pipeline_inner = Pipeline(steps=[
