@@ -20,16 +20,16 @@ jobs:
       - name: Build and Push Backend
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: Dockerfile
+          context: ./backend
+          file: backend/Dockerfile
           push: true
           tags: peekachiu/strada-backend:latest
 
       - name: Build and Push Frontend
         uses: docker/build-push-action@v4
         with:
-          context: .
-          file: nginx/Dockerfile
+          context: ./frontend
+          file: frontend/nginx/Dockerfile
           push: true
           tags: peekachiu/strada-frontend:latest
 
