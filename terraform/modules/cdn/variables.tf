@@ -11,5 +11,16 @@ variable "alb_dns_name" {
 variable "web_acl_id" {
   description = "ARN of the WAF Web ACL"
   type        = string
-  default     = "" # Optional if you want to deploy without WAF initially, or make it required.
+  default     = "" 
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM Certificate ARN for HTTPS"
+  type        = string
+}
+
+variable "aliases" {
+  description = "List of CNAME aliases for the CloudFront distribution"
+  type        = list(string)
+  default     = []
 }

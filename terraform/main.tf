@@ -30,6 +30,29 @@ provider "aws" {
 }
 
 #####################################################################
+# Route 53 (DNS)
+#####################################################################
+module "route53" {
+  source       = "./modules/route53"
+  domain_name  = var.domain_name
+  project_name = var.project_name
+}
+
+#####################################################################
+# ACM (SSL Certificate)
+#####################################################################
+module "acm" {
+  source       = "./modules/acm"
+  domain_name  = var.domain_name
+  zone_id      = module.route53.zone_id
+  project_name = var.project_name
+
+  providers = {
+    aws = aws.us_east_1
+  }
+}
+
+#####################################################################
 # Virtual Private Cloud
 #####################################################################
 module "vpc" {
@@ -143,8 +166,10 @@ module "waf" {
 # Cloudfront (CDN)
 #####################################################################
 module "cdn" {
-  source       = "./modules/cdn"
-  project_name = var.project_name
-  alb_dns_name = module.public_alb.alb_dns_name
-  web_acl_id   = module.waf.web_acl_arn
+  source              = "./modules/cdn"
+  project_name        = var.project_name
+  alb_dns_name        = module.public_alb.alb_dns_name
+  web_acl_id          = module.waf.web_acl_arn
+  acm_certificate_arn = module.acm.certificate_arn
+  aliases             = [var.domain_name]
 }

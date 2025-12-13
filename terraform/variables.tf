@@ -13,6 +13,12 @@ variable "project_name" {
   default     = "strada"
 }
 
+variable "domain_name" {
+  description = "Domain Name"
+  type        = string
+  default     = "strada-automobile.click"
+}
+
 #####################################################################
 # Virtual Private Cloud (VPC)
 #####################################################################
