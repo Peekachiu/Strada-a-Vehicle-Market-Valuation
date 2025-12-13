@@ -17,10 +17,6 @@ resource "aws_route53_zone" "main" {
   }
 }
 
-import {
-  to = aws_route53domains_registered_domain.main
-  id = var.domain_name
-}
 
 resource "aws_route53domains_registered_domain" "main" {
   provider    = aws.domains

@@ -42,6 +42,11 @@ module "route53" {
   }
 }
 
+import {
+  to = module.route53.aws_route53domains_registered_domain.main
+  id = "strada-automobile.click"
+}
+
 #####################################################################
 # ACM (SSL Certificate)
 #####################################################################
