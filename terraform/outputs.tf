@@ -1,14 +1,7 @@
-output "public_alb_dns_name" {
-  description = "DNS name of the Public Load Balancer"
-  value       = module.public_alb.alb_dns_name
+output "nameservers" {
+  value = module.route53.name_servers
 }
 
-output "internal_alb_dns_name" {
-  description = "DNS name of the Internal Load Balancer"
-  value       = module.internal_alb.alb_dns_name
-}
-
-output "rds_endpoint" {
-  description = "RDS Endpoint"
-  value       = module.database.db_endpoint
+output "alb_dns_name" {
+  value = module.public_alb.alb_dns_name
 }
