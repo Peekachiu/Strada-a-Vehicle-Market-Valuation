@@ -202,6 +202,7 @@ module "cdn" {
 module "storage" {
   source       = "./modules/storage"
   project_name = var.project_name
+  assets_dir   = "${path.module}/../frontend/public/assets/images"
 }
 
 resource "aws_s3_bucket_policy" "allow_cloudfront" {

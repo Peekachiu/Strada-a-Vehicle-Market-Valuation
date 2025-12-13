@@ -34,6 +34,8 @@ docker push peekachiu/strada-frontend:v1
 Step 1: Export Local Data
 ################################################
 
+cd backend
+
 python manage.py dumpdata --natural-foreign --natural-primary --exclude contenttypes --exclude auth.permission --exclude admin.logentry --exclude sessions.session --indent 2 > strada_database.json
 
 ################################################
