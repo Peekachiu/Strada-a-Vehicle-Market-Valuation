@@ -36,6 +36,10 @@ module "route53" {
   source       = "./modules/route53"
   domain_name  = var.domain_name
   project_name = var.project_name
+
+  providers = {
+    aws.domains = aws.us_east_1
+  }
 }
 
 #####################################################################
