@@ -43,8 +43,19 @@ module "route53" {
 }
 
 import {
-  to = module.route53.aws_route53domains_registered_domain.main
   id = "strada-automobile.click"
+}
+
+resource "aws_route53_record" "root" {
+  zone_id = module.route53.zone_id
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = module.cdn.cloudfront_domain_name
+    zone_id                = module.cdn.cloudfront_hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 
 #####################################################################
