@@ -32,7 +32,7 @@ export function renderHero(container) {
         <div class="new-hero-right">
           <div class="new-image-card-blur"></div>
           <div class="new-image-card">
-            <img src="assets/images/car.JPEG" alt="Luxury car" class="new-image-card-img" 
+            <img src="/images/car.JPEG" alt="Luxury car" class="new-image-card-img" 
                  onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'image-card-placeholder\\'>🚗</div>'"/>
           </div>
         </div>

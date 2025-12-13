@@ -5,7 +5,7 @@ export function renderLogin(container) {
         <!-- Left Side - Branding -->
         <div class="auth-branding animate-fade-up">
           <div class="auth-brand-logo">
-            <img src="assets/images/strada_logo.jpg" alt="Strada" class="auth-brand-img" style="height: 80px; width: auto; border-radius: 12px;">
+            <img src="/images/strada_logo.jpg" alt="Strada" class="auth-brand-img" style="height: 80px; width: auto; border-radius: 12px;">
             <span class="auth-brand-name">Strada</span>
           </div>
           <h2 class="auth-branding-title">Welcome Back!</h2>

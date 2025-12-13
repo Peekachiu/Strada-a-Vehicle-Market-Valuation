@@ -193,4 +193,41 @@ module "cdn" {
   web_acl_id          = module.waf.web_acl_arn
   acm_certificate_arn = module.acm.certificate_arn
   aliases             = [var.domain_name]
+  s3_bucket_domain_name = module.storage.bucket_regional_domain_name
+}
+
+#####################################################################
+# S3 Storage (Static Assets)
+#####################################################################
+module "storage" {
+  source       = "./modules/storage"
+  project_name = var.project_name
+}
+
+resource "aws_s3_bucket_policy" "allow_cloudfront" {
+  bucket = module.storage.bucket_id
+  policy = data.aws_iam_policy_document.allow_cloudfront.json
+}
+
+data "aws_iam_policy_document" "allow_cloudfront" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetObject"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${module.storage.bucket_id}/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [module.cdn.cloudfront_distribution_arn]
+    }
+  }
 }

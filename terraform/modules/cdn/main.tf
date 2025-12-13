@@ -1,6 +1,14 @@
 #####################################################################
 # Cloudfront (CDN)
 #####################################################################
+resource "aws_cloudfront_origin_access_control" "s3" {
+  name                              = "${var.project_name}-oac"
+  description                       = "OAC for S3"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 resource "aws_cloudfront_distribution" "main" {
   origin {
     domain_name = var.alb_dns_name
@@ -14,6 +22,12 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
+  origin {
+    domain_name              = var.s3_bucket_domain_name
+    origin_id                = "S3-${var.s3_bucket_domain_name}"
+    origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
+  }
+
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CDN for ${var.project_name}"
@@ -21,6 +35,27 @@ resource "aws_cloudfront_distribution" "main" {
 
   # Web ACL Association
   web_acl_id = var.web_acl_id
+
+  ordered_cache_behavior {
+    path_pattern     = "/images/*"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "S3-${var.s3_bucket_domain_name}"
+
+    forwarded_values {
+      query_string = false
+      headers      = []
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]

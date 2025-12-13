@@ -40,7 +40,7 @@ export function renderAbout(container) {
           </div>
           <div class="story-image reveal-on-scroll stagger-2">
             <div class="story-placeholder">
-              <img src="assets/images/IMG_0190.JPEG" alt="Our Team" style="width: 100%; height: auto; border-radius: 12px; object-fit: cover;">
+              <img src="/images/IMG_0190.JPEG" alt="Our Team" style="width: 100%; height: auto; border-radius: 12px; object-fit: cover;">
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export function renderAbout(container) {
         <div class="team-grid">
           <div class="team-card reveal-on-scroll stagger-1">
             <div class="team-photo" style="width: 120px; height: 120px; margin: 0 auto 1rem;">
-              <img src="assets/images/ivan_profile.jpg" alt="Ivan Neoh" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
+              <img src="/images/ivan_profile.jpg" alt="Ivan Neoh" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
             </div>
             <h3>Ivan Neoh</h3>
             <p class="team-role">CEO & Founder</p>
@@ -135,7 +135,7 @@ export function renderAbout(container) {
           
           <div class="team-card reveal-on-scroll stagger-2">
             <div class="team-photo" style="width: 120px; height: 120px; margin: 0 auto 1rem;">
-              <img src="assets/images/profile_pic.jpeg" alt="Edwin Neoh" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
+              <img src="/images/profile_pic.jpeg" alt="Edwin Neoh" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
             </div>
             <h3>Edwin Neoh</h3>
             <p class="team-role">CTO</p>
@@ -144,7 +144,7 @@ export function renderAbout(container) {
           
           <div class="team-card reveal-on-scroll stagger-3">
             <div class="team-photo" style="width: 120px; height: 120px; margin: 0 auto 1rem;">
-              <img src="assets/images/team/emily.jpg" alt="Emily Rodriguez" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
+              <img src="/images/team/emily.jpg" alt="Emily Rodriguez" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
             </div>
             <h3>Emily Rodriguez</h3>
             <p class="team-role">Head of Customer Success</p>
