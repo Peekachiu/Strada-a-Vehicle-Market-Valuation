@@ -34,7 +34,7 @@ variable "vpc_cidr" {
 variable "instance_type" {
   description = "EC2 Instance Type"
   type        = string
-  default     = "t2.micro"
+  default     = "t2.small"
 }
 
 variable "ami_id" {

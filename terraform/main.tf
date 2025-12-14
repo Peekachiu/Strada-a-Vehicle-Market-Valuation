@@ -243,3 +243,24 @@ data "aws_iam_policy_document" "allow_cloudfront" {
     }
   }
 }
+
+#####################################################################
+# CloudWatch Monitoring
+#####################################################################
+module "monitoring" {
+  source       = "./modules/monitoring"
+  project_name = var.project_name
+  region       = var.region
+
+  web_asg_name = module.compute.web_asg_name
+  api_asg_name = module.compute.api_asg_name
+
+  db_instance_id = module.database.db_instance_id
+
+  public_alb_arn_suffix  = module.public_alb.alb_arn_suffix
+  public_tg_arn_suffix   = module.public_alb.target_group_arn_suffix
+  
+  internal_alb_arn_suffix = module.internal_alb.alb_arn_suffix
+  internal_tg_arn_suffix  = module.internal_alb.target_group_arn_suffix
+}
+

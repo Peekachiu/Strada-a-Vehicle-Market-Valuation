@@ -12,3 +12,7 @@ output "db_port" {
   description = "The database port"
   value       = aws_db_instance.main.port
 }
+
+output "db_instance_id" {
+  value = aws_db_instance.main.identifier
+}
