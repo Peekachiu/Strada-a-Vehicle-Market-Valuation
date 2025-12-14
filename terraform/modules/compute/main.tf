@@ -28,6 +28,22 @@ resource "aws_iam_role_policy_attachment" "s3_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
+resource "aws_iam_role_policy" "secrets_access" {
+  name = "${var.project_name}-secrets-access"
+  role = aws_iam_role.ssm_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "secretsmanager:GetSecretValue"
+        Effect = "Allow"
+        Resource = var.db_password_secret_arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_instance_profile" "ssm_profile" {
   name = "${var.project_name}-ssm-profile"
   role = aws_iam_role.ssm_role.name
@@ -144,13 +160,15 @@ resource "aws_launch_template" "api" {
               usermod -aG docker ubuntu
               
               # Run Backend Container
-              # Passing DB credentials via Environment Variables
+              # Fetch DB Password from Secrets Manager
+              export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${var.db_password_secret_name} --query SecretString --output text --region dp-southeast-1)
+
               docker run -d --restart=always -p 8000:8000 \
                 -e DB_HOST=${var.db_host} \
                 -e DB_PORT=${var.db_port} \
                 -e DB_NAME=${var.db_name} \
                 -e DB_USER=${var.db_username} \
-                -e DB_PASSWORD=${var.db_password} \
+                -e DB_PASSWORD=$DB_PASSWORD \
                 -e ALLOWED_HOSTS='*' \
                 peekachiu/strada-backend:latest
               EOF
