@@ -72,20 +72,17 @@ jobs:
         echo "   Target Instance: $INSTANCE_ID"
 
         echo ">>> Step 4: Sending SSM Command..."
-        # Construct the command script to run on the EC2 instance
-        # Note: We escape double quotes for the JSON string
-        COMMANDS="aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json && \
-        docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && \
-        if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && \
-        sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json && \
-        sudo docker exec \$docker_id python manage.py migrate && \
-        sudo docker exec \$docker_id python manage.py loaddata strada_database.json && \
-        rm /tmp/strada_database.json"
-
+        # Use a simpler approach to avoid quoting hell: write commands to a temp variable then pass it
+        # Note: We rely on the fact that AWS CLI takes "commands=['cmd1','cmd2']" format or just commands="cmd1"
+        # We will use the list format for safety.
+        
+        # We need to escape single quotes if they exist, but here we only use doubles inside.
+        CMD_STRING="aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json && docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json && sudo docker exec \$docker_id python manage.py migrate && sudo docker exec \$docker_id python manage.py loaddata strada_database.json && rm /tmp/strada_database.json"
+        
         COMMAND_ID=$(aws ssm send-command \
           --instance-ids "$INSTANCE_ID" \
           --document-name "AWS-RunShellScript" \
-          --parameters commands="$COMMANDS" \
+          --parameters "{\"commands\": [\"$CMD_STRING\"]}" \
           --query "Command.CommandId" \
           --output text)
 
