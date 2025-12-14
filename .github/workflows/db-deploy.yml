@@ -73,23 +73,16 @@ jobs:
 
         echo ">>> Step 4: Sending SSM Command..."
         
-        # Define the exact script we want to run on the server
-        # We use a heredoc for clarity. Note: We DO want variable expansion for $BUCKET_NAME but NOT for inner bash variables like $docker_id
-        # So we escape the inner $ signs.
-        read -r -d '' REMOTE_SCRIPT <<EOF
-        aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json
-        docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1)
-        if [ -z "\$docker_id" ]; then echo "Backend container not found!"; exit 1; fi
-        sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json
-        sudo docker exec \$docker_id python manage.py migrate
-        sudo docker exec \$docker_id python manage.py loaddata strada_database.json
-        rm /tmp/strada_database.json
-        EOF
+        # We construct the JSON manually to avoid dependencies.
+        # We need to escape double quotes inside the command string for the JSON format.
+        # 1. Define the raw command
+        CMD_RAW="aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json && docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json && sudo docker exec \$docker_id python manage.py migrate && sudo docker exec \$docker_id python manage.py loaddata strada_database.json && rm /tmp/strada_database.json"
         
-        # Use jq to safely wrap this script into the JSON structure required by --parameters
-        # -n = null input, --arg s ... = passes the script as a string variable 's'
-        # The output format is: {"commands":[ "exact script content" ]}
-        PARAMS_JSON=$(jq -n --arg s "$REMOTE_SCRIPT" '{"commands":[$s]}')
+        # 2. Escape double quotes for JSON (replace " with \")
+        CMD_ESCAPED=${CMD_RAW//\"/\\\"}
+        
+        # 3. Construct JSON
+        PARAMS_JSON="{\"commands\":[\"$CMD_ESCAPED\"]}"
 
         COMMAND_ID=$(aws ssm send-command \
           --instance-ids "$INSTANCE_ID" \
