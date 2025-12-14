@@ -1,4 +1,4 @@
-name: Database Deploy
+name: 02 - Database Deploy
 
 on:
   workflow_dispatch:
