@@ -72,17 +72,29 @@ jobs:
         echo "   Target Instance: $INSTANCE_ID"
 
         echo ">>> Step 4: Sending SSM Command..."
-        # Use a simpler approach to avoid quoting hell: write commands to a temp variable then pass it
-        # Note: We rely on the fact that AWS CLI takes "commands=['cmd1','cmd2']" format or just commands="cmd1"
-        # We will use the list format for safety.
         
-        # We need to escape single quotes if they exist, but here we only use doubles inside.
-        CMD_STRING="aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json && docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json && sudo docker exec \$docker_id python manage.py migrate && sudo docker exec \$docker_id python manage.py loaddata strada_database.json && rm /tmp/strada_database.json"
+        # Define the exact script we want to run on the server
+        # We use a heredoc for clarity. Note: We DO want variable expansion for $BUCKET_NAME but NOT for inner bash variables like $docker_id
+        # So we escape the inner $ signs.
+        read -r -d '' REMOTE_SCRIPT <<EOF
+        aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json
+        docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1)
+        if [ -z "\$docker_id" ]; then echo "Backend container not found!"; exit 1; fi
+        sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json
+        sudo docker exec \$docker_id python manage.py migrate
+        sudo docker exec \$docker_id python manage.py loaddata strada_database.json
+        rm /tmp/strada_database.json
+        EOF
         
+        # Use jq to safely wrap this script into the JSON structure required by --parameters
+        # -n = null input, --arg s ... = passes the script as a string variable 's'
+        # The output format is: {"commands":[ "exact script content" ]}
+        PARAMS_JSON=$(jq -n --arg s "$REMOTE_SCRIPT" '{"commands":[$s]}')
+
         COMMAND_ID=$(aws ssm send-command \
           --instance-ids "$INSTANCE_ID" \
           --document-name "AWS-RunShellScript" \
-          --parameters "{\"commands\": [\"$CMD_STRING\"]}" \
+          --parameters "$PARAMS_JSON" \
           --query "Command.CommandId" \
           --output text)
 
