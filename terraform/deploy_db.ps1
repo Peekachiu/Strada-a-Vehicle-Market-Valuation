@@ -14,11 +14,57 @@ if ($LASTEXITCODE -ne 0) {
 }
 cd ../terraform
 
-Write-Host ">>> Step 2: Getting Terraform Outputs..."
-# We use -json to parse reliably
-$tfOutput = terraform output -json | ConvertFrom-Json
-$bucketName = $tfOutput.s3_bucket_name.value
-$asgName = $tfOutput.api_asg_name.value
+# Helper function to try getting outputs
+function Get-TfOutputs {
+    param ($Cmd)
+    try {
+        Write-Host ">>> Trying to get outputs using $Cmd..."
+        $json = & $Cmd output -json 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            return $json | ConvertFrom-Json
+        }
+    } catch {}
+    return $null
+}
+
+$bucketName = $null
+$asgName = $null
+
+# Try Tofu
+if (Get-Command "tofu" -ErrorAction SilentlyContinue) {
+    $tfOutput = Get-TfOutputs "tofu"
+    if ($tfOutput) {
+        $bucketName = $tfOutput.s3_bucket_name.value
+        $asgName = $tfOutput.api_asg_name.value
+    }
+} 
+
+# Try Terraform if Tofu failed/missing
+if (-not $bucketName -and (Get-Command "terraform" -ErrorAction SilentlyContinue)) {
+    $tfOutput = Get-TfOutputs "terraform"
+    if ($tfOutput) {
+        $bucketName = $tfOutput.s3_bucket_name.value
+        $asgName = $tfOutput.api_asg_name.value
+    }
+}
+
+# Fallback: Manual Input
+if (-not $bucketName -or -not $asgName) {
+    Write-Warning "Could not auto-detect Terraform outputs (backend might not be initialized locally)."
+    Write-Host "Please enter the values manually:" -ForegroundColor Cyan
+    
+    if (-not $bucketName) {
+        $bucketName = Read-Host "Enter your S3 Bucket Name (e.g. strada-vehicle-valuation-assets-xyz...)"
+    }
+    if (-not $asgName) {
+        $asgName = Read-Host "Enter your API Auto Scaling Group Name (e.g. strada-vehicle-valuation-api-asg)"
+    }
+}
+
+if (-not $bucketName -or -not $asgName) {
+    Write-Error "Bucket Name and ASG Name are required!"
+    exit 1
+}
 
 Write-Host "   Bucket: $bucketName"
 Write-Host "   ASG: $asgName"
@@ -39,11 +85,11 @@ Write-Host "   Target Instance: $instanceId"
 Write-Host ">>> Step 5: Triggering Import on EC2..."
 $commands = @(
     "aws s3 cp s3://$bucketName/db_dump/strada_database.json /tmp/strada_database.json",
-    "docker_id=`sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1`",
-    "if [ -z `"$docker_id`" ]; then echo `'Backend container not found!`'; exit 1; fi",
-    "sudo docker cp /tmp/strada_database.json $docker_id:/app/strada_database.json",
-    "sudo docker exec $docker_id python manage.py migrate",
-    "sudo docker exec $docker_id python manage.py loaddata strada_database.json",
+    "docker_id=`$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1)",
+    "if [ -z `"`$docker_id`" ]; then echo 'Backend container not found!'; exit 1; fi",
+    "sudo docker cp /tmp/strada_database.json `$docker_id:/app/strada_database.json",
+    "sudo docker exec `$docker_id python manage.py migrate",
+    "sudo docker exec `$docker_id python manage.py loaddata strada_database.json",
     "rm /tmp/strada_database.json"
 )
 

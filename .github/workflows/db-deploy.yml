@@ -1,0 +1,109 @@
+name: Database Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "yes" to confirm you have committed the latest strada_database.json'
+        required: true
+        default: 'no'
+
+jobs:
+  deploy-db:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./terraform
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Deploy Database via SSM
+      shell: bash
+      run: |
+        if [[ "${{ github.event.inputs.confirm }}" != "yes" ]]; then
+          echo "Please confirm by typing 'yes' in the workflow input."
+          exit 1
+        fi
+
+        echo ">>> Step 1: Locating Resources..."
+        # Find Bucket Name dynamically (starts with project name, contains 'assets')
+        BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'assets') && contains(Name, 'strada')].Name" --output text | head -n 1)
+        
+        # Find ASG Name dynamically (ends with -api-asg)
+        ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?contains(AutoScalingGroupName, '-api-asg')].AutoScalingGroupName" --output text | head -n 1)
+
+        if [ -z "$BUCKET_NAME" ] || [ -z "$ASG_NAME" ]; then
+           echo "Error: Could not find Bucket or ASG. Check AWS permissions."
+           echo "Bucket found: $BUCKET_NAME"
+           echo "ASG found: $ASG_NAME"
+           exit 1
+        fi
+
+        echo "   Bucket: $BUCKET_NAME"
+        echo "   ASG: $ASG_NAME"
+
+        echo ">>> Step 2: Uploading Database Dump to S3..."
+        # Check if file exists
+        if [ ! -f "../backend/strada_database.json" ]; then
+           echo "Error: backend/strada_database.json not found!"
+           echo "You must export your local database and push the file to GitHub first."
+           exit 1
+        fi
+
+        aws s3 cp ../backend/strada_database.json "s3://$BUCKET_NAME/db_dump/strada_database.json"
+
+        echo ">>> Step 3: Finding API Instance..."
+        INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].Instances[0].InstanceId" --output text)
+
+        if [ "$INSTANCE_ID" == "None" ] || [ -z "$INSTANCE_ID" ]; then
+           echo "Error: No instances found in ASG!"
+           exit 1
+        fi
+        echo "   Target Instance: $INSTANCE_ID"
+
+        echo ">>> Step 4: Sending SSM Command..."
+        # Construct the command script to run on the EC2 instance
+        # Note: We escape double quotes for the JSON string
+        COMMANDS="aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json && \
+        docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && \
+        if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && \
+        sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json && \
+        sudo docker exec \$docker_id python manage.py migrate && \
+        sudo docker exec \$docker_id python manage.py loaddata strada_database.json && \
+        rm /tmp/strada_database.json"
+
+        COMMAND_ID=$(aws ssm send-command \
+          --instance-ids "$INSTANCE_ID" \
+          --document-name "AWS-RunShellScript" \
+          --parameters commands="$COMMANDS" \
+          --query "Command.CommandId" \
+          --output text)
+
+        echo "   Command Sent! ID: $COMMAND_ID"
+        echo "   Waiting for execution..."
+
+        aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID"
+
+        # Fetch output
+        echo ">>> Output:"
+        aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardOutputContent" --output text
+        
+        # Fetch errors
+        ERRORS=$(aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardErrorContent" --output text)
+        if [ ! -z "$ERRORS" ]; then
+           echo ">>> Errors:"
+           echo "$ERRORS"
+           # Don't fail the build if it's just warnings, but show them.
+        fi
+
+        echo ">>> Deployment Complete!"
