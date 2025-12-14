@@ -72,7 +72,7 @@ class EstimateView(APIView):
         try:
             # 1. Load the trained model
             # We construct the path relative to the project base directory
-            model_path = os.path.join(settings.BASE_DIR, 'ml_pipeline', 'strada_model.joblib')
+            model_path = os.path.join(settings.BASE_DIR, 'ML_pipeline', 'strada_model.joblib')
             model = joblib.load(model_path)
 
             # 2. Get data from the frontend request
