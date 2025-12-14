@@ -62,7 +62,7 @@ resource "aws_launch_template" "web" {
   user_data = base64encode(<<-EOF
               #!/bin/bash
               apt-get update -y
-              apt-get install -y docker.io
+              apt-get install -y docker.io awscli
               systemctl start docker
               systemctl enable docker
               usermod -aG docker ubuntu
@@ -138,7 +138,7 @@ resource "aws_launch_template" "api" {
   user_data = base64encode(<<-EOF
               #!/bin/bash
               apt-get update -y
-              apt-get install -y docker.io
+              apt-get install -y docker.io awscli
               systemctl start docker
               systemctl enable docker
               usermod -aG docker ubuntu
