@@ -7,8 +7,7 @@ services:
     image: peekachiu/strada-backend:latest
     container_name: strada_backend
     volumes:
-      - ./backend:/app # Syncs your code so you don't have to rebuild on every change
-    ports:
+      - ./backend:/app
       - "8000:8000"
     environment:
       - DEBUG=1 # Keep debug on for development
