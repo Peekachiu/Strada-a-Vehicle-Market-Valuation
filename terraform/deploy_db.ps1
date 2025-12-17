@@ -74,7 +74,7 @@ aws s3 cp ../backend/strada_database.json "s3://$bucketName/db_dump/strada_datab
 
 Write-Host ">>> Step 4: Finding API Instance..."
 # Get an instance ID from the Auto Scaling Group
-$instanceId = aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $asgName --query "AutoScalingGroups[0].Instances[0].InstanceId" --output text
+$instanceId = aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $asgName --query "AutoScalingGroups[0].Instances[?LifecycleState=='InService'].InstanceId | [0]" --output text
 
 if (-not $instanceId -or $instanceId -eq "None") {
     Write-Error "No instances found in ASG!"

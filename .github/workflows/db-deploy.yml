@@ -63,7 +63,7 @@ jobs:
         aws s3 cp ../backend/strada_database.json "s3://$BUCKET_NAME/db_dump/strada_database.json"
 
         echo ">>> Step 3: Finding API Instance..."
-        INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].Instances[0].InstanceId" --output text)
+        INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].Instances[?LifecycleState=='InService'].InstanceId | [0]" --output text)
 
         if [ "$INSTANCE_ID" == "None" ] || [ -z "$INSTANCE_ID" ]; then
            echo "Error: No instances found in ASG!"
