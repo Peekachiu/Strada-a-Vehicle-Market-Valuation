@@ -134,6 +134,7 @@ data "aws_ami" "ubuntu" {
 module "compute" {
   source        = "./modules/compute"
   project_name  = var.project_name
+  region        = var.region
   instance_type = var.instance_type
   ami_id        = data.aws_ami.ubuntu.id
   # ssh_key_name removed as we use SSM

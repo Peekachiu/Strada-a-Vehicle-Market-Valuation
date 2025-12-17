@@ -161,7 +161,7 @@ resource "aws_launch_template" "api" {
               
               # Run Backend Container
               # Fetch DB Password from Secrets Manager
-              export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${var.db_password_secret_name} --query SecretString --output text --region dp-southeast-1)
+              export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${var.db_password_secret_name} --query SecretString --output text --region ${var.region})
 
               docker run -d --restart=always -p 8000:8000 \
                 -e DB_HOST=${var.db_host} \
