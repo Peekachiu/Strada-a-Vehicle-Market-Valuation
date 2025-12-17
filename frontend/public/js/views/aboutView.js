@@ -144,18 +144,18 @@ export function renderAbout(container) {
           
           <div class="team-card reveal-on-scroll stagger-3">
             <div class="team-photo" style="width: 120px; height: 120px; margin: 0 auto 1rem;">
-              <img src="/images/team/emily.jpg" alt="Emily Rodriguez" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
+              <img src="/images/zanne_pic.jpg" alt="Suzanne Chan" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
             </div>
-            <h3>Emily Rodriguez</h3>
+            <h3>Suzanne Chan</h3>
             <p class="team-role">Head of Customer Success</p>
             <p class="team-bio">Dedicated to ensuring every user has an exceptional experience with our platform.</p>
           </div>
           
           <div class="team-card reveal-on-scroll stagger-4">
             <div class="team-photo" style="width: 120px; height: 120px; margin: 0 auto 1rem;">
-              <img src="assets/images/team/david.jpg" alt="David Kumar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
+              <img src="/images/darren_golf_profile_02.jpg" alt="Darren Neoh" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background-color: #e5e7eb;">
             </div>
-            <h3>David Kumar</h3>
+            <h3>Darren Neoh</h3>
             <p class="team-role">Lead Data Analyst</p>
             <p class="team-bio">Expert in automotive market trends with deep knowledge of pricing dynamics across regions.</p>
           </div>
