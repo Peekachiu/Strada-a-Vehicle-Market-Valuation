@@ -1,4 +1,4 @@
-name: 02 - Database Deploy
+name: 503 - Database Deploy
 
 on:
   workflow_dispatch:
