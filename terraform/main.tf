@@ -150,7 +150,7 @@ module "compute" {
   db_port     = module.database.db_port
   db_name     = var.db_name
   db_username = var.db_username
-  db_username = var.db_username
+
   db_password_secret_arn  = module.secrets.secret_arn
   db_password_secret_name = module.secrets.secret_name
 }
