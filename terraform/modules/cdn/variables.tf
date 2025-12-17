@@ -11,7 +11,7 @@ variable "alb_dns_name" {
 variable "web_acl_id" {
   description = "ARN of the WAF Web ACL"
   type        = string
-  default     = "" 
+  default     = ""
 }
 
 variable "acm_certificate_arn" {

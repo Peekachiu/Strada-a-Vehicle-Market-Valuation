@@ -36,8 +36,8 @@ resource "aws_iam_role_policy" "secrets_access" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "secretsmanager:GetSecretValue"
-        Effect = "Allow"
+        Action   = "secretsmanager:GetSecretValue"
+        Effect   = "Allow"
         Resource = var.db_password_secret_arn
       }
     ]
@@ -96,10 +96,10 @@ resource "aws_launch_template" "web" {
 }
 
 resource "aws_autoscaling_group" "web" {
-  name                = "${var.project_name}-web-asg"
-  vpc_zone_identifier = var.public_subnet_ids
-  target_group_arns   = [var.public_target_group_arn]
-  health_check_type   = "ELB"
+  name                      = "${var.project_name}-web-asg"
+  vpc_zone_identifier       = var.public_subnet_ids
+  target_group_arns         = [var.public_target_group_arn]
+  health_check_type         = "ELB"
   health_check_grace_period = 300
 
   desired_capacity = 2
@@ -176,10 +176,10 @@ resource "aws_launch_template" "api" {
 }
 
 resource "aws_autoscaling_group" "api" {
-  name                = "${var.project_name}-api-asg"
-  vpc_zone_identifier = var.private_subnet_ids
-  target_group_arns   = [var.internal_target_group_arn]
-  health_check_type   = "ELB"
+  name                      = "${var.project_name}-api-asg"
+  vpc_zone_identifier       = var.private_subnet_ids
+  target_group_arns         = [var.internal_target_group_arn]
+  health_check_type         = "ELB"
   health_check_grace_period = 300
 
   desired_capacity = 2

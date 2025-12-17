@@ -65,7 +65,7 @@ resource "aws_cloudfront_distribution" "main" {
     forwarded_values {
       query_string = true
       headers      = ["*"] # Forward all headers (dynamic app)
-      
+
       cookies {
         forward = "all"
       }
@@ -73,7 +73,7 @@ resource "aws_cloudfront_distribution" "main" {
 
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
-    default_ttl            = 0     # Disable caching by default for dynamic app
+    default_ttl            = 0 # Disable caching by default for dynamic app
     max_ttl                = 86400
   }
 

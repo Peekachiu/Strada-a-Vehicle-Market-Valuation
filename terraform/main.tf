@@ -132,14 +132,14 @@ data "aws_ami" "ubuntu" {
 # EC2 Instances
 #####################################################################
 module "compute" {
-  source             = "./modules/compute"
-  project_name       = var.project_name
-  instance_type      = var.instance_type
-  ami_id             = data.aws_ami.ubuntu.id
+  source        = "./modules/compute"
+  project_name  = var.project_name
+  instance_type = var.instance_type
+  ami_id        = data.aws_ami.ubuntu.id
   # ssh_key_name removed as we use SSM
-  public_subnet_ids  = module.vpc.public_subnet_ids
-  private_subnet_ids = module.vpc.private_subnet_ids
-  web_sg_id          = module.security.web_sg_id
+  public_subnet_ids         = module.vpc.public_subnet_ids
+  private_subnet_ids        = module.vpc.private_subnet_ids
+  web_sg_id                 = module.security.web_sg_id
   api_sg_id                 = module.security.api_sg_id
   public_target_group_arn   = module.public_alb.target_group_arn
   internal_target_group_arn = module.internal_alb.target_group_arn
@@ -159,28 +159,28 @@ module "compute" {
 # Public Load Balancers
 #####################################################################
 module "public_alb" {
-  source              = "./modules/alb"
-  project_name        = var.project_name
-  vpc_id              = module.vpc.vpc_id
-  subnet_ids          = module.vpc.public_subnet_ids
-  security_group_id   = module.security.alb_sg_id
+  source            = "./modules/alb"
+  project_name      = var.project_name
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.public_subnet_ids
+  security_group_id = module.security.alb_sg_id
 
-  name_prefix         = "public-alb"
+  name_prefix = "public-alb"
 }
 
 #####################################################################
 # Internal Load Balancers
 #####################################################################
 module "internal_alb" {
-  source              = "./modules/alb"
-  project_name        = var.project_name
-  vpc_id              = module.vpc.vpc_id
-  subnet_ids          = module.vpc.private_subnet_ids
-  security_group_id   = module.security.internal_alb_sg_id
+  source            = "./modules/alb"
+  project_name      = var.project_name
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.private_subnet_ids
+  security_group_id = module.security.internal_alb_sg_id
 
-  internal            = true
-  name_prefix         = "internal-alb"
-  target_port         = 8000
+  internal    = true
+  name_prefix = "internal-alb"
+  target_port = 8000
 }
 
 #####################################################################
@@ -199,12 +199,12 @@ module "waf" {
 # Cloudfront (CDN)
 #####################################################################
 module "cdn" {
-  source              = "./modules/cdn"
-  project_name        = var.project_name
-  alb_dns_name        = module.public_alb.alb_dns_name
-  web_acl_id          = module.waf.web_acl_arn
-  acm_certificate_arn = module.acm.certificate_arn
-  aliases             = [var.domain_name]
+  source                = "./modules/cdn"
+  project_name          = var.project_name
+  alb_dns_name          = module.public_alb.alb_dns_name
+  web_acl_id            = module.waf.web_acl_arn
+  acm_certificate_arn   = module.acm.certificate_arn
+  aliases               = [var.domain_name]
   s3_bucket_domain_name = module.storage.bucket_regional_domain_name
 }
 
@@ -258,9 +258,9 @@ module "monitoring" {
 
   db_instance_id = module.database.db_instance_id
 
-  public_alb_arn_suffix  = module.public_alb.alb_arn_suffix
-  public_tg_arn_suffix   = module.public_alb.target_group_arn_suffix
-  
+  public_alb_arn_suffix = module.public_alb.alb_arn_suffix
+  public_tg_arn_suffix  = module.public_alb.target_group_arn_suffix
+
   internal_alb_arn_suffix = module.internal_alb.alb_arn_suffix
   internal_tg_arn_suffix  = module.internal_alb.target_group_arn_suffix
 }

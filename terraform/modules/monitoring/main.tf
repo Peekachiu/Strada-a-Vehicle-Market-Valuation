@@ -60,8 +60,8 @@ resource "aws_cloudwatch_dashboard" "main" {
         height = 6
         properties = {
           metrics = [
-             ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", var.public_alb_arn_suffix],
-             ["AWS/ApplicationELB", "HTTPCode_ELB_5XX_Count", "LoadBalancer", var.public_alb_arn_suffix]
+            ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", var.public_alb_arn_suffix],
+            ["AWS/ApplicationELB", "HTTPCode_ELB_5XX_Count", "LoadBalancer", var.public_alb_arn_suffix]
           ]
           period = 60
           stat   = "Sum"
@@ -83,7 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_web" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "This metric monitors ec2 cpu utilization"
-  
+
   dimensions = {
     AutoScalingGroupName = var.web_asg_name
   }
@@ -113,7 +113,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx_errors" {
   namespace           = "AWS/ApplicationELB"
   period              = "60"
   statistic           = "Sum"
-  threshold           = "10" 
+  threshold           = "10"
   alarm_description   = "High rate of 5xx errors on ALB"
 
   dimensions = {
