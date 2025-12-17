@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 
 Write-Host ">>> Step 1: Exporting Local Data..."
 cd ../backend
-python manage.py dumpdata --natural-foreign --natural-primary --exclude contenttypes --exclude auth.permission --exclude admin.logentry --exclude sessions.session --indent 2 > strada_database.json
+python manage.py dumpdata --natural-foreign --natural-primary --exclude contenttypes --exclude auth.permission --exclude admin.logentry --exclude sessions.session --indent 2 --output strada_database.json
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Dumpdata failed!"
     exit 1
