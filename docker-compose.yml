@@ -6,9 +6,10 @@ services:
       dockerfile: Dockerfile
     image: peekachiu/strada-backend:latest
     container_name: strada_backend
+    ports:
+      - "8000:8000"
     volumes:
       - ./backend:/app
-      - "8000:8000"
     environment:
       - DEBUG=1 # Keep debug on for development
     command: python manage.py runserver 0.0.0.0:8000 # Use dev server for now for auto-reload
