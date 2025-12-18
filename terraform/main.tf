@@ -157,8 +157,8 @@ module "compute" {
 
   # Email Credentials
   email_host    = "email-smtp.${var.region}.amazonaws.com"
-  smtp_username = module.ses.ses_smtp_username
-  smtp_password = module.ses.ses_smtp_password
+  smtp_username = module.ses.smtp_username
+  smtp_password = module.ses.smtp_password
 }
 
 #####################################################################
