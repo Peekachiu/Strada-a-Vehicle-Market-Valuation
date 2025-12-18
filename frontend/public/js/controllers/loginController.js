@@ -168,8 +168,8 @@ export class LoginController {
 
     // Cleanup
     this.cleanup = () => {
-      if (document.body.contains(this.modal)) {
-        document.body.removeChild(this.modal);
+      if (this.modal && this.modal.parentNode) {
+        this.modal.parentNode.removeChild(this.modal);
       }
       window.removeEventListener('hashchange', this.cleanup);
     };

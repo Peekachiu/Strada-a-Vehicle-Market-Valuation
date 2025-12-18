@@ -17,7 +17,10 @@ import { AffordabilityController } from './controllers/affordabilityController.j
 import { DepreciationController } from './controllers/depreciationController.js';
 import { LoginController } from './controllers/loginController.js';
 import { SignUpController } from './controllers/signupController.js';
+
 import { ProfileController } from './controllers/profileController.js';
+import { Modal } from './components/Modal.js';
+import { termsOfServiceContent, privacyPolicyContent } from './utils/legalContent.js';
 
 // Global state for the app
 const appState = {
@@ -386,6 +389,27 @@ document.addEventListener('DOMContentLoaded', () => {
       observer.observe(el);
     });
   };
+
+  // 8. Footer Legal Links (Global)
+  const footerTerms = document.getElementById('footer-terms');
+  const footerPrivacy = document.getElementById('footer-privacy');
+  // Reusing the same modal instance might be tricky if we don't have a global one.
+  // Ideally, one modal instance for the app or instantiated on demand.
+  const globalModal = new Modal();
+
+  if (footerTerms) {
+    footerTerms.addEventListener('click', (e) => {
+      e.preventDefault();
+      globalModal.create('Terms of Service', termsOfServiceContent);
+    });
+  }
+
+  if (footerPrivacy) {
+    footerPrivacy.addEventListener('click', (e) => {
+      e.preventDefault();
+      globalModal.create('Privacy Policy', privacyPolicyContent);
+    });
+  }
 
   // Initial check
   window.initScrollAnimations();
