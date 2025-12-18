@@ -15,16 +15,32 @@ export class InsuranceController {
         if (this.form) {
             this.form.addEventListener('submit', this.calculate);
         }
+
+        // Add Live Validation Listeners
+        const inputs = this.main.querySelectorAll('#ins-market-value, #ins-location, #ins-ncd, #ins-cc');
+        inputs.forEach(input => {
+            input.addEventListener('input', this.calculate);
+        });
     }
 
     calculate(e) {
         e.preventDefault();
 
         // 1. Get Inputs
-        const marketValue = parseFloat(document.getElementById('ins-market-value').value);
+        let marketValue = parseFloat(document.getElementById('ins-market-value').value);
         const location = document.getElementById('ins-location').value;
         const ncd = parseFloat(document.getElementById('ins-ncd').value);
-        const cc = parseInt(document.getElementById('ins-cc').value);
+        let cc = parseInt(document.getElementById('ins-cc').value);
+
+        // Apply Caps & Visual Update
+        if (marketValue > 10000000) {
+            marketValue = 10000000;
+            document.getElementById('ins-market-value').value = 10000000;
+        }
+        if (cc > 7000) {
+            cc = 7000;
+            document.getElementById('ins-cc').value = 7000;
+        }
 
         if (!marketValue || marketValue < 10000) {
             alert("Please enter a valid Market Value (min RM 10,000).");

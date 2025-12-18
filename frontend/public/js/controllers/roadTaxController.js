@@ -25,10 +25,16 @@ export class RoadTaxController {
     }
 
     calculate() {
-        const cc = parseInt(this.ccInput.value) || 0;
+        let cc = parseInt(this.ccInput.value) || 0;
         const region = this.regionInput.value;
         const type = this.typeInput.value;
         const ownership = this.ownershipInput.value;
+
+        // Apply Caps & Visual Update
+        if (cc > 7000) {
+            cc = 7000;
+            this.ccInput.value = 7000;
+        }
 
         if (cc > 0) {
             let baseRate = 0;

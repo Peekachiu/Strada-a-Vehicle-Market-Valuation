@@ -25,10 +25,15 @@ export class CalculatorController {
     }
 
     calculate() {
-        const price = parseFloat(this.priceInput.value) || 0;
+        let price = parseFloat(this.priceInput.value) || 0;
         const downPercent = parseFloat(this.downPercentInput.value) || 0;
-        const interestRate = parseFloat(this.interestInput.value) || 0;
-        const termYears = parseFloat(this.termInput.value) || 0;
+        let interestRate = parseFloat(this.interestInput.value) || 0;
+        let termYears = parseFloat(this.termInput.value) || 0;
+
+        // Apply Caps & specific visual update
+        if (price > 10000000) { price = 10000000; this.priceInput.value = 10000000; }
+        if (interestRate > 20) { interestRate = 20; this.interestInput.value = 20; }
+        if (termYears > 9) { termYears = 9; this.termInput.value = 9; }
 
         // Calculate Down Payment Amount
         const downPayment = price * (downPercent / 100);

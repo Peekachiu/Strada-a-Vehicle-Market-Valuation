@@ -15,6 +15,12 @@ export class AffordabilityController {
         if (this.form) {
             this.form.addEventListener('submit', this.calculate);
         }
+
+        // Add Live Validation Listeners
+        const inputs = this.main.querySelectorAll('#aff-budget, #aff-downpayment, #aff-term, #aff-rate');
+        inputs.forEach(input => {
+            input.addEventListener('input', this.calculate);
+        });
     }
 
     calculate(e) {
@@ -23,8 +29,18 @@ export class AffordabilityController {
         // 1. Get Inputs
         const monthlyBudget = parseFloat(document.getElementById('aff-budget').value);
         const downPaymentPercent = parseFloat(document.getElementById('aff-downpayment').value);
-        const termYears = parseInt(document.getElementById('aff-term').value);
-        const interestRate = parseFloat(document.getElementById('aff-rate').value);
+        let termYears = parseInt(document.getElementById('aff-term').value);
+        let interestRate = parseFloat(document.getElementById('aff-rate').value);
+
+        // Apply Caps & Visual Update
+        if (termYears > 9) {
+            termYears = 9;
+            document.getElementById('aff-term').value = 9;
+        }
+        if (interestRate > 20) {
+            interestRate = 20;
+            document.getElementById('aff-rate').value = 20;
+        }
 
         if (!monthlyBudget || monthlyBudget < 100) {
             alert("Please enter a valid Monthly Budget (min RM 100).");

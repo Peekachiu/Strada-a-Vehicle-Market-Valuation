@@ -15,15 +15,27 @@ export class DepreciationController {
         if (this.form) {
             this.form.addEventListener('submit', this.calculate);
         }
+
+        // Add Live Validation Listeners
+        const inputs = this.main.querySelectorAll('#dep-price, #dep-type, #dep-period');
+        inputs.forEach(input => {
+            input.addEventListener('input', this.calculate);
+        });
     }
 
     calculate(e) {
         e.preventDefault();
 
         // 1. Get Inputs
-        const currentPrice = parseFloat(document.getElementById('dep-price').value);
+        let currentPrice = parseFloat(document.getElementById('dep-price').value);
         const type = document.getElementById('dep-type').value;
         const period = parseInt(document.getElementById('dep-period').value);
+
+        // Apply Caps & Visual Update
+        if (currentPrice > 10000000) {
+            currentPrice = 10000000;
+            document.getElementById('dep-price').value = 10000000;
+        }
 
         if (!currentPrice || currentPrice < 1000) {
             alert("Please enter a valid Market Price (min RM 1,000).");
