@@ -73,26 +73,33 @@ class RequestOTPView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        print(f"[DEBUG] RequestOTPView POST called. EMAIL_BACKEND={settings.EMAIL_BACKEND}")
         email = request.data.get('email')
         if not email:
+            print("[DEBUG] No email provided")
             return Response({"error": "Email is required"}, status=400)
         
         try:
+            print(f"[DEBUG] Looking up user: {email}")
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            # Security: Don't reveal user existence
-            # Simulate a delay to prevent timing attacks? 
-            # For now, just return success message.
+            print("[DEBUG] User not found")
             return Response({"message": "If this email is registered, we have sent a verification code."}, status=200)
 
         # Generate 6-digit OTP
         otp_code = get_random_string(length=6, allowed_chars='0123456789')
         
-        # Save to DB
-        PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+        try:
+            # Save to DB
+            print("[DEBUG] Saving OTP to DB")
+            PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+        except Exception as db_e:
+            print(f"[ERROR] DB Error: {db_e}")
+            return Response({"error": "Database error"}, status=500)
         
         # Send Email
         try:
+            print("[DEBUG] Sending email...")
             send_mail(
                 subject="Your Strada Password Reset Code",
                 message=f"Your verification code is: {otp_code}\n\nThis code expires in 10 minutes.",
@@ -100,9 +107,10 @@ class RequestOTPView(APIView):
                 recipient_list=[email],
                 fail_silently=False,
             )
+            print("[DEBUG] Email sent successfully (check console)")
             return Response({"message": "If this email is registered, we have sent a verification code."}, status=200)
         except Exception as e:
-            print(f"Email Error: {e}")
+            print(f"[ERROR] Email Error: {e}")
             return Response({"error": "Failed to send email. Please try again."}, status=500)
 
 class ResetPasswordWithOTPView(APIView):

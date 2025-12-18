@@ -1,10 +1,9 @@
-name: 503 - Database Deploy
-
+name: 503 - Database Schema Migration Only
 on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Type "yes" to confirm you have committed the latest strada_database.json'
+        description: 'Type "yes" to confirm migration (SAFE: No Data Loss)'
         required: true
         default: 'no'
 
@@ -27,7 +26,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Deploy Database via SSM
+    - name: Run Schema Migration Only (Safe)
       shell: bash
       run: |
         if [[ "${{ github.event.inputs.confirm }}" != "yes" ]]; then
@@ -36,33 +35,16 @@ jobs:
         fi
 
         echo ">>> Step 1: Locating Resources..."
-        # Find Bucket Name dynamically (starts with project name, contains 'assets')
-        BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'assets') && contains(Name, 'strada')].Name" --output text | head -n 1)
-        
         # Find ASG Name dynamically (ends with -api-asg)
         ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?contains(AutoScalingGroupName, '-api-asg')].AutoScalingGroupName" --output text | head -n 1)
 
-        if [ -z "$BUCKET_NAME" ] || [ -z "$ASG_NAME" ]; then
-           echo "Error: Could not find Bucket or ASG. Check AWS permissions."
-           echo "Bucket found: $BUCKET_NAME"
-           echo "ASG found: $ASG_NAME"
+        if [ -z "$ASG_NAME" ]; then
+           echo "Error: Could not find ASG."
            exit 1
         fi
-
-        echo "   Bucket: $BUCKET_NAME"
         echo "   ASG: $ASG_NAME"
 
-        echo ">>> Step 2: Uploading Database Dump to S3..."
-        # Check if file exists
-        if [ ! -f "../backend/strada_database.json" ]; then
-           echo "Error: backend/strada_database.json not found!"
-           echo "You must export your local database and push the file to GitHub first."
-           exit 1
-        fi
-
-        aws s3 cp ../backend/strada_database.json "s3://$BUCKET_NAME/db_dump/strada_database.json"
-
-        echo ">>> Step 3: Finding API Instance..."
+        echo ">>> Step 2: Finding API Instance..."
         INSTANCE_ID=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].Instances[?LifecycleState=='InService'].InstanceId | [0]" --output text)
 
         if [ "$INSTANCE_ID" == "None" ] || [ -z "$INSTANCE_ID" ]; then
@@ -71,17 +53,13 @@ jobs:
         fi
         echo "   Target Instance: $INSTANCE_ID"
 
-        echo ">>> Step 4: Sending SSM Command..."
+        echo ">>> Step 3: Sending Migration Command..."
         
-        # We construct the JSON manually to avoid dependencies.
-        # We need to escape double quotes inside the command string for the JSON format.
-        # 1. Define the raw command
-        CMD_RAW="aws s3 cp s3://$BUCKET_NAME/db_dump/strada_database.json /tmp/strada_database.json && docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && sudo docker cp /tmp/strada_database.json \$docker_id:/app/strada_database.json && sudo docker exec \$docker_id python manage.py migrate && sudo docker exec \$docker_id python manage.py loaddata strada_database.json && rm /tmp/strada_database.json"
+        # We only run 'migrate', NOT 'loaddata'
+        CMD_RAW="docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && sudo docker exec \$docker_id python manage.py migrate"
         
-        # 2. Escape double quotes for JSON (replace " with \")
+        # Escape double quotes for JSON
         CMD_ESCAPED=${CMD_RAW//\"/\\\"}
-        
-        # 3. Construct JSON
         PARAMS_JSON="{\"commands\":[\"$CMD_ESCAPED\"]}"
 
         COMMAND_ID=$(aws ssm send-command \
@@ -92,12 +70,11 @@ jobs:
           --output text)
 
         echo "   Command Sent! ID: $COMMAND_ID"
-        echo "   Waiting for execution..."
-
-        # Wait for command execution (will exit non-zero if failed)
+        
+        # Wait for command execution
         aws ssm wait command-executed --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" || true
 
-        # Fetch output regardless of success/fail
+        # Fetch output
         echo ">>> Output:"
         aws ssm get-command-invocation --command-id "$COMMAND_ID" --instance-id "$INSTANCE_ID" --query "StandardOutputContent" --output text
         
@@ -108,5 +85,4 @@ jobs:
            echo "$ERRORS"
            exit 1
         fi
-
-        echo ">>> Deployment Complete!"
+        echo ">>> Migration Complete!"
