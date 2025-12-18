@@ -169,6 +169,11 @@ resource "aws_launch_template" "api" {
                 -e DB_NAME=${var.db_name} \
                 -e DB_USER=${var.db_username} \
                 -e DB_PASSWORD=$DB_PASSWORD \
+                -e EMAIL_HOST=${var.email_host} \
+                -e EMAIL_PORT=587 \
+                -e EMAIL_HOST_USER=${var.smtp_username} \
+                -e EMAIL_HOST_PASSWORD=${var.smtp_password} \
+                -e PROJECT_NAME='Strada' \
                 -e ALLOWED_HOSTS='*' \
                 peekachiu/strada-backend:latest
               EOF

@@ -154,6 +154,11 @@ module "compute" {
 
   db_password_secret_arn  = module.secrets.secret_arn
   db_password_secret_name = module.secrets.secret_name
+
+  # Email Credentials
+  email_host    = "email-smtp.${var.region}.amazonaws.com"
+  smtp_username = module.ses.ses_smtp_username
+  smtp_password = module.ses.ses_smtp_password
 }
 
 #####################################################################

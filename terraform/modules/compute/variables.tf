@@ -87,3 +87,19 @@ variable "db_password_secret_name" {
   type        = string
 }
 
+
+# Email Variables
+variable "email_host" {
+  description = "SMTP Host"
+  type        = string
+}
+
+variable "smtp_username" {
+  description = "SMTP Username"
+  type        = string
+}
+
+variable "smtp_password" {
+  description = "SMTP Password"
+  type        = string
+}
