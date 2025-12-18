@@ -194,4 +194,6 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Default Sender
-DEFAULT_FROM_EMAIL = 'noreply@strada-automobile.click'
+# Default Sender
+# TODO: Revert to noreply@strada-automobile.click after Domain Verification completes.
+DEFAULT_FROM_EMAIL = 'edwinneoh@gmail.com'
