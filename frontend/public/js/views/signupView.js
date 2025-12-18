@@ -91,8 +91,8 @@ export function renderSignUp(container) {
             <div class="checkbox-group">
               <input type="checkbox" id="signup-terms" name="terms" class="form-checkbox">
               <label for="signup-terms" class="form-label-checkbox">
-                I agree to the <a href="#" class="nav-item-link">Terms of Service</a>
-                and <a href="#" class="nav-item-link">Privacy Policy</a>
+                I agree to the <a href="#" id="link-terms" class="nav-item-link">Terms of Service</a>
+                and <a href="#" id="link-privacy" class="nav-item-link">Privacy Policy</a>
               </label>
             </div>
 
