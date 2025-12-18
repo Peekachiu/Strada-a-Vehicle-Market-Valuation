@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'strada_config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if 'DB_HOST' in os.environ:
+if os.environ.get('DB_HOST'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',

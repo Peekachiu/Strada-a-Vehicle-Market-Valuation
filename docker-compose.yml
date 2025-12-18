@@ -12,6 +12,8 @@ services:
       - ./backend:/app
     env_file:
       - .env
+    environment:
+      - DB_HOST=
     command: python manage.py runserver 0.0.0.0:8000 # Use dev server for now for auto-reload
 
   # Service 2: The Nginx Web Server
