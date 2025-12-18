@@ -17,3 +17,15 @@ output "s3_bucket_name" {
 output "api_asg_name" {
   value = module.compute.api_asg_name
 }
+
+output "ses_smtp_username" {
+  value       = module.ses.smtp_username
+  description = "SMTP Username for Django settings"
+  sensitive   = true
+}
+
+output "ses_smtp_password" {
+  value       = module.ses.smtp_password
+  description = "SMTP Password for Django settings"
+  sensitive   = true
+}

@@ -266,3 +266,14 @@ module "monitoring" {
   internal_tg_arn_suffix  = module.internal_alb.target_group_arn_suffix
 }
 
+#####################################################################
+# SES (Email Service)
+#####################################################################
+module "ses" {
+  source       = "./modules/ses"
+  domain_name  = var.domain_name
+  zone_id      = module.route53.zone_id
+  project_name = var.project_name
+}
+
+

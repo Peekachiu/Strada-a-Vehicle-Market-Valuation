@@ -192,3 +192,6 @@ if EMAIL_HOST and EMAIL_HOST_USER:
 else:
     # Development: Print to Console
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Default Sender
+DEFAULT_FROM_EMAIL = 'noreply@strada-automobile.click'
