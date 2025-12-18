@@ -7,7 +7,17 @@ from .models import Profile, Valuation, Vehicle
 # --- User Serializer  ---
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-        validators=[validators.UniqueValidator(queryset=User.objects.all())]
+        validators=[validators.UniqueValidator(
+            queryset=User.objects.all(),
+            message="A user with this email address already exists."
+        )]
+    )
+    username = serializers.CharField(
+        read_only=True,
+        validators=[validators.UniqueValidator(
+            queryset=User.objects.all(),
+            message="A user with this username already exists."
+        )]
     )
     phone_number = serializers.CharField(source='profile.phone_number', read_only=True)
     full_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
@@ -26,7 +36,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             'password': {'write_only': True},
-            'username': {'read_only': True}, 
         }
 
     def validate_full_name(self, value):
