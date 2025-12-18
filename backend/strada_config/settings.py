@@ -175,3 +175,20 @@ CORS_ALLOW_ALL_ORIGINS = True
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
 }
+
+# --- Email Configuration ---
+# In production (AWS), we use SMTP (e.g., Amazon SES).
+# Locally, we use Console.
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', 587)
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True
+
+if EMAIL_HOST and EMAIL_HOST_USER:
+    # Production: Use Real Email
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    # Development: Print to Console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

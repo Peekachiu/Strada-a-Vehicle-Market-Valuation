@@ -61,6 +61,90 @@ class GetUserView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
+# --- OTP Password Reset Views ---
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.conf import settings
+from datetime import timedelta
+from django.utils import timezone
+from .models import PasswordResetOTP
+
+class RequestOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"error": "Email is required"}, status=400)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Security: Don't reveal user existence
+            # Simulate a delay to prevent timing attacks? 
+            # For now, just return success message.
+            return Response({"message": "If this email is registered, we have sent a verification code."}, status=200)
+
+        # Generate 6-digit OTP
+        otp_code = get_random_string(length=6, allowed_chars='0123456789')
+        
+        # Save to DB
+        PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+        
+        # Send Email
+        try:
+            send_mail(
+                subject="Your Strada Password Reset Code",
+                message=f"Your verification code is: {otp_code}\n\nThis code expires in 10 minutes.",
+                from_email=None, # Uses DEFAULT_FROM_EMAIL
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            return Response({"message": "If this email is registered, we have sent a verification code."}, status=200)
+        except Exception as e:
+            print(f"Email Error: {e}")
+            return Response({"error": "Failed to send email. Please try again."}, status=500)
+
+class ResetPasswordWithOTPView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        otp_input = request.data.get('otp')
+        new_password = request.data.get('new_password')
+        
+        if not all([email, otp_input, new_password]):
+            return Response({"error": "Email, OTP, and new password are required."}, status=400)
+            
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+             return Response({"error": "Invalid request."}, status=400)
+
+        # Verify OTP
+        # Get latest OTP for user
+        otp_record = PasswordResetOTP.objects.filter(user=user).order_by('-created_at').first()
+        
+        if not otp_record:
+            return Response({"error": "Invalid or expired code."}, status=400) # Technically no code found
+            
+        # Check if code matches
+        if otp_record.otp_code != otp_input:
+             return Response({"error": "Invalid code."}, status=400)
+             
+        # Check expiry (10 mins)
+        if timezone.now() > otp_record.created_at + timedelta(minutes=10):
+             return Response({"error": "Code has expired. Please request a new one."}, status=400)
+             
+        # SUCCESS -> Reset Password
+        user.set_password(new_password)
+        user.save()
+        
+        # Cleanup used OTPs for this user
+        PasswordResetOTP.objects.filter(user=user).delete()
+        
+        return Response({"message": "Password reset successful. You can now login."}, status=200)
+
 # --- The Real ML Valuation View ---
 class EstimateView(APIView):
     """

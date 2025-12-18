@@ -17,4 +17,8 @@ urlpatterns = [
     path('history/<int:pk>/', views.ValuationDetailView.as_view(), name='history_detail'),
     path('vehicles/', views.VehicleListCreateView.as_view(), name='vehicle_list_create'),
     path('vehicles/<int:pk>/', views.VehicleDetailView.as_view(), name='vehicle_detail'),
+    
+    # --- Password Reset (OTP) ---
+    path('password-reset/request-otp/', views.RequestOTPView.as_view(), name='request_otp'),
+    path('password-reset/verify-otp/', views.ResetPasswordWithOTPView.as_view(), name='verify_reset_otp'),
 ]

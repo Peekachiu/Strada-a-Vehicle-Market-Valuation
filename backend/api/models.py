@@ -58,3 +58,12 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s {self.make} {self.model}"
+
+# --- NEW: Password Reset OTP Model ---
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_otps')
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"OTP for {self.user.username}"
