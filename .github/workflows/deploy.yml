@@ -2,11 +2,6 @@ name: 200 - Web Application Deployment
 
 on:
   workflow_dispatch:
-    inputs:
-      confirm:
-        description: 'Type "yes" to confirm database migration (optional)'
-        required: false
-        default: 'no'
 
 jobs:
   build-and-push:
