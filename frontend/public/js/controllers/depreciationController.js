@@ -1,44 +1,55 @@
+
 import { renderDepreciationPage, renderDepreciationResults } from '../views/depreciationView.js';
 
 export class DepreciationController {
     constructor(main) {
         this.main = main;
+        this.priceInput = this.main.querySelector('#dep-price');
+        this.typeInput = this.main.querySelector('#dep-type');
+        this.periodInput = this.main.querySelector('#dep-period');
+        this.resultsContainer = this.main.querySelector('#depreciation-results-container');
+
         this.calculate = this.calculate.bind(this);
     }
 
     init() {
         renderDepreciationPage(this.main);
 
-        this.form = document.getElementById('depreciation-form');
-        this.resultsContainer = document.getElementById('depreciation-results-container');
+        // Re-select after render
+        this.priceInput = this.main.querySelector('#dep-price');
+        this.typeInput = this.main.querySelector('#dep-type');
+        this.periodInput = this.main.querySelector('#dep-period');
+        this.resultsContainer = this.main.querySelector('#depreciation-results-container');
+        this.form = this.main.querySelector('#depreciation-form');
+
+        const inputs = [this.priceInput, this.typeInput, this.periodInput];
+        inputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', this.calculate);
+            }
+        });
 
         if (this.form) {
             this.form.addEventListener('submit', this.calculate);
         }
-
-        // Add Live Validation Listeners
-        const inputs = this.main.querySelectorAll('#dep-price, #dep-type, #dep-period');
-        inputs.forEach(input => {
-            input.addEventListener('input', this.calculate);
-        });
     }
 
     calculate(e) {
-        e.preventDefault();
+        if (e) e.preventDefault();
 
         // 1. Get Inputs
-        let currentPrice = parseFloat(document.getElementById('dep-price').value);
-        const type = document.getElementById('dep-type').value;
-        const period = parseInt(document.getElementById('dep-period').value);
+        let currentPrice = parseFloat(this.priceInput.value) || 0;
+        const type = this.typeInput.value;
+        const period = parseInt(this.periodInput.value) || 0;
 
         // Apply Caps & Visual Update
         if (currentPrice > 10000000) {
             currentPrice = 10000000;
-            document.getElementById('dep-price').value = 10000000;
+            this.priceInput.value = 10000000;
         }
 
         if (!currentPrice || currentPrice < 1000) {
-            alert("Please enter a valid Market Price (min RM 1,000).");
+            // Live validation usually silent or hint-based
             return;
         }
 
@@ -69,7 +80,7 @@ export class DepreciationController {
 
             value = value * (1 - rate);
 
-            labels.push(`Year ${i}`);
+            labels.push(`Year ${i} `);
             dataPoints.push(Math.round(value));
         }
 

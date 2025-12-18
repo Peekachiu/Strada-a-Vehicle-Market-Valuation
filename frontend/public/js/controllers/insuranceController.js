@@ -3,47 +3,59 @@ import { renderInsurancePage, renderInsuranceResults } from '../views/insuranceV
 export class InsuranceController {
     constructor(main) {
         this.main = main;
+        this.valueInput = this.main.querySelector('#ins-market-value');
+        this.locationInput = this.main.querySelector('#ins-location');
+        this.ncdInput = this.main.querySelector('#ins-ncd');
+        this.ccInput = this.main.querySelector('#ins-cc');
+        this.resultsContainer = this.main.querySelector('#insurance-results-container');
+
         this.calculate = this.calculate.bind(this);
     }
 
     init() {
         renderInsurancePage(this.main);
 
-        this.form = document.getElementById('insurance-form');
-        this.resultsContainer = document.getElementById('insurance-results-container');
+        // Re-select after render
+        this.valueInput = this.main.querySelector('#ins-market-value');
+        this.locationInput = this.main.querySelector('#ins-location');
+        this.ncdInput = this.main.querySelector('#ins-ncd');
+        this.ccInput = this.main.querySelector('#ins-cc');
+        this.resultsContainer = this.main.querySelector('#insurance-results-container');
+        this.form = this.main.querySelector('#insurance-form');
+
+        const inputs = [this.valueInput, this.locationInput, this.ncdInput, this.ccInput];
+        inputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', this.calculate);
+            }
+        });
 
         if (this.form) {
             this.form.addEventListener('submit', this.calculate);
         }
-
-        // Add Live Validation Listeners
-        const inputs = this.main.querySelectorAll('#ins-market-value, #ins-location, #ins-ncd, #ins-cc');
-        inputs.forEach(input => {
-            input.addEventListener('input', this.calculate);
-        });
     }
 
     calculate(e) {
-        e.preventDefault();
+        if (e) e.preventDefault();
 
         // 1. Get Inputs
-        let marketValue = parseFloat(document.getElementById('ins-market-value').value);
-        const location = document.getElementById('ins-location').value;
-        const ncd = parseFloat(document.getElementById('ins-ncd').value);
-        let cc = parseInt(document.getElementById('ins-cc').value);
+        let marketValue = parseFloat(this.valueInput.value) || 0;
+        const location = this.locationInput.value;
+        const ncd = parseFloat(this.ncdInput.value) || 0;
+        let cc = parseInt(this.ccInput.value) || 0;
 
         // Apply Caps & Visual Update
         if (marketValue > 10000000) {
             marketValue = 10000000;
-            document.getElementById('ins-market-value').value = 10000000;
+            this.valueInput.value = 10000000;
         }
         if (cc > 7000) {
             cc = 7000;
-            document.getElementById('ins-cc').value = 7000;
+            this.ccInput.value = 7000;
         }
 
         if (!marketValue || marketValue < 10000) {
-            alert("Please enter a valid Market Value (min RM 10,000).");
+            // Live validation check mostly silent or handled by UI hints
             return;
         }
 

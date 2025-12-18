@@ -1,5 +1,5 @@
 ###############################################################
-1. To start virtual environment: .\venv\Scripts\activate  
+1. To start virtual environment: .\venv\Scripts\activate
 2. To start the website: python manage.py runserver
 3. To check docker logs: docker logs <container_name>
 
