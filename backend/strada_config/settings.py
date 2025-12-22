@@ -196,4 +196,4 @@ else:
 # Default Sender
 # Default Sender
 # TODO: Revert to noreply@strada-automobile.click after Domain Verification completes.
-DEFAULT_FROM_EMAIL = 'edwinneoh@gmail.com'
+DEFAULT_FROM_EMAIL = 'noreply@strada-automobile.click'
