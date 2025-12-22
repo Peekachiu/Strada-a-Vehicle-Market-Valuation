@@ -38,9 +38,13 @@ export class LoginController {
     this.modal = document.getElementById('forgot-password-modal'); // It might be in body now or later
 
     // If modal is in the view but not body, move it (fix for stacking context)
+    // If modal is in the view but not body, move it (fix for stacking context)
     if (!this.modal) {
       this.modal = this.main.querySelector('#forgot-password-modal');
-      if (this.modal) document.body.appendChild(this.modal);
+    }
+
+    if (this.modal && this.modal.parentElement !== document.body) {
+      document.body.appendChild(this.modal);
     }
 
     if (this.forgotLink && this.modal) {
