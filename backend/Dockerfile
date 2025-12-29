@@ -14,7 +14,11 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
 # Copy the entire project into the container
+# Copy the entire project into the container
 COPY . /app/
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
 # Expose the port Django runs on
 EXPOSE 8000
