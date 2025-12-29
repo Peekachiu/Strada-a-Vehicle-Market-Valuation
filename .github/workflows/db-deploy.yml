@@ -6,6 +6,11 @@ on:
         description: 'Type "yes" to confirm migration (SAFE: No Data Loss)'
         required: true
         default: 'no'
+      import_data:
+        description: 'Check to IMPORT initial data (strada_database.json) - WARNING: May overwrite data'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   deploy-db:
@@ -55,8 +60,22 @@ jobs:
 
         echo ">>> Step 3: Sending Migration Command..."
         
-        # We only run 'migrate', NOT 'loaddata'
-        CMD_RAW="docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi && sudo docker exec \$docker_id python manage.py migrate"
+        # Base Command: Find Container
+        FIND_CONTAINER="docker_id=\$(sudo docker ps -q --filter ancestor=peekachiu/strada-backend:latest | head -n 1) && if [ -z \"\$docker_id\" ]; then echo 'Backend container not found!'; exit 1; fi"
+        
+        # Operation 1: Migrate (Always Run)
+        MIGRATE="sudo docker exec \$docker_id python manage.py migrate"
+        
+        # Operation 2: Load Data (Conditional)
+        if [[ "${{ github.event.inputs.import_data }}" == "true" ]]; then
+           echo ">>> Data Import Requested!"
+           LOAD_DATA=" && sudo docker exec \$docker_id python manage.py loaddata strada_database.json"
+        else
+           LOAD_DATA=""
+        fi
+
+        # Combine Commands
+        CMD_RAW="$FIND_CONTAINER && $MIGRATE$LOAD_DATA"
         
         # Escape double quotes for JSON
         CMD_ESCAPED=${CMD_RAW//\"/\\\"}
