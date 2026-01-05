@@ -44,6 +44,29 @@ resource "aws_iam_role_policy" "secrets_access" {
   })
 }
 
+
+resource "aws_iam_role_policy" "logs_access" {
+  name = "${var.project_name}-logs-access"
+  role = aws_iam_role.ssm_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_instance_profile" "ssm_profile" {
   name = "${var.project_name}-ssm-profile"
   role = aws_iam_role.ssm_role.name
