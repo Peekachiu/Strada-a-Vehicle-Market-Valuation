@@ -4,7 +4,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: peekachiu/strada-backend:latest
+    image: peekachiu/strada-backend:mobile
     container_name: strada_backend
     ports:
       - "8000:8000"
@@ -21,7 +21,7 @@ services:
     build:
       context: ./frontend
       dockerfile: nginx/Dockerfile
-    image: peekachiu/strada-frontend:latest
+    image: peekachiu/strada-frontend:mobile
     container_name: strada_frontend
     ports:
       - "80:80" # Maps localhost:80 to Nginx
