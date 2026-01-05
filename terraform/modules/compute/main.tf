@@ -175,6 +175,10 @@ resource "aws_launch_template" "api" {
                 -e EMAIL_HOST_PASSWORD=${var.smtp_password} \
                 -e PROJECT_NAME='Strada' \
                 -e ALLOWED_HOSTS='*' \
+                --log-driver=awslogs \
+                --log-opt awslogs-region=${var.region} \
+                --log-opt awslogs-group=/aws/ec2/${var.project_name}-api \
+                --log-opt awslogs-create-group=true \
                 peekachiu/strada-backend:latest
               EOF
   )
@@ -207,5 +211,17 @@ resource "aws_autoscaling_group" "api" {
     preferences {
       min_healthy_percentage = 50
     }
+  }
+}
+
+#####################################################################
+# Application Logging
+#####################################################################
+resource "aws_cloudwatch_log_group" "api" {
+  name              = "/aws/ec2/${var.project_name}-api"
+  retention_in_days = 7
+
+  tags = {
+    Name = "${var.project_name}-api-logs"
   }
 }
