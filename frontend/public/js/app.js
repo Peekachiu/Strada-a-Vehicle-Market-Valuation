@@ -161,7 +161,10 @@ function renderHeader(user) {
             </a>
           </div>
         </div>
-      </nav>
+      <button class="mobile-menu-btn" aria-label="Toggle menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </nav>
     `;
   } else {
     // --- GUEST ---
@@ -178,7 +181,10 @@ function renderHeader(user) {
           <button class="site-nav-item" data-navigate="login">Login</button>
           <button class="site-nav-item active" data-navigate="signup">Sign Up</button>
         </div>
-      </nav>
+      <button class="mobile-menu-btn" aria-label="Toggle menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </nav>
     `;
   }
 }
@@ -302,8 +308,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Set up navigation
   document.body.addEventListener('click', (e) => {
     const navTarget = e.target.closest('a[data-navigate], button[data-navigate]');
+    
+    // Mobile Menu Toggle
+    if (e.target.closest('.mobile-menu-btn')) {
+      document.querySelector('.site-nav-links')?.classList.toggle('active');
+    }
+
     if (navTarget) {
       e.preventDefault();
+      // Close mobile menu on navigate
+      document.querySelector('.site-nav-links')?.classList.remove('active');
+      
       const page = navTarget.getAttribute('data-navigate');
       router.navigate(page);
       return;
