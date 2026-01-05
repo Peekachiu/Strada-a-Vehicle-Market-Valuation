@@ -282,3 +282,10 @@ module "ses" {
 }
 
 
+
+#####################################################################
+# Threat Detection (GuardDuty & Security Hub)
+#####################################################################
+module "threat_detection" {
+  source = "./modules/threat_detection"
+}
