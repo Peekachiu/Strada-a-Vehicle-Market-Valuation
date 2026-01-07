@@ -44,6 +44,40 @@ Strada is built with modern, reliable technologies to ensure performance and sca
 
 ---
 
+## ☁️ Cloud Architecture
+
+The system is deployed on AWS, leveraging Docker for containerization to ensure consistency across environments.
+
+```mermaid
+graph TD
+    User([User Browser])
+    
+    subgraph AWS [AWS Cloud]
+        style AWS fill:#f9f9f9,stroke:#232f3e,stroke-width:2px
+        
+        subgraph EC2 [EC2 Instance / App Server]
+            style EC2 fill:#FF9900,stroke:#232f3e,color:white
+            
+            subgraph Docker [Docker Compose]
+                style Docker fill:#2496ed,stroke:#ffffff,color:white
+                
+                Nginx[Nginx Frontend]
+                Django[Django API Backend]
+            end
+        end
+        
+        RDS[(PostgreSQL Database)]
+        style RDS fill:#336791,stroke:#232f3e,color:white
+    end
+
+    User -->|HTTP/HTTPS| Nginx
+    Nginx -->|Serve Static| User
+    Nginx -->|Proxy /api| Django
+    Django -->|Read/Write| RDS
+```
+
+---
+
 ## 🚀 Getting Started
 
 To explore the application locally or contribute to the development, please check our technical guide.
