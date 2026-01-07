@@ -1,62 +1,51 @@
-###############################################################
-1. To start virtual environment: .\venv\Scripts\activate
-2. To start the website: python manage.py runserver
-3. To check docker logs: docker logs <container_name>
+# Strada - Vehicle Market Valuation 🚗💰
 
-###############################################################
-Start website with Docker
-1. docker-compose up --build
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.0-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-24.0-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20RDS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
-###############################################################
-To push Backend into Docker Hub
-1. docker login
-2. docker images ("Verify the name")
-3. docker tag strada-a-vehicle-market-valuation-backend peekachiu/strada-backend:v1 ("Add a tag for the image)
-4. docker push peekachiu/strada-backend:v1 ("Push it to Docker Hub")
+**Empowering car owners with accurate, instant, and transparent vehicle valuations.**
 
-###############################################################
-For every changes in the code ("Push to Docker")
+Strada is a comprehensive platform designed to provide real-time vehicle market valuations using advanced data analysis. Beyond valuation, it offers a suite of financial tools to assist users in making informed decisions about vehicle ownership, financing, and maintenance.
 
-# Build it with your tag
-docker build -t peekachiu/strada-backend:v1 .
+---
 
-# Push it to Docker Hub
-docker push peekachiu/strada-backend:v1
+## ✨ Features
 
-------------------------------------------------
+### 📈 AI-Powered Valuation
+Get instant market value estimates for vehicles based on real-time data analysis. Our system helps you understand the true worth of your vehicle in the current market.
 
-# Build it using the specific Nginx Dockerfile
-docker build -t peekachiu/strada-frontend:v1 -f Dockerfile.nginx .
+### 💸 Financial Calculators
+We provide a complete suite of tools to help you manage your vehicle finances:
 
-# Push it to Docker Hub
-docker push peekachiu/strada-frontend:v1
+*   **Loan Calculator**: Plan your finances by estimating monthly payments and total interest costs.
+*   **Road Tax Calculator**: Easily calculate road tax requirements based on your vehicle's engine capacity and type.
+*   **Insurance Estimator**: Get quick estimates on potential insurance premiums to avoid surprises.
+*   **Affordability Calculator**: Smart tools to help you assess if a car fits comfortably within your budget.
+*   **Depreciation Simulator**: Visualize reliable depreciation trends to understand long-term value retention.
 
-################################################
-Step 1: Export Local Data
-################################################
+### 📊 Interactive Dashboard
+Experience your data through a dynamic interactive dashboard. We use advanced visualization to present market trends and analysis clearly, helping you spot opportunities and make better decisions.
 
-cd backend
+### 🔐 Secure Authentication
+Your data is safe with us. We bank-grade security practices and robust user management to ensure your personal information remains protected.
 
-python manage.py dumpdata --natural-foreign --natural-primary --exclude contenttypes --exclude auth.permission --exclude admin.logentry --exclude sessions.session --indent 2 > strada_database.json
+---
 
-################################################
-Step 2: Connect to SSM (API Server)
-################################################
+## �️ Tech Stack
 
-Go to AWS Console > EC2 > Instances.
-Select your API instance (e.g., strada-api...).
-Click Connect -> Session Manager -> Connect.
+Strada is built with modern, reliable technologies to ensure performance and scalability.
 
-################################################
-Step 3: Import Data on Server
-################################################
+*   **Backend System**: Powered by **Django 5** and **Django Rest Framework**, ensuring a robust and secure API.
+*   **Frontend Experience**: A responsive interface built with modern **HTML5, CSS3**, and **JavaScript**, featuring dynamic charts for data visualization.
+*   **Infrastructure**: Containerized with **Docker** and hosted on **AWS (EC2 & RDS)** for high availability and reliability.
+*   **Data Management**: Utilizing **PostgreSQL** for secure and efficient data storage.
 
-sudo nano strada_database.json
+---
 
-sudo docker ps
+## 🚀 Getting Started
 
-sudo docker cp strada_database.json <CONTAINER_ID>:/app/strada_database.json
+To explore the application locally or contribute to the development, please check our technical guide.
 
-sudo docker exec -it <CONTAINER_ID> python manage.py migrate
-
-sudo docker exec -it <CONTAINER_ID> python manage.py loaddata strada_database.json
+👉 **[View Developer Guide](DEVELOPMENT.md)** for installation, detailed commands, and deployment instructions.
