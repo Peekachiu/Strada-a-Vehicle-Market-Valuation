@@ -50,30 +50,82 @@ The system is deployed on AWS, leveraging Docker for containerization to ensure 
 
 ```mermaid
 graph TD
-    User([User Browser])
-    
-    subgraph AWS [AWS Cloud]
-        style AWS fill:#f9f9f9,stroke:#232f3e,stroke-width:2px
+    %% Define styles
+    classDef dev fill:#4E79A7,stroke:#333,color:white,stroke-width:2px;
+    classDef aws fill:#FF9900,stroke:#232f3e,color:white,stroke-width:2px;
+    classDef docker fill:#2496ED,stroke:#333,color:white,stroke-width:2px;
+    classDef db fill:#336791,stroke:#333,color:white,stroke-width:2px;
+    classDef terraform fill:#7B42BC,stroke:#333,color:white,stroke-width:2px;
+
+    %% 1. Development & Build Phase
+    subgraph DevEnv [local_development]
+        Git[🐱 Git Repository]:::dev
+        Code[💻 Source Code]:::dev
+        DevUser[👨‍💻 Developer]:::dev
         
-        subgraph EC2 [EC2 Instance / App Server]
-            style EC2 fill:#FF9900,stroke:#232f3e,color:white
-            
-            subgraph Docker [Docker Compose]
-                style Docker fill:#2496ed,stroke:#ffffff,color:white
-                
-                Nginx[Nginx Frontend]
-                Django[Django API Backend]
-            end
-        end
-        
-        RDS[(PostgreSQL Database)]
-        style RDS fill:#336791,stroke:#232f3e,color:white
+        DevUser -->|1. Commit| Git
+        Git -->|2. Build| DockerBuild[🐳 Docker Build]:::docker
     end
 
-    User -->|HTTP/HTTPS| Nginx
-    Nginx -->|Serve Static| User
-    Nginx -->|Proxy /api| Django
-    Django -->|Read/Write| RDS
+    %% 2. Artifact Registry
+    subgraph DockerHub [registry]
+        Hub[📦 Docker Hub]:::docker
+    end
+
+    DockerBuild -->|3. Push Images| Hub
+
+    %% 3. Infrastructure Deployment
+    subgraph IaC [infrastructure_as_code]
+        TF[🚀 Terraform]:::terraform
+    end
+
+    DevUser -->|4. Deploy| TF
+
+    %% 4. AWS Cloud Environment
+    subgraph AWS [aws_cloud_environment]
+        style AWS fill:#f9f9f9,stroke:#232f3e,stroke-width:2px
+
+        subgraph Network [VPC]
+            IGW[Internet Gateway]
+            
+            subgraph Public [Public Subnets]
+                WAF[🛡️ AWS WAF]:::aws
+                CF[⚡ CloudFront]:::aws
+                ALB_Pub[Public ALB]:::aws
+                NAT[NAT Gateway]
+            end
+
+            subgraph Private [Private Subnets]
+                EC2_Web[🖥️ EC2 Web ASG]:::aws
+                EC2_API[🖥️ EC2 API ASG]:::aws
+                ALB_Int[Internal ALB]:::aws
+                SSM[🔧 Systems Manager]:::aws
+            end
+            
+            subgraph Data [Data Layer]
+                RDS[(🗄️ PostgreSQL RDS)]:::db
+                S3[🪣 S3 Assets]:::aws
+            end
+        end
+    end
+
+    %% Relationships
+    TF -->|5. Provision| AWS
+    Hub -->|6. Fetch Image| EC2_Web
+    Hub -->|6. Fetch Image| EC2_API
+    
+    %% Traffic Flow
+    User([👤 End User])
+    User -->|HTTPS| CF
+    CF --> WAF
+    WAF --> ALB_Pub
+    ALB_Pub --> EC2_Web
+    EC2_Web --> ALB_Int
+    ALB_Int --> EC2_API
+    EC2_API --> RDS
+
+    %% Database Migration
+    SSM -->|7. Migrate DB| RDS
 ```
 
 ---
