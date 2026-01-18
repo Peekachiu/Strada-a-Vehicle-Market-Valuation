@@ -9,7 +9,7 @@ export class ProfileController {
   async init() {
     const token = localStorage.getItem('accessToken');
     if (!token) {
-      alert("Please login to view your profile.");
+      showNotification("Please login to view your profile.", "error");
       window.location.hash = 'login';
       return;
     }
@@ -92,11 +92,11 @@ export class ProfileController {
       });
 
       if (res.ok) {
-        alert("Vehicle added successfully!");
+        showNotification("Vehicle added successfully!", "success");
         document.getElementById('add-vehicle-modal').style.display = 'none';
         this.fetchVehicles(); // Refresh list
       } else {
-        alert("Failed to add vehicle.");
+        showNotification("Failed to add vehicle.", "error");
       }
     } catch (err) {
       console.error("Add Vehicle Error:", err);
@@ -115,7 +115,7 @@ export class ProfileController {
       if (res.ok) {
         this.fetchVehicles();
       } else {
-        alert("Failed to delete vehicle.");
+        showNotification("Failed to delete vehicle.", "error");
       }
     } catch (err) {
       console.error("Delete vehicle error:", err);
@@ -138,11 +138,11 @@ export class ProfileController {
         // Reload history (page 1) to reflect changes
         this.fetchHistory('/api/history/');
       } else {
-        alert("Failed to delete valuation.");
+        showNotification("Failed to delete valuation.", "error");
       }
     } catch (error) {
       console.error("Delete Error:", error);
-      alert("An error occurred while deleting.");
+      showNotification("An error occurred while deleting.", "error");
     }
   }
 
@@ -264,6 +264,22 @@ export class ProfileController {
       if (data.mileage && parseInt(data.mileage) > 1000000) {
         showNotification("Mileage cannot exceed 1,000,000 km.", "error");
         return;
+      }
+      if (data.year && parseInt(data.year) > 2026) {
+        showNotification("Year cannot exceed 2026.", "error");
+        return;
+      }
+      if (data.last_service_date) {
+        const selectedDate = new Date(data.last_service_date);
+        const today = new Date();
+        // Reset time part to ensure accurate date comparison
+        today.setHours(0, 0, 0, 0);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate > today) {
+          showNotification("Last service date cannot be in the future.", "error");
+          return;
+        }
       }
 
       await this.handleAddVehicle(data);

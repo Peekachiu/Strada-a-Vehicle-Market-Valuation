@@ -188,7 +188,7 @@ export function renderProfilePage(container, user) {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
              <div style="margin-bottom: 1rem;">
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Year</label>
-                <input name="year" type="number" required placeholder="e.g. 2020" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                <input name="year" type="number" required max="2026" placeholder="e.g. 2020" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
              </div>
              <div style="margin-bottom: 1rem;">
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Mileage (km)</label>
@@ -202,7 +202,7 @@ export function renderProfilePage(container, user) {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
              <div style="margin-bottom: 1rem;">
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Last Service Date</label>
-                <input name="last_service_date" type="date" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                <input name="last_service_date" type="date" max="${new Date().toISOString().split('T')[0]}" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
              </div>
              <div style="margin-bottom: 1rem;">
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Last Service Mileage</label>

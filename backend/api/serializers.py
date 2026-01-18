@@ -220,3 +220,14 @@ class VehicleSerializer(serializers.ModelSerializer):
         if value > 1000000:
             raise serializers.ValidationError("Mileage cannot exceed 1,000,000 km.")
         return value
+
+    def validate_year(self, value):
+        if value > 2026:
+            raise serializers.ValidationError("Year cannot exceed 2026.")
+        return value
+
+    def validate_last_service_date(self, value):
+        from datetime import date
+        if value > date.today():
+             raise serializers.ValidationError("Last service date cannot be in the future.")
+        return value
