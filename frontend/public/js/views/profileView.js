@@ -192,7 +192,7 @@ export function renderProfilePage(container, user) {
              </div>
              <div style="margin-bottom: 1rem;">
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Mileage (km)</label>
-                <input name="mileage" type="number" required placeholder="e.g. 50000" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                <input name="mileage" type="number" required max="1000000" placeholder="e.g. 50000" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;">
              </div>
           </div>
           

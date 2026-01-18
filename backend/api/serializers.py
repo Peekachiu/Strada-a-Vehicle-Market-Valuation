@@ -46,7 +46,13 @@ class UserSerializer(serializers.ModelSerializer):
         first_name = value.split(' ')[0] if ' ' in value else value
         last_name = ' '.join(value.split(' ')[1:]) if ' ' in value else ''
         
-        if User.objects.filter(first_name=first_name, last_name=last_name).exists():
+        query = User.objects.filter(first_name=first_name, last_name=last_name)
+        
+        # Exclude this user if it's an update
+        if self.instance:
+            query = query.exclude(pk=self.instance.pk)
+
+        if query.exists():
             raise serializers.ValidationError("A user with this name already exists.")
         return value
 
@@ -209,3 +215,8 @@ class VehicleSerializer(serializers.ModelSerializer):
         model = Vehicle
         fields = '__all__'
         read_only_fields = ('user', 'created_at', 'next_service_date')
+
+    def validate_mileage(self, value):
+        if value > 1000000:
+            raise serializers.ValidationError("Mileage cannot exceed 1,000,000 km.")
+        return value

@@ -259,6 +259,13 @@ export class ProfileController {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
+
+      // Validation
+      if (data.mileage && parseInt(data.mileage) > 1000000) {
+        showNotification("Mileage cannot exceed 1,000,000 km.", "error");
+        return;
+      }
+
       await this.handleAddVehicle(data);
       form.reset();
     });
