@@ -55,6 +55,29 @@ export class SignUpController {
         this.openPrivacyModal();
       });
     }
+
+    // --- Password Toggle Logic ---
+    this.bindPasswordToggle('signup-toggle-password', 'signup-password');
+    this.bindPasswordToggle('signup-toggle-confirm', 'signup-confirm-password');
+  }
+
+  bindPasswordToggle(toggleId, inputId) {
+    const toggleBtn = this.main.querySelector(`#${toggleId}`);
+    const inputField = this.main.querySelector(`#${inputId}`);
+
+    if (toggleBtn && inputField) {
+      const showPassword = () => inputField.type = 'text';
+      const hidePassword = () => inputField.type = 'password';
+
+      toggleBtn.addEventListener('mousedown', showPassword);
+      toggleBtn.addEventListener('mouseup', hidePassword);
+      toggleBtn.addEventListener('mouseleave', hidePassword);
+      toggleBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        showPassword();
+      });
+      toggleBtn.addEventListener('touchend', hidePassword);
+    }
   }
 
   openTermsModal() {
