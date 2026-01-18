@@ -131,7 +131,7 @@ resource "aws_route_table_association" "private" {
 # VPC Flow Logs
 #####################################################################
 resource "aws_cloudwatch_log_group" "flow_log" {
-  name              = "/aws/vpc/${var.project_name}-flow-logs-v2"
+  name              = "/aws/vpc/${var.project_name}-flow-logs"
   retention_in_days = 30
 
   tags = {
