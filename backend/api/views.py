@@ -199,7 +199,7 @@ class EstimateView(APIView):
             # Note: "Electric" is not in training data, but we normalize it anyway.
             raw_fuel = normalize_text(data.get('fuel_type'))
             
-            # 3. Preprocess: Calculate 'age' 
+            # 3. Preprocess: Calculate 'age'
             # The model was trained on 'age', but the user inputs 'year'.
             # We must use the same logic as train_model.py (2025 - year)
             current_year = 2025
@@ -339,6 +339,11 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+class ShopPagination(PageNumberPagination):
+    page_size = 12
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class HistoryView(generics.ListAPIView):
     serializer_class = ValuationSerializer
     permission_classes = [IsAuthenticated]
@@ -402,3 +407,300 @@ class VehicleDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Vehicle.objects.filter(user=self.request.user)
+
+
+# ========================================
+# E-COMMERCE VIEWS
+# ========================================
+
+from .models import Category, Product, Cart, CartItem, Order, OrderItem
+from .serializers import (
+    CategorySerializer, ProductSerializer,
+    CartItemSerializer, CartSerializer, CartItemWriteSerializer,
+    OrderItemSerializer, OrderSerializer
+)
+
+
+# --- Category Views ---
+class CategoryListView(generics.ListAPIView):
+    """
+    List all active product categories.
+    Public endpoint - no authentication required.
+    """
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = ShopPagination
+
+    def get_queryset(self):
+        return Category.objects.all()
+
+
+# --- Product Views ---
+class ProductListView(generics.ListAPIView):
+    """
+    List all active products with optional filtering.
+    Public endpoint - no authentication required.
+    Query params:
+        - category: Filter by category slug
+        - brand: Filter by brand name (case-insensitive contains)
+        - search: Search in name and description (case-insensitive contains)
+        - min_price / max_price: Price range filter
+        - ordering: Sort by 'price', '-price', 'created_at', '-created_at', 'name'
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = ShopPagination
+    def get_queryset(self):
+        queryset = Product.objects.filter(is_active=True)
+
+        # Filter by category
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category__slug=category)
+
+        # Filter by brand
+        brand = self.request.query_params.get('brand')
+        if brand:
+            queryset = queryset.filter(brand__icontains=brand)
+
+        # Search in name and description
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | Q(description__icontains=search)
+            )
+
+        # Price range
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+
+        # Ordering
+        ordering = self.request.query_params.get('ordering', '-created_at')
+        valid_orderings = ['price', '-price', 'created_at', '-created_at', 'name', '-name']
+        if ordering in valid_orderings:
+            queryset = queryset.order_by(ordering)
+
+        return queryset
+
+
+class ProductDetailView(generics.RetrieveAPIView):
+    """
+    Retrieve a single product detail.
+    Public endpoint - no authentication required.
+    """
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        return Product.objects.filter(is_active=True)
+
+
+# --- Cart Views ---
+class CartView(APIView):
+    """
+    Get or create the current user's cart.
+    Authenticated endpoint.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Get the current user's cart with all items."""
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """Add an item to the cart or update quantity if already exists."""
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        item_serializer = CartItemWriteSerializer(data=request.data)
+        
+        if item_serializer.is_valid():
+            product_id = item_serializer.validated_data['product'].id
+            quantity = item_serializer.validated_data['quantity']
+
+            # Check stock
+            try:
+                product = Product.objects.get(id=product_id, is_active=True)
+            except Product.DoesNotExist:
+                return Response({"error": "Product not found."}, status=404)
+
+            if product.stock < quantity:
+                return Response({"error": f"Insufficient stock. Only {product.stock} available."}, status=400)
+
+            # Add or update cart item
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                product=product,
+                defaults={'quantity': quantity}
+            )
+            if not created:
+                cart_item.quantity += quantity
+                if product.stock < cart_item.quantity:
+                    return Response({"error": f"Insufficient stock. Only {product.stock} available."}, status=400)
+                cart_item.save()
+
+            # Return updated cart
+            cart_serializer = CartSerializer(cart)
+            return Response(cart_serializer.data, status=201 if created else 200)
+        
+        return Response(item_serializer.errors, status=400)
+
+
+class CartItemUpdateView(APIView):
+    """
+    Update or delete a specific cart item.
+    Authenticated endpoint.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, item_id):
+        """Update quantity of a cart item."""
+        try:
+            cart_item = CartItem.objects.get(
+                id=item_id,
+                cart__user=request.user
+            )
+        except CartItem.DoesNotExist:
+            return Response({"error": "Cart item not found."}, status=404)
+
+        quantity = request.data.get('quantity')
+        if quantity is None or quantity < 1:
+            return Response({"error": "Quantity must be at least 1."}, status=400)
+
+        # Check stock
+        if cart_item.product.stock < quantity:
+            return Response({"error": f"Insufficient stock. Only {cart_item.product.stock} available."}, status=400)
+
+        cart_item.quantity = quantity
+        cart_item.save()
+
+        cart_serializer = CartSerializer(cart_item.cart)
+        return Response(cart_serializer.data)
+
+    def delete(self, request, item_id):
+        """Remove an item from the cart."""
+        try:
+            cart_item = CartItem.objects.get(
+                id=item_id,
+                cart__user=request.user
+            )
+        except CartItem.DoesNotExist:
+            return Response({"error": "Cart item not found."}, status=404)
+
+        cart_item.delete()
+        cart_serializer = CartSerializer(cart_item.cart)
+        return Response(cart_serializer.data)
+
+
+# --- Order Views ---
+class OrderListView(generics.ListAPIView):
+    """
+    List all orders for the current user.
+    Authenticated endpoint.
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+
+class OrderCreateView(APIView):
+    """
+    Create an order from the current user's cart.
+    Authenticated endpoint.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            cart = Cart.objects.get(user=request.user)
+        except Cart.DoesNotExist:
+            return Response({"error": "No cart found. Please add items first."}, status=400)
+
+        if cart.items.count() == 0:
+            return Response({"error": "Cart is empty."}, status=400)
+
+        # Verify stock availability for all items
+        for cart_item in cart.items.all():
+            product = cart_item.product
+            if product.stock < cart_item.quantity:
+                return Response(
+                    {"error": f"Insufficient stock for {product.name}. Only {product.stock} available."},
+                    status=400
+                )
+
+        shipping_address = request.data.get('shipping_address')
+        if not shipping_address:
+            return Response({"error": "Shipping address is required."}, status=400)
+
+        # Create order
+        order = Order.objects.create(
+            user=request.user,
+            total_price=cart.total_price,
+            shipping_address=shipping_address,
+            status='pending'
+        )
+
+        # Create order items and update stock
+        for cart_item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                price=cart_item.product.price
+            )
+            # Update stock
+            cart_item.product.stock -= cart_item.quantity
+            cart_item.product.save()
+
+        # Clear the cart
+        cart.items.all().delete()
+        cart.delete()
+
+        order_serializer = OrderSerializer(order)
+        return Response(order_serializer.data, status=201)
+
+
+class OrderDetailView(generics.RetrieveAPIView):
+    """
+    Retrieve a single order detail.
+    Authenticated endpoint - users can only view their own orders.
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+class OrderCancelView(APIView):
+    """
+    Cancel a pending order and restore stock.
+    Authenticated endpoint.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, order_id):
+        try:
+            order = Order.objects.get(id=order_id, user=request.user)
+        except Order.DoesNotExist:
+            return Response({"error": "Order not found."}, status=404)
+
+        if order.status != 'pending':
+            return Response({"error": f"Cannot cancel order with status '{order.status}'."}, status=400)
+
+        # Restore stock for all items
+        for order_item in order.items.all():
+            order_item.product.stock += order_item.quantity
+            order_item.product.save()
+
+        order.status = 'cancelled'
+        order.save()
+
+        order_serializer = OrderSerializer(order)
+        return Response(order_serializer.data)

@@ -9,6 +9,11 @@ import { renderInsurancePage } from './views/insuranceView.js';
 import { renderAffordabilityPage } from './views/affordabilityView.js';
 import { renderDepreciationPage } from './views/depreciationView.js';
 import { renderGallery } from './views/galleryView.js';
+import { renderShopPage } from './views/shopView.js';
+import { renderCartPage } from './views/cartView.js';
+import { renderCheckoutPage } from './views/checkoutView.js';
+import { renderOrdersPage } from './views/ordersView.js';
+import { ShopController } from './controllers/shopController.js';
 import { ValuationController } from './controllers/valuationController.js';
 import { CalculatorController } from './controllers/calculatorController.js';
 import { RoadTaxController } from './controllers/roadTaxController.js';
@@ -141,9 +146,20 @@ function renderHeader(user) {
               </a>
             </div>
           </div>
+
+          <button class="site-nav-item ${isActive('shop') ? 'active' : ''}" data-navigate="shop">
+            <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Shop
+          </button>
+
         </div>
 
         <div class="nav-user-section">
+          <button class="site-nav-item cart-nav-btn" data-navigate="cart" id="cart-icon-btn">
+            <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-badge" id="cart-badge" style="display: none;">0</span>
+          </button>
+
           <div class="nav-avatar-btn" id="user-menu-btn">
             ${userInitial}
           </div>
@@ -155,6 +171,10 @@ function renderHeader(user) {
             </div>
             <a class="nav-dropdown-item" data-navigate="profile">
               ${icons.user} Profile
+            </a>
+            <a class="nav-dropdown-item" data-navigate="orders">
+              <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="22" y2="10"/></svg>
+              My Orders
             </a>
             <a class="nav-dropdown-item" id="logout-btn">
               ${icons.logout} Log out
@@ -189,12 +209,38 @@ function renderHeader(user) {
   }
 }
 
+/**
+ * Updates the cart badge count from the server.
+ * Called after renderHeader to ensure badge reflects actual cart state.
+ */
+async function updateCartBadge() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return;
+
+  try {
+    const res = await fetch('/api/shop/cart/', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      const badge = document.getElementById('cart-badge');
+      if (badge) {
+        const count = data.item_count || 0;
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-block' : 'none';
+      }
+    }
+  } catch (e) {
+    // Silently fail - badge will show on next successful fetch
+  }
+}
+
 // --- ROUTER & PAGE RENDERING ---
 
 const router = {
   currentPage: null,
 
-  navigate(page) {
+  navigate(page, fromHashChange = false) {
     if (page === this.currentPage) return;
 
     const loggedIn = isUserLoggedIn(); // Check token
@@ -216,7 +262,10 @@ const router = {
     }
 
     // 3. Allow navigation
-    window.location.hash = page;
+    // Only set hash if NOT triggered by hashchange (avoid infinite loop)
+    if (!fromHashChange) {
+      window.location.hash = page;
+    }
     this.currentPage = page;
     this.render();
     window.scrollTo(0, 0);
@@ -278,6 +327,16 @@ const router = {
       depreciationController.init();
     } else if (page === 'gallery') {
       renderGallery(main);
+    } else if (page === 'shop') {
+      renderShopPage(main);
+      const shopController = new ShopController(main);
+      shopController.init();
+    } else if (page === 'cart') {
+      renderCartPage(main);
+    } else if (page === 'checkout') {
+      renderCheckoutPage(main);
+    } else if (page === 'orders') {
+      renderOrdersPage(main);
     } else if (page === 'my-valuations') {
       main.innerHTML = `<div class="container" style="padding: 4rem 0;"><h1 class="auth-title">My Valuations</h1><p class="auth-sub">Your saved valuations will appear here.</p></div>`;
     } else if (page === 'profile') {
@@ -361,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Re-render header on every navigation
     renderHeader(appState.currentUser);
+    updateCartBadge();
 
     const authPages = ['login', 'signup'];
     const isAuthPage = authPages.includes(page);
@@ -370,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (loggedIn && isAuthPage) {
       router.navigate('home');
     } else {
-      router.navigate(page || (loggedIn ? 'home' : 'login'));
+      router.navigate(page || (loggedIn ? 'home' : 'login'), true);
     }
   };
 

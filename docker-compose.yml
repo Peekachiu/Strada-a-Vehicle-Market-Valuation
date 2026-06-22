@@ -7,7 +7,7 @@ services:
     image: peekachiu/strada-backend:latest
     container_name: strada_backend
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/app
     env_file:
@@ -24,7 +24,7 @@ services:
     image: peekachiu/strada-frontend:latest
     container_name: strada_frontend
     ports:
-      - "80:80" # Maps localhost:80 to Nginx
+      - "127.0.0.1:80:80" # Maps localhost:80 to Nginx
     environment:
       - API_HOST=backend:8000
     volumes:
